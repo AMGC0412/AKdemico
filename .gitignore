@@ -12,3 +12,9 @@ frontend/node_modules/
 # Otras carpetas que no deben subirse, como carpetas de builds/compilación
 dist/
 build/
+
+# Archivos de base de datos (generalmente no se versionan)
+*.sql
+
+# Directorios de carga de archivos (contiene datos sensibles/grandes de usuario)
+backend/uploads/
