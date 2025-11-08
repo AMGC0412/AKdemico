@@ -1,0 +1,131 @@
+/* ---
+  Estilos para AdminUserManagementPage (AdminUserManagementPage.css)
+  Temática: "Pixel-Tech Académico"
+--- */
+
+/* --- Barra de Filtros --- */
+.admin-filter-bar {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los filtros se reorganicen en pantallas pequeñas */
+  gap: 1.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2.5rem;
+
+  /* Estilo "Glassmorphism" */
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: var(--card-radius, 16px);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.filter-group.search-group {
+  flex-grow: 1; /* El campo de búsqueda ocupa el espacio disponible */
+}
+
+.filter-group label {
+  font-weight: 600;
+  color: var(--color-text-light, #A0A0A0);
+}
+
+/* Estilo "glass" para inputs y select (reutilizado de Taxonomía) */
+.filter-group input,
+.filter-group select {
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: 8px;
+  padding: 0.8rem;
+  color: var(--color-text-body, #E0E0E0);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+}
+.filter-group select option {
+  background: var(--color-bg-dark, #0F0F1A);
+  color: var(--color-text-body, #E0E0E0);
+}
+
+.filter-group input {
+  flex-grow: 1;
+  padding-left: 2.5rem; /* Espacio para el ícono */
+  background-color: rgba(0,0,0, 0.2); /* Fondo más oscuro para input */
+}
+
+.filter-group.search-group {
+  position: relative;
+}
+.filter-group.search-group svg {
+  position: absolute;
+  left: 1rem;
+  color: var(--color-text-light, #A0A0A0);
+}
+
+
+/* --- Estilos de la Tabla --- */
+/* (Reutilizamos .admin-table de AdminVerificationPage.css) */
+
+/* --- Etiquetas de Rol (Tags) --- */
+.role-tag {
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+  background-color: var(--card-background);
+  color: var(--color-text-light);
+}
+
+.role-tag.role-administrador {
+  background-color: var(--color-primary, #6d41dc);
+  color: white;
+  box-shadow: 0 0 10px rgba(109, 65, 220, 0.7);
+}
+.role-tag.role-docente {
+  background-color: var(--color-secondary, #00bcd4);
+  color: var(--color-bg-dark, #0F0F1A);
+}
+.role-tag.role-estudiante {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-text-body, #E0E0E0);
+}
+
+/* --- Etiquetas de Estado (Tags) --- */
+.status-tag {
+  padding: 0.3rem 0.7rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: capitalize;
+}
+
+.status-tag.status-verificado {
+  color: var(--color-success, #4CAF50);
+  background-color: rgba(76, 175, 80, 0.15);
+}
+.status-tag.status-rechazado {
+  color: var(--color-danger, #D9534F);
+  background-color: rgba(217, 83, 79, 0.15);
+}
+.status-tag.status-en_revision {
+  color: var(--color-warning, #FF9800);
+  background-color: rgba(255, 152, 0, 0.15);
+}
+.status-tag.status-no_aplica {
+  color: var(--color-text-light, #A0A0A0);
+  background-color: rgba(160, 160, 160, 0.15);
+}
+
+/* --- Mensaje de advertencia en Modal --- */
+.warning-message {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-warning, #FF9800);
+  background-color: rgba(255, 152, 0, 0.15);
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1rem;
+}

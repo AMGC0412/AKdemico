@@ -1,0 +1,157 @@
+/* Estilos para DocentePagosPage */
+.docente-pagos-page {
+  padding: 2rem 0;
+  max-width: 1000px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.page-header-actions h1 {
+  font-size: 2rem;
+  color: var(--color-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.page-summary {
+    color: var(--color-text-medium);
+    font-size: 1.1rem;
+    margin-top: 0;
+    margin-bottom: 2.5rem;
+}
+
+/* --- Grid de Pagos --- */
+.pagos-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.pago-card {
+  background-color: var(--color-white-frost);
+  backdrop-filter: blur(5px);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.pago-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #eee;
+}
+
+.pago-monto {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+}
+
+.pago-status-pending {
+  background-color: #ffc107; /* Amarillo */
+  color: #333;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pago-details {
+  flex-grow: 1; /* Empuja las acciones al fondo */
+}
+.pago-details p {
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
+  color: var(--color-text-medium);
+}
+.pago-details strong {
+    color: var(--color-text-dark);
+}
+
+.fecha-subida {
+    font-style: italic;
+    font-size: 0.85rem !important;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.5rem !important;
+}
+
+/* Enlace al Comprobante */
+.btn-comprobante-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    color: var(--color-accent-blue);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+.btn-comprobante-link:hover {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+/* Acciones */
+.pago-acciones {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.btn-accion-sm {
+    flex: 1; /* Ocupan el mismo ancho */
+    padding: 10px 0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Estilo del botón Rechazar */
+.btn-danger { 
+    background-color: #dc3545; 
+}
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+
+/* No Data Box */
+.no-data-box {
+  text-align: center;
+  padding: 3rem;
+  max-width: 600px;
+  margin: 2rem auto;
+}
+.no-data-box h3 {
+    color: var(--color-secondary-dark);
+}
+
+/* Overlay Spinner para la Acción */
+.overlay-spinner {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+    border-radius: var(--radius-lg);
+    color: var(--color-primary);
+}

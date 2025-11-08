@@ -1,0 +1,14 @@
+# Ignorar carpetas de dependencias
+backend/node_modules/
+frontend/node_modules/
+
+# Archivos comunes de entorno y logs
+.env
+*.log
+
+# Archivos del sistema operativo (macOS)
+.DS_Store
+
+# Otras carpetas que no deben subirse, como carpetas de builds/compilación
+dist/
+build/

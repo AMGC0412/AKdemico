@@ -1,0 +1,70 @@
+/* ---
+  Estilos para AuthPages (AuthPages.css) - REDISEÑO ART POP
+  Estilos para los formularios de Login y Registro
+--- */
+
+/* Paleta importada de index.css */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Espacio entre campos del form */
+}
+
+.form-group {
+  text-align: left; 
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+  color: var(--color-text-secondary); /* Texto gris claro */
+  font-size: 0.95rem;
+}
+
+/* [NUEVO] Estilo Art Pop para Inputs */
+.form-group input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid #555; /* Borde oscuro neutro */
+  border-radius: 8px;
+  box-sizing: border-box; 
+  font-size: 1rem;
+  background-color: var(--color-bg-dark); /* Fondo negro */
+  color: var(--color-text-primary); /* Texto blanco */
+  font-family: var(--font-body-poppins);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--color-accent-cyan); /* Borde Cian Brillante */
+  outline: none;
+  box-shadow: 0 0 10px rgba(77, 255, 255, 0.5); /* Brillo Cian */
+}
+
+.form-group input::placeholder {
+  color: var(--color-text-tertiary);
+  opacity: 0.7;
+}
+
+/* [NUEVO] Botón de ancho completo */
+.btn-block {
+  width: 100%;
+  padding: 16px; /* Botón más grande */
+  font-size: 1.1rem;
+  margin-top: 1rem; /* Espacio antes del botón */
+}
+
+/* [NUEVO] Mensaje de Error (Art Pop) */
+.error-message {
+  color: var(--color-text-primary);
+  background-color: rgba(230, 57, 70, 0.5); /* Rojo */
+  border: 1px solid var(--color-accent-red);
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 0; /* El gap de 1.5rem ya da espacio */
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: center;
+}

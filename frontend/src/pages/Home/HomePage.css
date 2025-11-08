@@ -1,0 +1,907 @@
+/* ---
+  Estilos para HomePage (HomePage.css) - REDISEÑO COMPLETO
+  Temática: "AKdémico Art Pop" (Inspirado en la Mascota)
+  Paleta: Colores de la lechuza (Azul Eléctrico, Turquesa Brillante, Púrpura Profundo)
+--- */
+
+/* --- Importación de la fuente personalizada --- */
+@font-face {
+  font-family: '04b30';
+  /* Asume que la fuente está en la carpeta public/fonts */
+  src: url('/fonts/04b30.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* --- [NUEVA] PALETA DE COLORES INSPIRADA EN LA MASCOTA AKDÉMICO --- */
+:root {
+  --font-display-pixel: '04b30', sans-serif; /* Fuente para Títulos */
+  --font-body-poppins: 'Poppins', sans-serif; /* Fuente para texto normal */
+  
+  /* Colores VIBRANTES de la mascota */
+  --color-brand-blue: #1A52B8;        /* Azul Eléctrico (Cuerpo Lechuza) */
+  --color-brand-purple: #4B004B;    /* Púrpura Profundo (Libro) */
+  --color-brand-cyan: #00A6AD;      /* Turquesa (Gafas) */
+  
+  /* Acentos BRILLANTES de la mascota */
+  --color-accent-magenta: #FF3EFF;   /* Magenta (Alas) */
+  --color-accent-cyan: #4DFFFF;      /* Cian Brillante (Bombilla) */
+  --color-accent-blue: #6C9EFF;      /* Azul Claro (Reflejos) */
+  --color-accent-red: #E63946;       /* Un rojo vibrante para errores */
+
+  /* Colores Base Neutros (Alto Contraste) */
+  --color-bg-dark: #181818;          /* Gris Oscuro / Negro (Fondo Art Pop) */
+  --color-bg-light: #2A2A2A;        /* Gris Claro (Fondo de Tarjetas) */
+  --color-text-primary: #FFFFFF;    /* Texto principal blanco */
+  --color-text-secondary: #E0E0E0;  /* Texto secundario gris claro */
+  --color-text-tertiary: #A0A0A0;   /* Texto más tenue */
+  
+  --card-radius: 12px;
+}
+
+/* --- Estilos Base de la Página --- */
+.home-page-akademic {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem; /* Más espacio entre secciones */
+  font-family: var(--font-body-poppins);
+  
+  background: var(--color-bg-dark); /* Fondo Art Pop oscuro y sólido */
+  color: var(--color-text-secondary);
+  
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* --- 1. Sección Hero (Banner Rediseñado) --- */
+.hero-section-dynamic {
+  position: relative;
+  height: 80vh;
+  min-height: 500px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  color: var(--color-text-primary);
+  border-bottom: 4px solid var(--color-brand-cyan); /* Borde Art Pop */
+}
+
+.hero-background-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-banner-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s ease-in-out;
+  animation: zoom-in 15s ease-in-out infinite alternate;
+}
+
+@keyframes zoom-in {
+  from { transform: scale(1); }
+  to { transform: scale(1.1); }
+}
+
+/* Overlay Art Pop (Duotono con colores de la mascota) */
+.hero-overlay-pixeltech {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(26, 82, 184, 0.85) 0%, /* Azul Eléctrico */
+    rgba(75, 0, 75, 0.8) 50%,     /* Púrpura Profundo */
+    rgba(0, 166, 173, 0.7) 100%   /* Turquesa */
+  );
+  z-index: 2;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 3;
+  padding: 2rem;
+  max-width: 900px;
+  width: 100%;
+}
+
+/* Título con Fuente Pixel */
+.hero-content h1 {
+  font-family: var(--font-display-pixel);
+  font-size: 3.5rem;
+  letter-spacing: 2px;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  text-shadow: 4px 4px 0px var(--color-bg-dark); 
+  text-transform: uppercase; /* Asegura estilo pixel */
+}
+
+.hero-content p {
+  font-family: var(--font-display-pixel);
+  font-size: 1.3rem;
+  letter-spacing: 1px;
+  margin-bottom: 2.5rem;
+  opacity: 0.95;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+}
+
+/* Barra de Búsqueda Rediseñada */
+.hero-search-bar {
+  display: flex;
+  width: 100%;
+  max-width: 650px;
+  margin: 2.5rem auto;
+  background: var(--color-bg-light);
+  border-radius: 12px;
+  border: 2px solid var(--color-text-tertiary);
+  transition: border-color 0.3s ease;
+  overflow: hidden;
+}
+.hero-search-bar:focus-within {
+  border-color: var(--color-accent-cyan); /* Resalta en cian */
+}
+
+.hero-search-bar input {
+  flex-grow: 1;
+  background: transparent;
+  border: none;
+  padding: 1.2rem 1.5rem;
+  font-size: 1.1rem;
+  color: white;
+  border-radius: 12px 0 0 12px;
+  font-family: var(--font-body-poppins);
+}
+.hero-search-bar input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+.hero-search-bar button {
+  flex-shrink: 0;
+  border-radius: 0 8px 8px 0;
+  font-size: 1.2rem;
+  padding: 0 1.8rem;
+  border: none;
+  cursor: pointer;
+  background: var(--color-accent-cyan);
+  color: var(--color-bg-dark);
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+.hero-search-bar button:hover {
+  background: var(--color-text-primary);
+}
+
+/* [NUEVO] Contenedor de botones del Hero */
+.hero-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+
+/* --- 2. Contenido Principal (Secciones) --- */
+.featured-courses-section,
+.how-it-works-section,
+.cta-section {
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-header h2 {
+  font-family: var(--font-display-pixel);
+  font-size: 2.8rem;
+  font-weight: normal;
+  letter-spacing: 1px;
+  color: var(--color-text-primary);
+  margin-bottom: 1rem;
+  text-shadow: 2px 2px 0px var(--color-brand-blue);
+  text-transform: uppercase;
+}
+
+.section-header p {
+  font-size: 1.2rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* [NUEVO] Acción al pie de la sección (Centrado) */
+.section-footer-action {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+/* --- Grid de Cursos (Rediseño Art Pop) --- */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2.5rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* --- Tarjeta de Curso (Fondo Sólido, Borde Art Pop) --- */
+.course-card {
+  border-radius: var(--card-radius);
+  background: var(--color-bg-light); /* Fondo sólido */
+  border: 2px solid #444; /* Borde oscuro */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.course-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--color-accent-cyan); /* Borde cian al pasar el ratón */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.course-image-container {
+  position: relative;
+  height: 220px;
+  width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-bottom: 2px solid #444;
+  transition: border-color 0.4s ease;
+}
+.course-card:hover .course-image-container {
+  border-color: var(--color-accent-cyan);
+}
+
+.course-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.course-card:hover .course-image {
+  transform: scale(1.08);
+}
+
+.course-price {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--color-accent-magenta); /* Magenta brillante */
+  color: var(--color-text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 2;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.course-info {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Asegura que el contenedor crezca */
+  height: 100%; /* Ocupa el espacio disponible */
+}
+
+.course-category-tag {
+  color: var(--color-accent-cyan); /* Cian brillante */
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+}
+
+.course-title a {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  line-height: 1.4;
+  display: block;
+  /* [NUEVO] Limitar texto a 2 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 2.8em; /* 1.4 * 2 líneas */
+}
+.course-title a:hover {
+  color: var(--color-accent-cyan);
+}
+
+.course-description {
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+  margin: 0 0 1.5rem 0;
+  line-height: 1.6;
+  flex-grow: 1;
+  /* [NUEVO] Limitar texto a 3 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+  color: var(--color-text-tertiary);
+  border-top: 1px solid #444;
+  padding-top: 1.2rem;
+  margin-top: auto; /* Empuja al fondo */
+  flex-shrink: 0; /* Evita que se encoja */
+}
+.course-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.course-meta svg {
+  color: var(--color-accent-cyan);
+}
+
+/* --- 3. Sección "Tu Ruta" (Rediseño Art Pop) --- */
+.steps-container-v2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  width: 100%;
+}
+
+.step-card-v2 {
+  padding: 2.5rem 2rem;
+  position: relative;
+  background: var(--color-bg-light); /* Fondo sólido */
+  border: 2px solid #444;
+  border-radius: var(--card-radius);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  transition: all 0.4s ease;
+  overflow: hidden;
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.step-card-v2:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-brand-blue); /* Borde Azul Eléctrico */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+.step-number {
+  position: absolute;
+  top: -10px;
+  right: 0px;
+  font-size: 6rem;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.03);
+  z-index: 1;
+  line-height: 1;
+  font-family: var(--font-display-pixel);
+}
+
+.step-icon-v2 {
+  position: relative;
+  z-index: 2;
+  font-size: 3rem;
+  color: var(--color-brand-blue); /* Icono Azul */
+  margin-bottom: 1.5rem;
+}
+
+.step-card-v2 h3 {
+  position: relative;
+  z-index: 2;
+  font-family: var(--font-display-pixel); /* Fuente Pixel para títulos de pasos */
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  font-weight: normal;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+}
+
+.step-card-v2 p {
+  position: relative;
+  z-index: 2;
+  font-size: 1.05rem;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* --- 4. Sección CTA (Rediseño Art Pop) --- */
+.cta-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3.5rem 4rem;
+  background: var(--color-brand-purple); /* Púrpura Profundo del libro */
+  border-radius: var(--card-radius);
+  color: white;
+  box-shadow: 0 15px 40px rgba(0,0,0, 0.5);
+  gap: 2rem;
+  border: 2px solid var(--color-accent-magenta);
+}
+
+.cta-content {
+  flex-grow: 1;
+}
+
+.cta-content h2 {
+  font-family: var(--font-display-pixel);
+  font-size: 2rem;
+  font-weight: normal;
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: white;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+  text-transform: uppercase;
+}
+
+.cta-content p {
+  font-size: 1.1rem;
+  margin: 0;
+  opacity: 0.95;
+  max-width: 550px;
+  line-height: 1.6;
+  color: white;
+}
+
+.cta-actions {
+  flex-shrink: 0; /* Evita que el botón se encoja */
+}
+
+/* --- 5. Footer (Rediseño Art Pop) --- */
+.footer-home {
+  padding: 4rem 2rem 2rem 2rem;
+  background: var(--color-bg-dark);
+  border-top: 2px solid #333;
+  width: 100%;
+  margin-top: auto;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+}
+
+.footer-logo h3 {
+  font-family: var(--font-display-pixel); /* Fuente Pixel */
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+  color: var(--color-brand-blue); /* Azul Eléctrico */
+  margin: 0 0 1rem 0;
+  text-transform: uppercase;
+}
+
+.footer-logo p {
+  font-size: 1.05rem;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.footer-links h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.footer-links a {
+  display: block;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.8rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+.footer-links a:hover {
+  color: var(--color-brand-blue);
+  transform: translateX(5px);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #333;
+  color: var(--color-text-tertiary);
+  font-size: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- 6. Modal de Vista Rápida (Rediseño Art Pop) --- */
+.quick-view-modal-overlay {
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.quick-view-modal-content {
+  background: var(--color-bg-light);
+  color: var(--color-text-secondary);
+  border-radius: var(--card-radius);
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  position: relative;
+  animation: slideInUp 0.4s ease;
+  border: 2px solid var(--color-accent-cyan);
+  overflow: hidden;
+}
+
+.quick-view-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: all 0.3s ease;
+  z-index: 10001;
+}
+.quick-view-close:hover {
+  color: var(--color-accent-cyan);
+}
+
+.quick-view-body {
+  display: flex;
+  padding: 0;
+  height: 100%;
+}
+.quick-view-image {
+  flex: 1;
+  min-height: 400px;
+  background-color: var(--color-bg-dark); /* Fondo para imagen */
+}
+.quick-view-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.quick-view-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 2.5rem;
+  overflow-y: auto;
+}
+
+.quick-view-category {
+  color: var(--color-accent-cyan);
+  font-weight: 700;
+  font-size: 1rem;
+  margin-bottom: 0.8rem;
+}
+
+.quick-view-title {
+  font-family: var(--font-display-pixel);
+  font-size: 2rem;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.quick-view-price {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--color-accent-magenta);
+  margin-bottom: 1.5rem;
+}
+
+.quick-view-description {
+  margin-bottom: 2rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  font-size: 1.05rem;
+}
+
+.quick-view-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.quick-view-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1rem;
+  color: var(--color-text-secondary);
+}
+.quick-view-meta svg {
+  color: var(--color-accent-blue);
+  font-size: 1.1rem;
+}
+
+.quick-view-actions {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: auto;
+  padding-top: 2rem;
+  border-top: 1px solid #444;
+}
+
+/* --- [NUEVO] ESTILOS DE BOTONES GLOBALES (COPIADOS DE INDEX.CSS) --- */
+/* Esto asegura que los botones en esta página se vean correctos */
+.btn {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-body-poppins);
+}
+
+/* Botón Primario (Azul Lechuza) */
+.btn-primary {
+  background-color: var(--color-brand-blue);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0,0,0, 0.4);
+}
+.btn-primary:hover {
+  background-color: var(--color-accent-blue);
+  color: var(--color-bg-dark);
+  box-shadow: 0 6px 20px rgba(0,0,0, 0.6);
+  transform: translateY(-3px);
+}
+
+/* Botón Secundario (Borde Blanco) */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+}
+.btn-secondary:hover {
+  background-color: var(--color-text-primary);
+  color: var(--color-bg-dark);
+  transform: translateY(-3px);
+}
+
+/* Botón de CTA (Cian Brillante) */
+.btn-secondary-cta {
+  background-color: var(--color-accent-cyan);
+  color: var(--color-bg-dark);
+  padding: 14px 35px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.btn-secondary-cta:hover {
+  background-color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0, 0.4);
+}
+
+/* --- Estilos para la Tarjeta de Error (Art Pop) --- */
+.error-card-pixeltech {
+    background: var(--color-brand-purple); /* Púrpura */
+    border: 2px solid var(--color-accent-magenta); /* Borde Magenta */
+    border-radius: var(--card-radius);
+    padding: 3rem;
+    text-align: center;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+.error-card-pixeltech svg {
+    color: var(--color-accent-magenta);
+    margin-bottom: 1rem;
+}
+.error-card-pixeltech h3 {
+    font-family: var(--font-display-pixel);
+    font-size: 1.8rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+}
+.error-card-pixeltech p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* --- Estilos para el Estado Vacío (Art Pop) --- */
+.empty-state-pixeltech {
+    background: var(--color-bg-light);
+    border: 2px dashed var(--color-brand-cyan); /* Borde cian */
+    border-radius: var(--card-radius);
+    padding: 4rem;
+    text-align: center;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+.empty-state-pixeltech svg {
+    color: var(--color-brand-cyan);
+    opacity: 0.7;
+    margin-bottom: 1rem;
+}
+.empty-state-pixeltech h3 {
+    font-family: var(--font-display-pixel);
+    font-size: 1.8rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+}
+.empty-state-pixeltech p {
+    font-size: 1.1rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+
+/* --- Animaciones (Sin cambios) --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-fade-in-down { animation: fadeInDown 0.8s ease both; }
+.animate-fade-in-up { animation: fadeInUp 0.8s ease both; }
+.delay-1 { animation-delay: 0.2s; }
+.delay-2 { animation-delay: 0.4s; }
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Adaptabilidad (Ajustes menores) --- */
+@media (max-width: 992px) {
+  .hero-content h1 {
+    font-size: 2.8rem; /* Ajuste para fuente pixel */
+  }
+  .cta-section {
+    flex-direction: column;
+    text-align: center;
+  }
+  .quick-view-body {
+    flex-direction: column;
+  }
+  .quick-view-image {
+    height: 300px; /* Ajuste de altura de imagen en modal */
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .home-page-akademic {
+    gap: 3rem;
+  }
+  .section-header h2 {
+    font-size: 2.2rem;
+  }
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-content h1 {
+    font-size: 2.2rem;
+  }
+  .hero-content p {
+    font-size: 1.1rem;
+  }
+  .hero-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .hero-search-bar {
+    flex-direction: column;
+    background: transparent;
+    border: none;
+    gap: 1rem;
+  }
+  .hero-search-bar input {
+    border-radius: 10px;
+    text-align: center;
+    background: var(--color-bg-light);
+    border: 2px solid var(--color-text-tertiary);
+  }
+  .hero-search-bar button {
+    border-radius: 10px;
+  }
+  .cta-section {
+    padding: 2.5rem 1.5rem;
+  }
+  .quick-view-image {
+    height: 200px;
+    min-height: 200px;
+  }
+}

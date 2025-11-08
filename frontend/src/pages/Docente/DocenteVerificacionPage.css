@@ -1,0 +1,135 @@
+/* Estilos para DocenteVerificacionPage - MEJORADO */
+.verification-page {
+  padding: 2rem 0;
+  min-height: calc(100vh - 150px);
+}
+
+.frosted-glass {
+  background-color: var(--color-white-frost);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+}
+
+.content-box {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem 3rem;
+}
+
+/* --- Estilos Cajas de Estado --- */
+.status-box { text-align: center; padding: 2rem; }
+.status-box svg { margin-bottom: 1rem; }
+.status-box h2 { font-size: 1.8rem; margin-bottom: 1rem; }
+.status-box p { font-size: 1.1rem; color: var(--color-text-medium); margin-bottom: 2rem; }
+.status-box .btn { width: auto; padding: 10px 30px; }
+
+.status-verificado-box svg { color: var(--color-secondary-dark); }
+.status-verificado-box h2 { color: var(--color-secondary-dark); }
+.status-pendiente-box svg { color: #ffc107; }
+.status-pendiente-box h2 { color: #856404; }
+.status-pendiente-box p strong { color: #856404; }
+
+
+/* --- Estilos Formulario de Verificación --- */
+.verification-form { width: 100%; }
+.verification-form h2 { text-align: center; margin-bottom: 1rem; }
+.verification-form p {
+  text-align: center; color: var(--color-text-medium);
+  margin-bottom: 2rem; font-size: 1rem;
+}
+
+/* --- ESTILOS DE INPUT DE ARCHIVO MEJORADOS --- */
+.form-group-file {
+  margin-bottom: 1.5rem;
+}
+.form-group-file > label { /* Título del campo (ej: Curriculum Vitae) */
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-text-dark);
+  display: block;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.form-group-file > label svg {
+  color: var(--color-primary); /* Icono morado */
+}
+
+/* Ocultar el input real */
+.form-group-file input[type="file"] {
+  display: none;
+}
+
+/* Label que parece un input (el botón falso) */
+.file-input-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: white;
+  border: 1px solid #ced4da; /* Borde gris claro */
+  border-radius: 6px;
+  padding: 0; /* Padding se maneja en los hijos */
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.file-input-label:hover {
+  border-color: var(--color-primary);
+}
+
+/* El nombre del archivo */
+.file-input-label span {
+  padding: 10px 15px;
+  font-size: 0.95rem;
+  color: var(--color-text-medium);
+  /* Truncar texto si es muy largo */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Estilo cuando hay un archivo seleccionado */
+.file-input-label span:not(:empty) {
+    color: var(--color-text-dark);
+}
+
+/* El botón "Buscar" */
+.btn-browse {
+  background-color: var(--color-primary); /* Morado */
+  color: white;
+  padding: 10px 20px;
+  border-radius: 0 5px 5px 0; /* Redondeado solo a la derecha */
+  font-weight: 500;
+  font-size: 0.95rem;
+  white-space: nowrap; /* Evitar que se rompa el texto */
+  transition: background-color 0.2s;
+}
+.file-input-label:hover .btn-browse {
+  background-color: #754ABD; /* Morado más oscuro */
+}
+/* ---------------------------------- */
+
+
+.btn-full {
+  width: 100%;
+  padding: 14px;
+  font-size: 1.1rem;
+  margin-top: 1rem;
+}
+.spinner {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Enlace "Volver al Panel" */
+.back-link.styled a {
+    color: var(--color-text-medium);
+    font-weight: 500;
+}
+.back-link.styled a:hover {
+    color: var(--color-primary);
+}

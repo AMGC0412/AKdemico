@@ -1,0 +1,130 @@
+/* ---
+  Estilos para AuthPageLayout (AuthPageLayout.css) - REDISEÑO ART POP
+  Paleta: Colores de la lechuza (Azul, Turquesa, Púrpura)
+--- */
+
+/* --- Paleta de Colores (Consistente con index.css) --- */
+:root {
+  --font-display-pixel: '04b30', sans-serif;
+  --font-body-poppins: 'Poppins', sans-serif;
+  
+  --color-brand-blue: #1A52B8;
+  --color-brand-purple: #4B004B;
+  --color-brand-cyan: #00A6AD;
+  
+  --color-accent-magenta: #FF3EFF;
+  --color-accent-cyan: #4DFFFF;
+  --color-accent-blue: #6C9EFF;
+
+  --color-bg-dark: #181818;
+  --color-bg-light: #2A2A2A;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E0E0E0;
+  --color-text-tertiary: #A0A0A0;
+  
+  --card-radius: 12px;
+}
+
+/* --- Contenedor Principal --- */
+.auth-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Alinea arriba */
+  min-height: calc(100vh - 80px); /* Ocupa la pantalla menos el header */
+  width: 100%;
+  padding: 4rem 1.5rem;
+  background-color: var(--color-bg-dark); /* Fondo oscuro global */
+  box-sizing: border-box;
+}
+
+/* --- Tarjeta de Formulario (Estilo Art Pop) --- */
+.auth-form-wrapper {
+  width: 100%;
+  max-width: 480px; 
+  
+  /* [NUEVO] Estilo de tarjeta Art Pop */
+  background: var(--color-bg-light);
+  border: 2px solid var(--color-brand-blue); /* Borde Azul Eléctrico */
+  border-radius: var(--card-radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  
+  padding: 2.5rem 3rem;
+  animation: fadeIn 0.5s ease;
+}
+
+/* --- [NUEVO] Logo y Marca --- */
+.auth-logo-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-decoration: none;
+  margin-bottom: 2.5rem;
+}
+.auth-logo-brand img {
+  height: 45px; /* Tamaño del logo */
+  width: auto;
+}
+.auth-logo-text {
+  font-family: var(--font-display-pixel); /* Fuente Pixel */
+  font-size: 2.2rem;
+  letter-spacing: 1px;
+  color: var(--color-text-primary); /* Blanco */
+  line-height: 1;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0px var(--color-brand-blue);
+}
+
+/* --- Estilo de Pestañas de Navegación --- */
+.auth-nav-links {
+  display: flex;
+  justify-content: space-around;
+  border-bottom: 2px solid #444; /* Borde oscuro */
+  margin-bottom: 2rem;
+}
+
+.auth-nav-links a {
+  flex: 1;
+  text-align: center;
+  padding: 1rem 0.5rem;
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-tertiary); /* Color tenue por defecto */
+  border-bottom: 4px solid transparent;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.auth-nav-links a:hover {
+  color: var(--color-text-secondary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* [NUEVO] Estilo de la pestaña activa (Cian Brillante) */
+.auth-nav-links a.active {
+  color: var(--color-accent-cyan);
+  border-bottom-color: var(--color-accent-cyan);
+}
+
+/* Contenedor del formulario (Outlet) */
+.auth-form-content {
+  color: var(--color-text-secondary);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .auth-form-wrapper {
+    padding: 2rem 1.5rem;
+  }
+  .auth-nav-links a {
+    font-size: 0.9rem;
+    padding: 1rem 0.2rem;
+  }
+}

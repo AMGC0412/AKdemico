@@ -1,0 +1,314 @@
+/* --- 1. Diseño Estructural General (Integrado con AdminDashboard) --- */
+.test-center { 
+    display:flex; 
+    flex-direction:column; 
+    gap:1.5rem; 
+    color: #E0E0E0; /* Texto principal del dashboard */
+    padding: 2rem; /* Añadir padding al contenedor principal */
+}
+
+/* Encabezado */
+.admin-page-header {
+    margin-bottom: 0; 
+}
+.admin-page-header h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #E0E0E0; 
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+.admin-page-header p {
+    font-size: 1.1rem;
+    color: #dadada; 
+    margin-top: 0.5rem;
+}
+
+/* Barra de controles (Filtro, Auto-Run, Botón Ejecutar Todo) */
+.tc-bar { 
+    display:flex; 
+    align-items:center; 
+    justify-content:space-between; 
+    gap:1rem; 
+    flex-wrap:wrap; 
+}
+
+/* Estilo para la URL base */
+.tc-api-base {
+    color: #A0A0A0; /* Texto atenuado */
+    font-size: 0.9rem;
+    padding: 0 0.5rem;
+}
+
+/* Controles de Auto-Run/Intervalo */
+.tc-controls { 
+    display:flex; 
+    align-items:center; 
+    gap:.75rem; 
+}
+
+/* Grid de Módulos (Cards) - Responsive */
+.tc-grid { 
+    display:grid; 
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); /* Tarjetas más anchas */
+    gap:1.5rem; 
+}
+
+/* --- 2. Estilos de las Tarjetas de Módulo (tc-card) --- */
+.tc-card { 
+    border:1px solid rgba(255, 255, 255, 0.2); /* Borde de tarjeta */
+    border-radius:16px; 
+    padding:1.5rem; 
+    background:rgba(255, 255, 255, 0.1); /* Fondo oscuro transparente */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+/* Estilos de estado de las tarjetas - Usando colores del dashboard */
+.tc-card.ok { 
+    border-color:#4CAF50; /* Verde - Éxito */
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+}
+.tc-card.warn { 
+    border-color:#FF9800; /* Naranja/Amarillo - Advertencia/Parcial */
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.4);
+}
+.tc-card.bad { 
+    border-color:#e53935; /* Rojo - Fallo */
+    box-shadow: 0 0 10px rgba(229, 57, 53, 0.6);
+}
+.tc-card:hover {
+    transform: translateY(-3px);
+}
+
+/* Encabezado de la tarjeta (Título y Descripción) */
+.tc-card-h { 
+    display:flex; 
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+.tc-card-h h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    color: #FFFFFF;
+}
+
+.tc-card-h span {
+    font-size: 0.95rem;
+    color: #A0A0A0;
+}
+
+/* Lista de pruebas dentro de la tarjeta */
+.tc-tests { 
+    list-style:none; 
+    padding:0; 
+    margin:1rem 0 0; 
+    display:flex; 
+    flex-direction:column; 
+    gap:.75rem; 
+}
+
+/* --- 3. Estilos de Pruebas Individuales (tc-test) --- */
+.tc-test { 
+    border:1px solid transparent; 
+    border-radius:10px; 
+    padding:.75rem; 
+    background-color: rgba(0, 0, 0, 0.3); /* Fondo más claro para la prueba */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Estilos de estado de la prueba individual */
+.tc-test.ok { 
+    border-color:#2e7d32; /* Verde - Prueba OK */
+}
+.tc-test.bad { 
+    border-color:#e53935; /* Rojo - Prueba Fallida */
+}
+
+/* Línea principal de la prueba (Icono, Nombre, Método, Ruta) */
+.tc-test-main { 
+    display:grid; 
+    grid-template-columns: 24px auto; /* Icono y Contenido */
+    gap:.5rem; 
+    align-items:center; 
+}
+
+.tc-main-info {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+}
+
+.kpi { 
+    font-weight:600; 
+    color: #FFFFFF;
+}
+.tc-method { 
+    font-weight:700; 
+    font-size: 0.8em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background-color: #6d41dc; /* Color Primario */
+    color: white;
+}
+.tc-path { 
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; 
+    background-color: #0d0d0d;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.tc-status, .tc-ms, .tc-time { 
+    opacity:.7; 
+    font-size: 0.9em;
+}
+
+/* Contenedor de Detalles (Path y Value esperados) */
+.tc-expect-details {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+    font-size: 0.85em;
+    color: #A0A0A0;
+}
+.tc-expect-details p {
+    margin: 0;
+    white-space: pre-wrap;
+}
+
+/* Mensaje de error */
+.tc-error { 
+    color:#ff8a80; /* Rojo claro para el error */
+    white-space:pre-wrap; 
+    margin:.75rem 0 0 0; 
+    background-color: #331010;
+    border: 1px solid #b71c1c;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9em;
+}
+
+/* --- 4. Edición y Acciones --- */
+.tc-test-actions { 
+    display:flex; 
+    gap:.75rem; 
+    margin-top:.75rem; 
+}
+
+/* Contenedor del editor de pruebas */
+.tc-editor { 
+    margin-top:.75rem; 
+    border-top:1px solid rgba(255, 255, 255, 0.2); 
+    padding-top:.75rem; 
+    display:flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Grid para campos de edición (2 columnas) */
+.tc-editor-grid { 
+    display:grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap:.75rem; 
+}
+@media (max-width: 600px) {
+    .tc-editor-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tc-editor-grid label { 
+    display:flex; 
+    flex-direction:column; 
+    gap:.25rem; 
+    font-size:.9rem; 
+}
+
+/* Estilo base del botón - Adaptado al dashboard */
+.btn { 
+    display:inline-flex; 
+    align-items:center; 
+    gap:.4rem; 
+    border:1px solid #555; 
+    background:rgba(255, 255, 255, 0.05); 
+    color: #E0E0E0;
+    padding:.5rem .8rem; 
+    border-radius:8px; 
+    cursor:pointer; 
+    transition: background-color 0.2s, border-color 0.2s;
+    font-weight: 500;
+}
+
+.btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #A0A0A0;
+}
+
+.btn.sm { 
+    padding:.35rem .6rem; 
+    font-size:.85rem; 
+}
+
+/* Botón principal de Ejecutar Todo */
+.tc-run-all {
+    background: #6d41dc; /* Color Primario */
+    border-color: #6d41dc;
+    color: white;
+}
+.tc-run-all:hover {
+    background: #7b53e7;
+    border-color: #7b53e7;
+}
+
+
+/* Colores de iconos de estado */
+.ok-i { 
+    color:#4CAF50; 
+}
+.bad-i { 
+    color:#e53935; 
+}
+.warn-i {
+    color: #FF9800;
+}
+.pending-i {
+    color: #A0A0A0;
+}
+
+.tc-editor textarea, .tc-editor input {
+    background: #111;
+    border: 1px solid #333;
+    padding: 8px;
+    border-radius: 6px;
+    color: white;
+    width: 100%; /* Asegurar que ocupen el 100% de su contenedor */
+    box-sizing: border-box;
+}
+
+/* Estilo para el input de Auto Run en la barra de controles */
+.tc-controls input[type="number"] {
+    background: #111;
+    border: 1px solid #333;
+    padding: 6px;
+    border-radius: 6px;
+    color: white;
+    width: 100px;
+    text-align: center;
+}
+.tc-controls input[type="text"] {
+    background: #111;
+    border: 1px solid #333;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: white;
+}
+.tc-controls label { /* Para el checkbox de Auto Run */
+    background: rgba(255, 255, 255, 0.05);
+    border-color: #444;
+}

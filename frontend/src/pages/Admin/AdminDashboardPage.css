@@ -1,0 +1,540 @@
+/* ---
+  Estilos para AdminDashboardPage (AdminDashboardPage.css)
+  [MODIFICADO] Con layout de 2 columnas y colores corregidos
+--- */
+
+/* --- [NUEVO] Nueva Estructura de Layout --- */
+.admin-dashboard-layout {
+  display: grid;
+  /* Define 2 columnas: la principal (2fr) y la secundaria (1fr) */
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem; /* Espacio entre columnas */
+  align-items: flex-start; /* Alinea los items arriba */
+}
+
+/* En pantallas más pequeñas, volvemos a una sola columna */
+@media (max-width: 1200px) {
+  .admin-dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+/* El contenido principal y la barra lateral */
+.dashboard-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; /* Espacio entre el header y las tarjetas */
+}
+.dashboard-sidebar-content {
+  /* La barra lateral puede tener sus propios estilos si es necesario */
+  /* La tabla de desglose ya está en su propio contenedor */
+}
+/* --- Fin Nueva Estructura --- */
+
+
+.admin-dashboard-page {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Header de la Página --- */
+.admin-page-header {
+  margin-bottom: 0; /* Ya no es necesario, usamos 'gap' */
+}
+
+.admin-page-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  /* [CORREGIDO] Sintaxis inválida var() */
+  color: #E0E0E0; 
+  margin: 0;
+}
+
+.admin-page-header p {
+  font-size: 1.1rem;
+  color: #dadada; 
+  margin-top: 0.5rem;
+}
+
+/* --- Grid de Estadísticas --- */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+
+.stat-card {
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: var(--card-radius, 16px);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.stat-card-icon {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stat-card-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.stat-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  /* [CORREGIDO] Sintaxis inválida var() */
+  color: #FFFFFF; 
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.stat-card-label {
+  font-size: 0.95rem;
+  /* [CORREGIDO] Texto de la imagen es más oscuro */
+  color: #A0A0A0; /* Ajustado para mejor legibilidad */
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- Colores de Tarjetas (Sin cambios) --- */
+.stat-card.color-primary .stat-card-icon {
+  background: rgba(109, 65, 220, 0.2);
+  color: var(--color-primary, #6d41dc);
+}
+.stat-card.color-secondary .stat-card-icon {
+  background: rgba(0, 188, 212, 0.2);
+  color: var(--color-secondary, #00bcd4);
+}
+.stat-card.color-success .stat-card-icon {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+.stat-card.color-warning .stat-card-icon {
+  background: rgba(255, 152, 0, 0.2);
+  color: #FF9800;
+}
+
+/* --- Sección de Tabla (Desglose) --- */
+.admin-section-container {
+  margin-top: 0; /* Ya no es necesario, el grid lo maneja */
+  /* [CORREGIDO] Fondo de la imagen es translúcido, no blanco */
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: var(--card-radius, 16px);
+  padding: 1.5rem 2rem;
+  overflow-x: auto;
+  /* [NUEVO] Asegura que el contenedor no sea más alto que su contenido */
+  height: fit-content;
+}
+
+.admin-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  /* [CORREGIDO] Sintaxis inválida var() */
+  color: #FFFFFF;
+  margin: 0 0 1.5rem 0;
+}
+
+.admin-table-container {
+  width: 100%;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.admin-table th {
+  font-size: 0.9rem;
+  color: #A0A0A0; /* Encabezado de tabla más claro */
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.admin-table td {
+  font-size: 1.05rem;
+  color: #E0E0E0; /* Texto de celda más claro */
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table td.rol-capitalize {
+  text-transform: capitalize;
+  font-weight: 600;
+  color: #FFFFFF; /* Texto del Rol más claro */
+}
+
+/* --- Estados de Carga y Error (Sin cambios) --- */
+.admin-page-loader, .admin-page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: var(--color-text-light, #A0A0A0);
+  gap: 1rem;
+}
+.admin-page-error {
+  color: #FF6B6B;
+}
+
+/* ---
+  Estilos para AdminDashboardPage (AdminDashboardPage.css)
+  [MODIFICADO] Con Centro de Acciones
+--- */
+
+/* --- Layout de 2 Columnas --- */
+.admin-dashboard-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem; 
+  align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+  .admin-dashboard-layout {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
+
+.dashboard-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+.dashboard-sidebar-content {
+  /* [NUEVO] Añadimos un 'gap' para separar las tarjetas de la derecha */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+/* --- Fin Layout --- */
+
+
+.admin-dashboard-page {
+  animation: fadeIn 0.5s ease-out;
+}
+/* ... (keyframes fadeIn, .admin-page-header, .stats-grid, .stat-card, etc. no cambian) ... */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.admin-page-header {
+  margin-bottom: 0;
+}
+.admin-page-header h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #E0E0E0; 
+  margin: 0;
+}
+.admin-page-header p {
+  font-size: 1.1rem;
+  color: #dadada; 
+  margin-top: 0.5rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+}
+.stat-card {
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: var(--card-radius, 16px);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+.stat-card-icon {
+  font-size: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.stat-card-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.stat-card-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #FFFFFF; 
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+.stat-card-label {
+  font-size: 0.95rem;
+  color: #A0A0A0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.stat-card.color-primary .stat-card-icon {
+  background: rgba(109, 65, 220, 0.2);
+  color: var(--color-primary, #6d41dc);
+}
+.stat-card.color-secondary .stat-card-icon {
+  background: rgba(0, 188, 212, 0.2);
+  color: var(--color-secondary, #00bcd4);
+}
+.stat-card.color-success .stat-card-icon {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4CAF50;
+}
+.stat-card.color-warning .stat-card-icon {
+  background: rgba(255, 152, 0, 0.2);
+  color: #FF9800;
+}
+
+/* --- [NUEVO] Estilos del Centro de Acciones --- */
+.pending-actions-card {
+  /* Hereda .admin-section-container, solo añadimos padding */
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+}
+
+.pending-actions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Espacio entre items */
+}
+
+.pending-action-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.pending-action-item:hover {
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border-color: var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.action-item-icon {
+  font-size: 1.5rem;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+/* Reutilizamos los mismos colores de los StatCards */
+.action-item-icon.color-primary {
+  background: rgba(109, 65, 220, 0.2);
+  color: var(--color-primary, #6d41dc);
+}
+.action-item-icon.color-warning {
+  background: rgba(255, 152, 0, 0.2);
+  color: #FF9800;
+}
+
+.action-item-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.action-item-info span {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.action-item-info small {
+  font-size: 0.9rem;
+  color: var(--color-text-light, #A0A0A0);
+}
+
+.action-count {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-light, #A0A0A0);
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.action-arrow {
+  color: var(--color-text-light, #A0A0A0);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.pending-action-item:hover .action-arrow {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* --- [NUEVO] Estilos de Resalte --- */
+.pending-action-item.highlight {
+  /* Si hay tareas, resalta el fondo */
+  background: rgba(109, 65, 220, 0.1);
+  border-color: rgba(109, 65, 220, 0.5);
+}
+.pending-action-item.highlight:hover {
+  background: rgba(109, 65, 220, 0.2);
+}
+
+.action-count.highlight {
+  /* Si hay tareas, resalta el contador */
+  background: var(--color-primary, #6d41dc);
+  color: white;
+  box-shadow: 0 0 10px rgba(109, 65, 220, 0.7);
+}
+
+
+/* --- Sección de Tabla (Desglose) --- */
+.admin-section-container {
+  margin-top: 0; /* Ya no es necesario */
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: var(--card-radius, 16px);
+  padding: 1.5rem 2rem;
+  overflow-x: auto;
+  height: fit-content;
+}
+/* ... (El resto de .admin-section-title, .admin-table, etc. no cambia) ... */
+.admin-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin: 0 0 1.5rem 0;
+}
+
+.admin-table-container {
+  width: 100%;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th, .admin-table td {
+  padding: 0.8rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.admin-table th {
+  font-size: 0.9rem;
+  color: #A0A0A0; 
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.admin-table td {
+  font-size: 1.05rem;
+  color: #E0E0E0;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table td.rol-capitalize {
+  text-transform: capitalize;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+/* ... (Estados de Carga y Error no cambian) ... */
+.admin-page-loader, .admin-page-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  color: var(--color-text-light, #A0A0A0);
+  gap: 1rem;
+}
+.admin-page-error {
+  color: #FF6B6B;
+}
+
+/* Añade estos estilos al final de AdminDashboardPage.css */
+
+/* Estilos para el pie de tabla */
+.admin-table tfoot tr {
+  border-top: 2px solid var(--card-border, rgba(255, 255, 255, 0.3));
+}
+
+.admin-table tfoot td {
+  padding: 1rem;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Mejora el contraste para mejor legibilidad */
+.admin-table td.rol-capitalize {
+  text-transform: capitalize;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+/* Estilo para mensaje de datos vacíos */
+.admin-table td[colspan] {
+  font-style: italic;
+  padding: 2rem;
+}

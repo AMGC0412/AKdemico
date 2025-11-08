@@ -1,0 +1,166 @@
+/* ---
+  Estilos para AdminLayout (AdminLayout.css)
+  Temática: "Pixel-Tech Académico"
+--- */
+
+:root {
+  --admin-sidebar-width: 260px;
+}
+
+.admin-layout-container {
+  display: flex;
+  /* Ocupa toda la altura menos el Header (que es 'fixed') */
+  min-height: calc(100vh - var(--header-height, 70px));
+  /* Usamos el fondo principal de la app */
+  background: var(--color-bg-gradient, #0F0F1A);
+  color: var(--color-text-body, #E0E0E0);
+}
+
+/* --- Sidebar (Menú Lateral) --- */
+.admin-sidebar {
+  width: var(--admin-sidebar-width);
+  flex-shrink: 0;
+  
+  /* Estilo "Glassmorphism" oscuro, como el footer */
+  background: var(--color-bg-dark, #0F0F1A);
+  border-right: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+}
+
+.admin-sidebar-header {
+  padding: 0 1rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.admin-sidebar-header h3 {
+  color: var(--color-primary, #6d41dc);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+/* --- Enlaces de Navegación --- */
+.admin-nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+  flex-grow: 1; /* Empuja el footer hacia abajo */
+}
+
+.admin-nav-links li {
+  margin-bottom: 0.5rem;
+}
+
+.admin-nav-links a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1.2rem;
+  border-radius: 10px;
+  
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-light, #A0A0A0);
+  
+  transition: all 0.3s ease;
+}
+
+/* Enlace al pasar el mouse (no activo) */
+.admin-nav-links a:hover {
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  color: var(--color-text-dark, #FFFFFF);
+}
+
+/* --- [IMPORTANTE] Estilo del enlace ACTIVO --- */
+.admin-nav-links a.active {
+  background: var(--color-primary, #6d41dc);
+  color: white;
+  box-shadow: 0 4px 15px rgba(109, 65, 220, 0.4);
+}
+
+.admin-nav-links a.active svg {
+  /* El ícono ya es blanco, pero esto asegura */
+  color: white; 
+}
+
+.admin-nav-links a svg {
+  font-size: 1.2rem;
+  /* Íconos con el color secundario por defecto */
+  color: var(--color-secondary, #00bcd4);
+  transition: color 0.3s ease;
+}
+
+/* --- Pie del Sidebar --- */
+.admin-sidebar-footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.admin-footer-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  color: var(--color-text-light, #A0A0A0);
+  transition: all 0.3s ease;
+}
+
+.admin-footer-link:hover {
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  color: var(--color-secondary, #00bcd4);
+}
+
+
+/* --- Área de Contenido Principal --- */
+.admin-content-area {
+  flex-grow: 1;
+  padding: 2.5rem;
+  overflow-y: auto; /* Permite scroll si el contenido es largo */
+}
+
+/* --- Adaptabilidad (Móvil) --- */
+@media (max-width: 992px) {
+  .admin-layout-container {
+    flex-direction: column;
+  }
+  
+  .admin-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  }
+  
+  .admin-nav-links {
+    display: flex;
+    flex-wrap: wrap; /* Los enlaces se ponen uno al lado del otro */
+    justify-content: center;
+    margin: 1rem 0;
+  }
+  
+  .admin-nav-links li {
+    flex-grow: 1;
+  }
+  
+  .admin-nav-links a {
+    justify-content: center;
+  }
+  
+  .admin-sidebar-footer {
+    display: none; /* Ocultamos el 'Volver al Sitio' en móvil (ya está en el Header) */
+  }
+  
+  .admin-content-area {
+    padding: 1.5rem;
+  }
+}

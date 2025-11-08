@@ -1,0 +1,358 @@
+/* --- Variables y Estilos Base --- */
+:root {
+    --color-primary: #6d41dc;
+    --color-secondary: #00bcd4;
+    --color-danger: #e94158;
+    --color-success: #00c853;
+    --color-warn: #ffab00;
+    --color-text: #222;
+    --color-text-light: #666;
+    --color-bg-light: #f4f6f8;
+    --border-radius-main: 12px;
+    
+    /* ¡Colores de Estado ahora usados en gráficos! */
+    --color-status-programado: #0d47a1;
+    --color-status-en_curso: #1b5e20;
+    --color-status-finalizado: #4a148c;
+    --color-status-cancelado: #b71c1c;
+}
+
+/* --- (A) ESTRUCTURA DE PÁGINA "PORTAFOLIO" --- */
+.accordion-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.page-header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+.page-header-actions h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    color: var(--color-text);
+}
+
+/* --- (B) EL ACORDEÓN DE PLANES --- */
+.plan-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem; /* Espacio entre cada plan */
+}
+
+.plan-accordion-item {
+    background: #ffffff;
+    border-radius: var(--border-radius-main);
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    transition: all 0.3s ease;
+}
+/* Estilo "activo" para el plan seleccionado */
+.plan-accordion-item:has(.plan-header-card.active) {
+    border-color: var(--color-primary);
+    box-shadow: 0 6px 20px rgba(109, 65, 220, 0.1);
+}
+
+/* --- (C) LA CABECERA-TARJETA CLICKEABLE --- */
+.plan-header-card {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    cursor: pointer;
+    border-radius: var(--border-radius-main);
+    transition: background-color 0.2s ease;
+}
+.plan-header-card:not(.active):hover {
+    background-color: var(--color-bg-light);
+}
+.plan-header-card.active {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.plan-header-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    flex-grow: 1; /* Ocupa el espacio */
+    min-width: 0;
+}
+.plan-header-icon {
+    font-size: 1.75rem;
+    color: var(--color-primary);
+    margin-top: 0.25rem;
+}
+.plan-header-texto h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--color-text);
+}
+.plan-header-texto p {
+    margin: 0;
+    color: var(--color-text-light);
+    font-size: 0.95rem;
+}
+
+/* ¡LOS KPIs EN LA CABECERA! */
+.plan-kpi-stats {
+    display: flex;
+    gap: 1.5rem;
+    flex-shrink: 0; /* No se encoge */
+    margin: 0 1rem;
+}
+.kpi-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+}
+.kpi-stat-item svg {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+}
+
+/* Flecha del Acordeón */
+.accordion-arrow {
+    font-size: 1.2rem;
+    color: var(--color-text-light);
+    transition: transform 0.3s ease;
+}
+.plan-header-card.active .accordion-arrow {
+    transform: rotate(180deg);
+}
+
+/* --- (D) EL CONTENIDO COLAPSABLE (GRID DE LOTES) --- */
+.plan-content-wrapper {
+    /* La magia del acordeón */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+}
+.plan-content-wrapper.open {
+    max-height: 2000px; /* Alto máximo (ajústalo si es necesario) */
+}
+
+.plan-content-interior {
+    padding: 1.5rem;
+    padding-top: 0; /* Se une con la cabecera */
+    border-top: 1px solid #e0e0e0;
+    background: var(--color-bg-light); /* Fondo sutil para el contenido */
+    border-bottom-left-radius: var(--border-radius-main);
+    border-bottom-right-radius: var(--border-radius-main);
+}
+
+.lotes-grid-header {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 0;
+}
+
+.lotes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+.no-lotes-msg {
+    color: var(--color-text-light);
+    font-style: italic;
+    font-size: 1.1rem;
+    padding: 2rem;
+    text-align: center;
+}
+
+/* --- (E) LA TARJETA DEL LOTE (LoteCard) --- */
+.lote-card {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #dbe0e4;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-left-width: 5px; 
+    border-left-style: solid;
+    transition: box-shadow 0.2s ease;
+    flex-shrink: 0;
+}
+.lote-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.lote-card.status-programado { border-left-color: var(--color-status-programado); }
+.lote-card.status-en_curso { border-left-color: var(--color-status-en_curso); }
+.lote-card.status-finalizado { border-left-color: var(--color-status-finalizado); }
+.lote-card.status-cancelado { border-left-color: var(--color-status-cancelado); }
+
+.lote-card-contenido {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.lote-info-principal {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.lote-fechas {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: var(--color-text-light);
+    font-weight: 500;
+}
+.lote-estado-label {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+}
+
+.lote-cupos-visual { width: 100%; }
+.cupos-texto {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: var(--color-text-light);
+    margin-bottom: 0.25rem;
+}
+.cupos-texto span:first-child { font-weight: 500; }
+.cupos-barra {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.cupos-barra-progreso {
+    height: 100%;
+    background: var(--color-primary);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.lote-acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    border-top: 1px solid #f0f0f0;
+    padding-top: 1.25rem;
+    margin-top: 0.25rem;
+}
+.btn-accion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.btn-accion:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-accion.edit { background: #f0f0f0; color: var(--color-text); }
+.btn-accion.edit:hover { background: #e0e0e0; }
+.btn-accion.delete { background: transparent; color: var(--color-danger); }
+.btn-accion.delete:hover { background: #ffebee; }
+
+.error-delete-lote {
+    color: var(--color-danger);
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: block;
+    padding: 0 1.25rem 1.25rem 1.25rem;
+    margin-top: -1rem;
+}
+
+/* --- ESTADOS GLOBALES (Loading, Error, No Data) --- */
+.page-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 60vh;
+    gap: 1rem;
+    font-size: 1.2rem;
+    color: var(--color-text-light);
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.page-loading .spinner {
+    font-size: 2rem;
+    color: var(--color-primary);
+    animation: spin 1s linear infinite;
+}
+
+.page-loading-inline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--color-primary);
+    padding: 1rem;
+}
+.page-loading-inline .spinner {
+    animation: spin 1s linear infinite;
+}
+
+.message {
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 1rem; /* Añadido para separar del contenido */
+}
+.message.error {
+    background-color: #ffebee;
+    border: 1px solid var(--color-danger);
+    color: var(--color-danger);
+}
+.message.success {
+    background-color: #e8f5e9;
+    border: 1px solid var(--color-success);
+    color: #0c6210;
+}
+
+.no-data-box {
+    text-align: center;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    border: 2px dashed #dbe0e4;
+    border-radius: var(--border-radius-main);
+    background: rgba(255, 255, 255, 0.7);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+.no-data-icon {
+    font-size: 3rem;
+    color: var(--color-warn);
+}
+.no-data-box h3 {
+    margin: 0;
+    color: var(--color-text);
+}
+.no-data-box p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    max-width: 400px;
+}

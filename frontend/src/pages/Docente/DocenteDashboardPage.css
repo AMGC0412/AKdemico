@@ -1,0 +1,236 @@
+/* Estilos para DocenteDashboardPage - MEJORADO Y CENTRADO */
+.dashboard-page.styled {
+  padding: 2rem 0;
+}
+
+/* --- CABECERA ESTILIZADA --- */
+.dashboard-header-styled {
+    /* ... (sin cambios) ... */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--color-primary), #935399);
+    color: white;
+    padding: 2rem 3rem;
+    border-radius: var(--radius-lg);
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(138, 99, 210, 0.4);
+}
+.welcome-header {
+    /* ... (sin cambios) ... */
+    font-size: 2.2rem;
+    font-family: var(--font-heading);
+    color: white;
+    margin: 0 0 0.5rem 0;
+}
+.dashboard-summary {
+    /* ... (sin cambios) ... */
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0;
+    max-width: 80%;
+}
+.header-status { text-align: center; }
+.status-label {
+    /* ... (sin cambios) ... */
+    display: block; font-size: 0.9rem;
+    opacity: 0.8; margin-bottom: 0.5rem;
+}
+.status-box {
+    /* ... (sin cambios) ... */
+    padding: 8px 15px; border-radius: 6px;
+    font-weight: 700; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+.status-box svg { font-size: 1rem; }
+.status-box.status-verificado { background-color: var(--color-secondary); color: var(--color-secondary-dark); }
+.status-box.status-pendiente { background-color: #ffc107; color: #333; }
+.status-box.status-rechazado { background-color: #dc3545; color: white; }
+.status-box.status-no_aplica { background-color: #f0f0f0; color: #6c757d; }
+
+
+/* --- Alertas de Estado --- */
+.alert {
+  /* ... (sin cambios) ... */
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin: 0 auto 2rem auto;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-weight: 500;
+  font-size: 1rem;
+}
+.alert svg { font-size: 1.2rem; }
+.alert-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+.alert-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+.alert-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+
+
+/* --- Grid de Cards (Estructura 2x2 Centrada) --- */
+.dashboard-grid {
+  /* ... (sin cambios) ... */
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
+  margin-bottom: 2rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- ESTILOS DEL CARD CORREGIDOS --- */
+.dashboard-card.styled {
+  background-color: var(--color-white-frost);
+  backdrop-filter: blur(5px);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* --- NUEVO: Centra todo el contenido --- */
+  text-align: center; /* --- NUEVO: Centra el texto --- */
+}
+/* ----------------------------------- */
+
+.dashboard-card.styled:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon {
+  color: var(--color-primary);
+  margin-bottom: 1rem;
+  /* align-self: center; --- Quitado, ya lo hace el 'align-items: center' del padre --- */
+}
+.dashboard-card:first-child .card-icon {
+    color: var(--color-secondary-dark);
+}
+
+.dashboard-card h4 {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  color: var(--color-text-dark);
+  margin: 0 0 0.5rem 0;
+  /* text-align: center; --- Quitado, ya lo hace el 'text-align: center' del padre --- */
+}
+
+.dashboard-card p {
+  color: var(--color-text-medium);
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  flex-grow: 1; /* Sigue empujando el botón al fondo */
+  /* text-align: center; --- Quitado, ya lo hace el 'text-align: center' del padre --- */
+}
+
+/* --- ESTILO DE BOTÓN CORREGIDO --- */
+.btn-dashboard {
+  padding: 10px 20px; /* Padding horizontal ajustado */
+  font-size: 0.95rem;
+  /* width: 100%; --- ESTA LÍNEA SE ELIMINA --- */
+  align-self: auto; /* Dejar que el 'align-items: center' del padre lo centre */
+  margin-top: auto; /* Empuja al fondo */
+}
+/* --------------------------------- */
+
+/* Badge de estado (opcional, solo para el primer card) */
+.status-badge {
+    /* ... (sin cambios) ... */
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.status-pendiente { background-color: #ffc107; color: #333; }
+.status-rechazado { background-color: #dc3545; color: white; }
+.status-no_aplica { background-color: #f0f0f0; color: #6c757d; }
+.status-verificado { background-color: var(--color-secondary); color: var(--color-secondary-dark); }
+
+
+/* --- ESTILOS PARA CARD DESHABILITADO (CORREGIDO) --- */
+.dashboard-card.card-disabled {
+    opacity: 0.7; 
+    background-color: #f8f9fa;
+    box-shadow: none;
+    pointer-events: all; 
+}
+.dashboard-card.card-disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+.card-disabled .btn-disabled {
+    cursor: not-allowed;
+    box-shadow: none;
+    pointer-events: none;
+}
+.card-disabled-overlay {
+    /* ... (sin cambios) ... */
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(4px);
+    color: var(--color-primary);
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border-radius: 12px;
+    z-index: 10;
+    pointer-events: none; 
+    text-align: center;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+
+
+/* --- Enlace Rápido Perfil --- */
+.quick-link-perfil {
+    /* ... (sin cambios) ... */
+    margin-top: 2rem;
+    text-align: center;
+}
+.quick-link-perfil .btn-tertiary {
+    /* ... (sin cambios) ... */
+    background-color: transparent;
+    color: var(--color-primary);
+    font-weight: 600;
+    box-shadow: none;
+    border: 1px solid var(--color-primary);
+    padding: 10px 20px;
+}
+.quick-link-perfil .btn-tertiary:hover {
+    /* ... (sin cambios) ... */
+    background-color: var(--color-primary);
+    color: white;
+    transform: none;
+    box-shadow: 0 4px 10px rgba(138, 99, 210, 0.4);
+}
+
+/* --- Adaptabilidad --- */
+@media (max-width: 840px) { 
+    .dashboard-grid {
+        grid-template-columns: 1fr; 
+        max-width: 450px; 
+    }
+}
+@media (max-width: 768px) {
+    .dashboard-header-styled {
+        /* ... (sin cambios) ... */
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+        text-align: left;
+    }
+    .welcome-header { font-size: 1.8rem; }
+    .header-status { margin-top: 1rem; text-align: left; }
+    .dashboard-summary { max-width: 100%; }
+}

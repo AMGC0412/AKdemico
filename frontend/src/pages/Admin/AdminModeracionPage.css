@@ -1,0 +1,112 @@
+/* ---
+  Estilos para AdminModeracionPage (AdminModeracionPage.css)
+  Temática: "Pixel-Tech Académico"
+--- */
+
+.admin-moderacion-page {
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* --- Lista de Tarjetas de Moderación --- */
+.moderacion-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 900px; /* Las tarjetas de reseña pueden ser anchas */
+}
+
+.moderacion-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-background, rgba(255, 255, 255, 0.1));
+  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+  border-radius: var(--card-radius, 16px);
+  border-left: 5px solid var(--color-warning, #FF9800); /* Borde de "pendiente" */
+  transition: all 0.3s ease;
+}
+
+.moderacion-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border-color: var(--color-warning, #FF9800);
+}
+
+.moderacion-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.moderacion-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.95rem;
+  color: var(--color-text-light, #A0A0A0);
+}
+
+.moderacion-info strong {
+  color: var(--color-text-body, #E0E0E0);
+  font-weight: 600;
+}
+
+.moderacion-rating {
+  font-size: 1.1rem;
+}
+.moderacion-rating .star-filled {
+  color: var(--color-warning, #FF9800);
+}
+.moderacion-rating .star-empty {
+  color: var(--card-border, rgba(255, 255, 255, 0.2));
+}
+
+.moderacion-card-body {
+  padding: 1.5rem 2rem;
+  position: relative;
+  flex-grow: 1;
+}
+
+.moderacion-card-body .quote-icon {
+  position: absolute;
+  top: 1.5rem;
+  left: 1rem;
+  font-size: 1.5rem;
+  color: var(--color-primary, #6d41dc);
+  opacity: 0.3;
+}
+
+.comentario-texto {
+  font-size: 1.1rem;
+  color: var(--color-text-body, #E0E0E0);
+  line-height: 1.7;
+  font-style: italic;
+  margin: 0;
+  padding-left: 2rem; /* Espacio para la comilla */
+}
+
+/* --- Botones de la Tarjeta --- */
+.moderacion-card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.8rem;
+  padding: 1rem 1.5rem;
+  background: rgba(0,0,0, 0.15);
+  border-top: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+  border-radius: 0 0 var(--card-radius) var(--card-radius);
+}
+
+/* Reutilizamos .btn-small de AdminVerificationPage.css */
+.btn.btn-small .fa-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* (Asegúrate de tener .admin-empty-state y .admin-page-loader definidos,
+   lo cual ya hicimos en AdminVerificationPage.css) */

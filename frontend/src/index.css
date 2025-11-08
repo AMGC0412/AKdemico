@@ -1,0 +1,185 @@
+/* ---
+  Estilos Globales (index.css) - REDISEÑO COMPLETO
+  Temática: "AKdémico Art Pop" (Inspirado en la Mascota)
+  Paleta: Colores de la lechuza (Azul Eléctrico, Turquesa Brillante, Púrpura Profundo)
+--- */
+
+/* --- Importación de Fuentes --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+/* Importa la fuente pixel para títulos de display */
+@font-face {
+  font-family: '04b30';
+  /* Asume que la fuente está en la carpeta public/fonts */
+  src: url('/fonts/04b30.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* --- [NUEVA] PALETA DE COLORES GLOBAL (INSPIRADA EN LA MASCOTA) --- */
+:root {
+  --font-display-pixel: '04b30', sans-serif; /* Fuente para Títulos */
+  --font-body-poppins: 'Poppins', sans-serif; /* Fuente para texto normal */
+  
+  /* Colores VIBRANTES de la mascota */
+  --color-brand-blue: #1A52B8;        /* Azul Eléctrico (Cuerpo Lechuza) */
+  --color-brand-purple: #4B004B;    /* Púrpura Profundo (Libro) */
+  --color-brand-cyan: #00A6AD;      /* Turquesa (Gafas) */
+  
+  /* Acentos BRILLANTES de la mascota */
+  --color-accent-magenta: #FF3EFF;   /* Magenta (Alas) */
+  --color-accent-cyan: #4DFFFF;      /* Cian Brillante (Bombilla) */
+  --color-accent-blue: #6C9EFF;      /* Azul Claro (Reflejos) */
+  --color-accent-red: #E63946;       /* Un rojo vibrante para errores */
+
+  /* Colores Base Neutros (Alto Contraste) */
+  --color-bg-dark: #181818;          /* Gris Oscuro / Negro (Fondo Art Pop) */
+  --color-bg-light: #2A2A2A;        /* Gris Claro (Fondo de Tarjetas) */
+  --color-text-primary: #FFFFFF;    /* Texto principal blanco */
+  --color-text-secondary: #E0E0E0;  /* Texto secundario gris claro */
+  --color-text-tertiary: #A0A0A0;   /* Texto más tenue */
+  
+  --card-radius: 12px;
+}
+
+/* --- Estilos Base Globales --- */
+body {
+  margin: 0;
+  font-family: var(--font-body-poppins); /* Fuente Poppins para todo el cuerpo */
+  font-size: 16px;
+  line-height: 1.6;
+  background-color: var(--color-bg-dark); /* Fondo oscuro por defecto */
+  color: var(--color-text-secondary); /* Texto claro por defecto */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Títulos por Defecto (Limpios y Blancos) --- */
+/* Los componentes específicos (como HomePage) pueden sobrescribir esto con la fuente pixel */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body-poppins);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 1rem 0;
+}
+
+a {
+  color: var(--color-accent-cyan); /* Enlaces en Cian brillante */
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* --- ESTILOS DE BOTONES GLOBALES (ART POP) --- */
+/* Esto reemplaza los botones verdes/morados anteriores */
+
+.btn {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1.1rem; /* Botones más grandes */
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  text-transform: uppercase; /* Estilo Art Pop */
+  letter-spacing: 0.5px;
+  font-family: var(--font-body-poppins);
+}
+
+/* --- Botón Primario (Azul Lechuza) --- */
+.btn-primary {
+  background-color: var(--color-brand-blue); 
+  color: var(--color-text-primary);
+  box-shadow: 0 4px 15px rgba(0,0,0, 0.4);
+}
+.btn-primary:hover {
+  background-color: var(--color-accent-blue);
+  color: var(--color-bg-dark); /* Texto oscuro para contraste */
+  box-shadow: 0 6px 20px rgba(0,0,0, 0.6);
+  transform: translateY(-3px);
+}
+
+/* --- Botón Secundario (Borde Blanco/Gris) --- */
+.btn-secondary {
+  background-color: transparent;
+  color: var(--color-text-secondary); 
+  border-color: var(--color-text-secondary); 
+}
+.btn-secondary:hover {
+  background-color: var(--color-text-primary); 
+  color: var(--color-bg-dark); /* Texto oscuro */
+  border-color: var(--color-text-primary);
+  transform: translateY(-3px);
+}
+
+/* --- Botón de Peligro (Rojo Art Pop) --- */
+.btn-danger {
+  background-color: var(--color-accent-red);
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #F15B67;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(230, 57, 70, 0.4);
+}
+
+/* --- Botón de CTA (Cian Brillante) --- */
+/* Se usa en HomePage, pero es bueno tenerlo global */
+.btn-secondary-cta {
+  padding: 14px 35px;
+  border-radius: 10px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8rem;
+  justify-content: center;
+  
+  background-color: var(--color-accent-cyan); /* Cian Brillante */
+  color: var(--color-bg-dark); /* Texto negro */
+}
+.btn-secondary-cta:hover {
+  background-color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,0,0, 0.4);
+}
+
+
+/* --- Clases de Utilidad (Mensajes) --- */
+.error-message {
+  color: var(--color-text-primary);
+  background-color: rgba(230, 57, 70, 0.5); /* Rojo */
+  border: 1px solid var(--color-accent-red);
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.success-message {
+  color: var(--color-bg-dark);
+  background-color: var(--color-accent-cyan); /* Cian */
+  border: 1px solid var(--color-brand-cyan);
+  padding: 10px 15px;
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}

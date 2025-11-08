@@ -1,0 +1,123 @@
+/* Enhanced and Styled CourseCard */
+.course-card.styled {
+  background-color: var(--color-white-frost); /* Fondo semi-transparente */
+  backdrop-filter: blur(8px);
+  border-radius: 12px; /* Bordes más redondeados */
+  overflow: hidden; /* Para que la imagen encaje */
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Borde sutil */
+}
+
+.course-card.styled:hover {
+  transform: translateY(-5px); /* Levantar al pasar el mouse */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Imagen de la Tarjeta --- */
+.course-card-image {
+  height: 180px; /* Altura fija para la imagen */
+  background-color: #eee; /* Placeholder */
+  position: relative; /* Para el precio superpuesto */
+  background-size: cover;
+  background-position: center;
+  /* Estilo para la imagen real: */
+  /* background-image: url('/path/to/default-image.jpg'); */
+  display: flex; /* Placeholder */
+  align-items: center; /* Placeholder */
+  justify-content: center; /* Placeholder */
+  color: #aaa; /* Placeholder */
+}
+/* .course-card-image img { width: 100%; height: 100%; object-fit: cover; } */
+
+.price-overlay {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(138, 99, 210, 0.9); /* Morado semi-transparente */
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+/* --- Contenido de la Tarjeta --- */
+.course-card-content.styled {
+  padding: 1rem 1.2rem; /* Más padding */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Para que ocupe el espacio restante */
+}
+
+.course-card-category { /* Estilo opcional para categoría */
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.course-card-title.styled {
+  font-family: var(--font-heading);
+  font-size: 1.15rem; /* Ligeramente más grande */
+  font-weight: 600;
+  color: var(--color-text-dark);
+  margin: 0 0 0.6rem 0;
+  line-height: 1.3;
+  /* Limitar a 2 líneas (opcional) */
+  /* display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden; */
+}
+.course-card-title.styled a {
+    color: inherit; /* Hereda color */
+    text-decoration: none;
+}
+.course-card-title.styled a:hover {
+    color: var(--color-primary); /* Cambia a morado al pasar el mouse */
+}
+
+.course-card-teacher-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-medium);
+  margin-bottom: 0.8rem;
+}
+.teacher-icon {
+    color: var(--color-accent-blue); /* Icono azul */
+}
+
+/* --- Meta Info (Modalidad, etc.) --- */
+.course-card-meta {
+  display: flex;
+  justify-content: space-between; /* Espacia los elementos */
+  align-items: center;
+  margin-top: auto; /* Empuja al final de la tarjeta */
+  padding-top: 0.8rem;
+  border-top: 1px solid #eee; /* Separador sutil */
+  font-size: 0.85rem;
+  color: var(--color-text-medium);
+}
+
+.meta-item.styled {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.meta-icon {
+  color: var(--color-primary); /* Iconos morados */
+}
+
+/* Estrellas pequeñas (opcional) */
+.star-rating-display-small { color: #ffc107; font-size: 0.9rem; }
+.star-rating-display-small .stars { letter-spacing: 0.5px; }
+
+
+/* Botón opcional dentro de la tarjeta */
+/* .btn-card-details { padding: 8px 15px; font-size: 0.9rem; margin-top: 1rem; } */

@@ -1,0 +1,206 @@
+/* ---
+  Estilos para Footer (Footer.css) - REDISEÑO ART POP
+  [MEJORA] Añadidos iconos sociales y efectos hover refinados.
+--- */
+
+/* --- [NUEVA] PALETA DE COLORES (Consistente con HomePage.css) --- */
+:root {
+  --font-display-pixel: '04b30', sans-serif;
+  --font-body-poppins: 'Poppins', sans-serif;
+  
+  /* Colores VIBRANTES de la mascota */
+  --color-brand-blue: #1A52B8;
+  --color-brand-purple: #4B004B;
+  --color-brand-cyan: #00A6AD;
+  
+  /* Acentos BRILLANTES de la mascota */
+  --color-accent-magenta: #FF3EFF;
+  --color-accent-cyan: #4DFFFF;
+  --color-accent-blue: #6C9EFF;
+
+  /* Colores Base Neutros */
+  --color-bg-dark: #181818;
+  --color-bg-light: #2A2A2A;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E0E0E0;
+  --color-text-tertiary: #A0A0A0;
+  
+  --card-radius: 12px;
+}
+
+/* --- Estilo Base del Footer --- */
+.footer-akademic {
+  padding: 4rem 2rem 2rem 2rem;
+  background: var(--color-bg-dark); /* Fondo oscuro Art Pop */
+  border-top: 2px solid #333; /* Borde superior sutil */
+  width: 100%;
+  margin-top: auto;
+  box-sizing: border-box;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 3rem;
+  margin-bottom: 3rem;
+  max-width: 1200px;
+  margin: 0 auto 3rem auto;
+}
+
+/* --- Columna de Marca (Logo y Sociales) --- */
+.footer-brand-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Espacio entre logo, texto y sociales */
+}
+
+.footer-logo-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.footer-logo-brand img {
+  height: 40px; 
+  width: auto;
+}
+
+.footer-logo-text {
+  font-family: var(--font-display-pixel); /* Fuente Pixel */
+  font-size: 1.8rem;
+  letter-spacing: 1px;
+  color: var(--color-brand-blue); /* Azul Eléctrico */
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.footer-brand-column p {
+  font-size: 1.05rem;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* --- [NUEVO] Iconos de Redes Sociales --- */
+.footer-social-icons {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem; /* Más espacio entre iconos */
+  margin-top: 0.5rem; /* Espacio extra */
+}
+
+.footer-social-icons a {
+  color: var(--color-text-tertiary); /* Color sutil por defecto */
+  font-size: 1.5rem; /* Tamaño del icono */
+  transition: all 0.3s ease;
+}
+
+.footer-social-icons a:hover {
+  color: var(--color-accent-cyan); /* Resalta en Cian Brillante */
+  transform: scale(1.1) translateY(-2px); /* Efecto Pop */
+  text-shadow: 0 0 10px var(--color-accent-cyan);
+}
+
+
+/* --- Columnas de Enlaces --- */
+.footer-links h4 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--color-text-primary); /* Blanco */
+  margin-bottom: 1.5rem;
+  margin-top: 0;
+}
+
+.footer-links a {
+  display: block;
+  text-decoration: none;
+  color: var(--color-text-secondary); /* Gris claro */
+  margin-bottom: 0.8rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+/* [MEJORA] Hover de enlace más limpio */
+.footer-links a:hover {
+  color: var(--color-accent-cyan); 
+  /* Eliminado transform: translateX(5px); */
+}
+
+/* --- [MEJORA] Enlace CTA "Enseña con Nosotros" --- */
+.footer-cta-link {
+  color: var(--color-accent-cyan) !important; /* Cian Brillante por defecto */
+  font-weight: 700;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.25rem 0.5rem; /* Lo hacemos parecer un "tag" */
+  margin-left: -0.5rem; /* Alinea el padding */
+}
+
+.footer-cta-link:hover {
+  color: var(--color-accent-magenta) !important; /* Magenta al pasar el ratón */
+  background-color: rgba(255, 62, 255, 0.1); /* Fondo magenta sutil */
+  border-color: var(--color-accent-magenta); /* Borde magenta */
+  transform: none; /* Resetea el transform de 'a:hover' */
+  box-shadow: 0 0 10px rgba(255, 62, 255, 0.5);
+}
+
+
+/* --- Barra Inferior (Copyright) --- */
+.footer-bottom {
+  text-align: center;
+  padding-top: 2rem;
+  border-top: 1px solid #333;
+  color: var(--color-text-tertiary);
+  font-size: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- Enlace de Admin Secreto (Sutil) --- */
+.footer-admin-login {
+  margin-top: 0.5rem;
+}
+
+.footer-admin-login a {
+  color: var(--color-text-tertiary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.footer-admin-login a:hover {
+  opacity: 1;
+  color: var(--color-accent-blue);
+  text-decoration: underline;
+}
+
+
+/* --- Adaptabilidad --- */
+@media (max-width: 1200px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+  }
+  .footer-brand-column {
+    grid-column: span 2; 
+    text-align: center;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2.5rem;
+  }
+  .footer-brand-column {
+    grid-column: span 1; 
+  }
+  .footer-links h4 {
+    margin-bottom: 1rem;
+  }
+}

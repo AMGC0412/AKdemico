@@ -1,0 +1,165 @@
+/* Enhanced and Styled PaymentUploadPage */
+.payment-upload-page.styled {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Evita que se centre verticalmente */
+  padding: var(--spacing-xl) var(--spacing-md);
+  /* background: linear-gradient(to bottom right, #a0e7e5, #c4e1f7); /* Gradiente de fondo */
+  min-height: calc(100vh - 100px); /* Ajusta según tu header/footer */
+}
+
+.upload-container.styled {
+  background-color: var(--color-white-frost);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border-light);
+  padding: var(--spacing-xl) var(--spacing-xxl);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 550px; /* Ancho ajustado */
+  text-align: center;
+  transition: transform 0.3s ease; /* Transición suave */
+}
+.upload-container.styled.dragging { /* Efecto visual al arrastrar */
+    transform: scale(1.02);
+    box-shadow: 0 12px 30px rgba(106, 130, 251, 0.4);
+}
+
+.upload-container h2 {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--color-primary);
+  font-size: 1.8rem;
+  font-family: var(--font-heading);
+}
+
+.upload-container p {
+  color: var(--color-text-medium);
+  margin-bottom: var(--spacing-lg);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Estilos para Mensajes de Error/Éxito */
+.message {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    text-align: left;
+}
+.message.error {
+    color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb;
+}
+.message.success {
+    color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb;
+}
+
+
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* Zona de Arrastrar y Soltar */
+.file-drop-zone {
+  border: 2px dashed var(--color-accent-blue);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl) var(--spacing-lg);
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px; /* Altura mínima */
+  text-align: center;
+}
+.file-drop-zone:hover {
+    background-color: rgba(106, 130, 251, 0.05); /* Fondo azul muy claro al pasar */
+}
+.file-drop-zone.dragging { /* Estilo cuando se arrastra sobre ella */
+    background-color: rgba(106, 130, 251, 0.1);
+    border-color: var(--color-primary);
+}
+
+.drop-icon {
+    font-size: 2.5rem;
+    color: var(--color-accent-blue);
+    margin-bottom: var(--spacing-md);
+}
+
+.file-label.styled {
+  font-weight: 600;
+  color: var(--color-primary); /* Morado */
+  cursor: pointer;
+  font-size: 1rem;
+}
+.file-label.styled:hover {
+    text-decoration: underline;
+}
+
+.pdf-info { /* Mensaje para PDF seleccionado */
+    margin-top: var(--spacing-sm);
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    font-style: italic;
+}
+
+/* Vista Previa */
+.image-preview.styled {
+  margin-top: 0; /* Ya hay gap en el form */
+  max-height: 250px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  border: 1px solid #eee;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-light);
+}
+.image-preview img {
+  max-width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+}
+
+/* Botón y Spinner */
+.upload-form .btn {
+  margin-top: var(--spacing-xs);
+  display: flex; /* Para alinear icono spinner */
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+}
+
+.spinner { /* Animación de carga */
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.disabled-like { /* Clase visual para botones deshabilitados */
+    background-color: #e9ecef !important; /* Forzar gris */
+    color: #adb5bd !important;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.back-link.styled {
+    margin-top: var(--spacing-xl);
+    font-size: 0.9rem;
+}
+.back-link a {
+    color: var(--color-text-medium);
+    font-weight: 500;
+}
+.back-link a:hover {
+    color: var(--color-primary);
+}
