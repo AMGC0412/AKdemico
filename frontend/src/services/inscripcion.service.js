@@ -1,67 +1,155 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:4000/api/v1/inscripciones';
-const getToken = () => localStorage.getItem('authToken'); // Asumiendo que guardas el token aquí
+// Definimos las URL base. 
+// Usamos VITE_API_BASE_URL si existe, si no, localhost.
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api/v1';
+const API_URL_INSCRIPCIONES = `${BASE_URL}/inscripciones`;
+const API_URL_ESTUDIANTES = `${BASE_URL}/estudiantes`; 
 
-/**
- * Llama a la API para inscribir al estudiante actual en un lote.
- * @param {string|number} loteId - El ID del lote al que se inscribe.
- * @returns {Promise<object>} - Promesa que resuelve con la respuesta del backend.
- */
+// Helper para obtener el token
+const getToken = () => localStorage.getItem('authToken');
+
+// Configuración de headers con token
+const getAuthHeaders = () => ({
+    headers: { Authorization: `Bearer ${getToken()}` }
+});
+
+/* =================================================================
+   FUNCIONALIDADES DE INSCRIPCIÓN (Lógica existente)
+   ================================================================= */
+
 export const inscribirseEnLote = async (loteId) => {
   try {
-    const token = getToken();
-    // La URL incluye el loteId al final
-    const response = await axios.post(`${API_URL}/lote/${loteId}`, 
-      {}, // El cuerpo de la petición está vacío, el ID va en la URL
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
+    // POST /api/v1/inscripciones/lote/:loteId
+    const response = await axios.post(
+        `${API_URL_INSCRIPCIONES}/lote/${loteId}`, 
+        {}, 
+        getAuthHeaders()
     );
-    return response.data; // Devuelve { mensaje: "¡Inscripción exitosa!..." }
-  } catch (error) {
-    console.error(`Error al inscribirse en el lote ${loteId}:`, error.response?.data || error.message);
-    // Relanzamos el error para que el componente lo maneje (ej. mostrar mensaje específico)
-    throw error.response?.data || new Error('Error de red al intentar inscribirse.'); 
-  }
-};
-
-/**
- * Llama a la API para verificar el estado de inscripción del usuario actual en un lote.
- * @param {string|number} loteId - El ID del lote a verificar.
- * @returns {Promise<object>} - Promesa que resuelve a { estaInscrito: boolean, estado: string|null }.
- */
-export const obtenerMiEstadoInscripcionEnLote = async (loteId) => {
-  try {
-    const token = getToken();
-    const response = await axios.get(`${API_URL}/mi-estado/lote/${loteId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
     return response.data;
   } catch (error) {
-    // Si da 404 o 500, asumimos que no está inscrito o hay error
-    console.error(`Error al verificar estado en lote ${loteId}:`, error.response?.data || error.message);
-    // Devolvemos un estado 'no inscrito' en caso de error para no bloquear la UI
-    return { estaInscrito: false, estado: null }; 
+    console.error(`Error al inscribirse en lote ${loteId}:`, error);
+    throw error.response?.data || new Error('Error al inscribirse.');
   }
 };
 
-/**
- * Llama a la API para cancelar la inscripción del estudiante actual.
- * @param {string|number} inscripcionId - El ID de la inscripción a cancelar.
- * @returns {Promise<object>} - Promesa que resuelve con la respuesta del backend.
- */
+export const obtenerMiEstadoInscripcionEnLote = async (loteId) => {
+  try {
+    // GET /api/v1/inscripciones/mi-estado/lote/:loteId
+    const response = await axios.get(
+        `${API_URL_INSCRIPCIONES}/mi-estado/lote/${loteId}`, 
+        getAuthHeaders()
+    );
+    return response.data;
+  } catch (error) {
+    return { estaInscrito: false, estado: null };
+  }
+};
+
 export const cancelarInscripcion = async (inscripcionId) => {
   try {
-    const token = getToken();
-    const response = await axios.delete(`${API_URL}/${inscripcionId}`, { // Usa el método DELETE
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    return response.data; // Devuelve { mensaje: "Inscripción cancelada..." }
+    // DELETE /api/v1/inscripciones/:inscripcionId
+    const response = await axios.delete(
+        `${API_URL_INSCRIPCIONES}/${inscripcionId}`, 
+        getAuthHeaders()
+    );
+    return response.data;
   } catch (error) {
-    console.error(`Error al cancelar inscripción ${inscripcionId}:`, error.response?.data || error.message);
-    throw error.response?.data || new Error('Error de red al intentar cancelar.');
+    console.error(`Error al cancelar inscripción ${inscripcionId}:`, error);
+    throw error.response?.data || new Error('Error al cancelar.');
   }
 };
 
-// Podríamos añadir funciones aquí para obtener "Mis Inscripciones", cancelar, etc.
+export const getMisInscripciones = async () => {
+  try {
+    // GET /api/v1/inscripciones/mis-inscripciones
+    const response = await axios.get(
+        `${API_URL_INSCRIPCIONES}/mis-inscripciones`, 
+        getAuthHeaders()
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener mis inscripciones:', error);
+    throw error.response?.data || new Error('Error al obtener cursos.');
+  }
+};
+
+/* =================================================================
+   NUEVAS FUNCIONES (Para el Dashboard de Mis Inscripciones)
+   Estas funciones resuelven el error de "export not found".
+   Nota: Requieren que crees los endpoints en el backend o usarán mocks.
+   ================================================================= */
+
+// Obtener estadísticas de progreso
+export const getProgressStats = async () => {
+  try {
+    // GET /api/v1/estudiantes/dashboard/stats
+    // Si no tienes el endpoint aún, puedes descomentar el return mock de abajo
+    // const response = await axios.get(`${API_URL_ESTUDIANTES}/dashboard/stats`, getAuthHeaders());
+    // return response.data;
+    
+    // MOCK TEMPORAL (Para que no falle la pantalla mientras haces el backend)
+    return {
+        promedio_general: 0,
+        cursos_completados: 0,
+        total_horas: 0
+    };
+  } catch (error) {
+    console.warn('Error fetching progress stats (usando default):', error);
+    return null;
+  }
+};
+
+// Obtener próximas clases
+export const getUpcomingClasses = async () => {
+  try {
+    // GET /api/v1/estudiantes/dashboard/clases-proximas
+    // const response = await axios.get(`${API_URL_ESTUDIANTES}/dashboard/clases-proximas`, getAuthHeaders());
+    // return response.data;
+
+    // MOCK TEMPORAL
+    return [];
+  } catch (error) {
+    console.warn('Error fetching upcoming classes:', error);
+    return [];
+  }
+};
+
+// Obtener recomendaciones
+export const getCourseRecommendations = async () => {
+  try {
+    // GET /api/v1/estudiantes/dashboard/recomendaciones
+    // const response = await axios.get(`${API_URL_ESTUDIANTES}/dashboard/recomendaciones`, getAuthHeaders());
+    // return response.data;
+
+    // MOCK TEMPORAL
+    return [];
+  } catch (error) {
+    console.warn('Error fetching recommendations:', error);
+    return [];
+  }
+};
+
+/* =================================================================
+   NUEVA FUNCIÓN: CALENDARIO
+   ================================================================= */
+
+/**
+ * Obtiene los eventos del calendario del estudiante.
+ * Llama al endpoint GET /api/v1/inscripciones/calendario
+ */
+export const getStudentCalendarData = async () => {
+  const token = getToken();
+  if (!token) return { hitos: [], cursos: [] };
+  
+  try {
+    const response = await axios.get(
+        `${API_URL_INSCRIPCIONES}/calendario`, 
+        getAuthHeaders()
+    );
+    return response.data; // { hitos: [], cursos: [] }
+  } catch (error) {
+    console.error('Error fetching calendar data:', error);
+    return { hitos: [], cursos: [] };
+  }
+};

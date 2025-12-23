@@ -1,14 +1,14 @@
 /* ---
-  Estilos para CourseSearchPage (CourseSearchPage.css) - REDISEÑO COMPLETO
-  Temática: "AKdémico Art Pop" (Inspirado en la Mascota)
-  Paleta: Colores de la lechuza (Azul, Turquesa, Púrpura)
+  Estilos para CourseSearchPage (CourseSearchPage.css)
+  [ANIMACIONES AÑADIDAS]: Slide-in para la barra lateral y fade-in para los resultados.
 --- */
 
-/* --- [NUEVA] PALETA DE COLORES (Consistente con HomePage.css) --- */
+/* --- Paleta de Colores (Basada en la Mascota) --- */
 :root {
   --font-display-pixel: '04b30', sans-serif;
   --font-body-poppins: 'Poppins', sans-serif;
   
+  /* Paleta de la Mascota */
   --color-brand-blue: #1A52B8;
   --color-brand-purple: #4B004B;
   --color-brand-cyan: #00A6AD;
@@ -25,62 +25,91 @@
   --color-text-tertiary: #A0A0A0;
   
   --card-radius: 12px;
+
+  /* Gradiente de Neón para bordes */
+  --gradient-neon: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-blue), var(--color-accent-magenta));
+}
+
+/* =========================================
+   ANIMACIONES KEYFRAMES
+   ========================================= */
+
+@keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeInResult {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* --- Estilo Base de la Página --- */
 .search-page-akademic {
-  padding: 2.5rem 0; /* Espaciado general */
-  background-color: var(--color-bg-dark); /* Fondo oscuro */
+  padding: 2.5rem 0; 
+  background-color: var(--color-bg-dark); 
   min-height: 80vh;
 }
 
-/* --- Contenedor Principal (Centrado) --- */
+/* --- Contenedor Principal (Layout de Grid) --- */
 .search-container {
-  max-width: 1200px;
+  max-width: 1400px; 
   margin: 0 auto;
   padding: 0 2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem; /* Espacio entre filtros y resultados */
+  display: grid;
+  grid-template-columns: 300px 1fr; 
+  gap: 2.5rem; 
 }
 
-
-/* --- Sección de Filtros Estilizada (Art Pop) --- */
-.search-filters-section {
-  background-color: var(--color-bg-light); /* Fondo de tarjeta */
-  padding: 2rem 2.5rem;
+/* --- Sidebar de Filtros (Glassmorphism) --- */
+.search-filters-sidebar {
+  background: rgba(42, 42, 42, 0.5); 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1); 
+  
+  padding: 1.5rem;
   border-radius: var(--card-radius);
-  border: 2px solid var(--color-brand-blue); /* Borde Art Pop Azul */
   box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  
+  position: sticky;
+  top: 100px; 
+  align-self: start; 
+  
+  /* ANIMACIÓN DE ENTRADA */
+  animation: slideInFromLeft 0.5s ease-out;
 }
 
+/* --- Cabecera de Sección (Con Borde de Neón) --- */
 .search-section-header {
   display: flex;
   align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #444;
+  
+  border-image: var(--gradient-neon) 1;
+  border-bottom: 2px solid;
 }
 .header-icon {
-  color: var(--color-brand-blue); /* Icono Azul */
+  color: var(--color-accent-cyan); 
   font-size: 1.8rem;
 }
 .search-section-header h2 {
   font-family: var(--font-display-pixel);
-  font-size: 1.8rem; /* Tamaño de fuente pixel */
+  font-size: 1.8rem; 
   color: var(--color-text-primary); 
   text-transform: uppercase;
   margin: 0;
   font-weight: normal;
+  text-shadow: 0 0 10px var(--color-accent-cyan); 
 }
 
-/* --- Grid de Filtros --- */
+/* --- Grid de Filtros (Ahora vertical en el sidebar) --- */
 .filters-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adaptable */
-  gap: 1.5rem 1.5rem; /* Espacio entre filtros */
-  align-items: end; /* Alinear botones al final */
+  display: flex;
+  flex-direction: column; 
+  gap: 1.5rem; 
 }
 
 .filter-item label {
@@ -91,38 +120,36 @@
   color: var(--color-text-secondary);
 }
 
-/* [NUEVO] Estilo Art Pop para Inputs y Selects */
+/* Estilo Art Pop para Inputs y Selects */
 .filter-item input[type="text"],
-.filter-item select,
-.filter-item input[type="range"] {
+.filter-item select {
   width: 100%;
   padding: 12px 14px;
-  border: 2px solid #555; /* Borde oscuro neutro */
+  border: 2px solid #555; 
   border-radius: 8px;
   box-sizing: border-box;
   font-size: 1rem;
-  background-color: var(--color-bg-dark); /* Fondo negro */
-  color: var(--color-text-primary); /* Texto blanco */
+  background-color: var(--color-bg-dark); 
+  color: var(--color-text-primary); 
   font-family: var(--font-body-poppins);
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-.filter-item input[type="range"] { padding: 0; } 
 
 .filter-item select {
     cursor: pointer;
-    appearance: none; /* Quita flecha por defecto */
+    appearance: none; 
     background-image: url('data:image/svg+xml;utf8,<svg fill="%23A0A0A0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
     background-repeat: no-repeat;
     background-position: right 12px center;
-    padding-right: 40px; /* Espacio para la flecha SVG */
+    padding-right: 40px; 
 }
 
-/* [NUEVO] Efecto Focus Art Pop */
+/* Efecto Focus Art Pop */
 .filter-item input[type="text"]:focus,
 .filter-item select:focus {
   outline: none;
-  border-color: var(--color-accent-cyan); /* Borde Cian Brillante */
-  box-shadow: 0 0 10px rgba(77, 255, 255, 0.5); /* Brillo Cian */
+  border-color: var(--color-accent-cyan); 
+  box-shadow: 0 0 10px rgba(77, 255, 255, 0.5); 
 }
 
 .input-with-icon {
@@ -136,30 +163,83 @@
     color: var(--color-text-tertiary);
 }
 .input-with-icon input {
-    padding-left: 40px; /* Espacio para el icono */
+    padding-left: 40px; 
 }
 
-/* Botón Limpiar usa estilos globales de index.css */
+/* --- Estilos del Slider de Precio --- */
+.filter-item input[type="range"].price-slider-akademic {
+  -webkit-appearance: none; appearance: none; 
+  width: 100%; height: 8px;
+  background: var(--color-bg-dark); 
+  border-radius: 5px; border: 1px solid #555;
+  outline: none; padding: 0;
+  margin-top: 1rem; cursor: pointer;
+}
+.filter-item input[type="range"].price-slider-akademic::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  margin-top: -7px; 
+  width: 22px; height: 22px;
+  background: var(--color-accent-cyan); 
+  border-radius: 50%;
+  border: 2px solid var(--color-text-primary); 
+  box-shadow: 0 0 8px rgba(77, 255, 255, 0.5); 
+  transition: transform 0.2s ease;
+}
+.filter-item input[type="range"].price-slider-akademic:active::-webkit-slider-thumb {
+    transform: scale(1.2); 
+}
+.filter-item input[type="range"].price-slider-akademic::-moz-range-thumb {
+  width: 22px; height: 22px;
+  background: var(--color-accent-cyan);
+  border-radius: 50%; border: 2px solid var(--color-text-primary);
+  box-shadow: 0 0 8px rgba(77, 255, 255, 0.5);
+  transition: transform 0.2s ease;
+}
+
+/* --- [NUEVA MEJORA VISUAL] Botón Limpiar Filtros Personalizado --- */
 .filter-item.clear-button {
-  align-self: end;
+  margin-top: 1rem; 
 }
-.filter-item.clear-button .btn {
+.filter-item.clear-button .btn.btn-secondary {
+  /* Usamos el Púrpura y Magenta de la paleta de la mascota */
+  background: var(--color-brand-purple);
+  border: 2px solid var(--color-accent-magenta);
+  color: var(--color-text-primary);
+  font-weight: 600;
   width: 100%;
-  padding: 12px; /* Ajustar padding */
+  padding: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(255, 62, 255, 0.3); /* Sombra magenta sutil */
 }
 
-/* --- Sección de Resultados --- */
+.filter-item.clear-button .btn.btn-secondary:hover {
+  background: var(--color-accent-magenta); /* Efecto hover magenta brillante */
+  border-color: var(--color-text-primary); /* Borde blanco para resaltar */
+  color: var(--color-text-primary);
+  box-shadow: 0 0 20px rgba(255, 62, 255, 0.7); /* Sombra más intensa */
+  transform: translateY(-2px); /* Pequeño salto */
+}
+/* --- Fin de la Mejora del Botón --- */
+
+
+/* --- Sección de Resultados (Contenido Principal) --- */
 .search-results-section {
-  /* Ya no necesita estilos, el contenedor base es suficiente */
+  /* Ocupa el espacio restante del grid */
 }
 
 .course-grid-akademic {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); /* Tarjetas consistentes */
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
   gap: 2.5rem; 
 }
 
-/* --- [REUTILIZADO] Estilos de Carga / Error / Vacío (de HomePage.css) --- */
+/* [ANIMACIÓN] Aplicar un retraso a cada tarjeta de curso */
+.course-grid-akademic > .course-card {
+    animation: fadeInResult 0.5s ease-out forwards;
+    /* La lógica para el delay se aplicaría en React (CourseSearchPage.jsx) */
+}
+
+/* --- Estados de Carga / Error / Vacío con Mascota --- */
 .loading-state {
   text-align: center;
   padding: 5rem 0;
@@ -173,67 +253,70 @@
   text-transform: uppercase;
 }
 
-.error-card-pixeltech {
-    background: var(--color-brand-purple);
-    border: 2px solid var(--color-accent-magenta);
+.error-card-pixeltech,
+.empty-state-pixeltech {
+    background: rgba(42, 42, 42, 0.5);
+    backdrop-filter: blur(10px);
+    border: 2px dashed;
     border-radius: var(--card-radius);
     padding: 3rem;
     text-align: center;
     margin: 2rem auto;
     max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
 }
-.error-card-pixeltech svg {
-    color: var(--color-accent-magenta);
-    margin-bottom: 1rem;
+.error-card-pixeltech {
+    border-color: var(--color-accent-red);
 }
-.error-card-pixeltech h3 {
-    font-family: var(--font-display-pixel);
-    font-size: 1.8rem;
-    color: var(--color-text-primary);
-    margin: 0 0 0.5rem 0;
-    text-transform: uppercase;
-}
-.error-card-pixeltech p {
-    font-size: 1.1rem;
-    color: var(--color-text-secondary);
-    margin: 0;
+.empty-state-pixeltech {
+    border-color: var(--color-brand-cyan);
 }
 
-.empty-state-pixeltech {
-    background: var(--color-bg-light);
-    border: 2px dashed var(--color-brand-cyan);
-    border-radius: var(--card-radius);
-    padding: 4rem;
-    text-align: center;
-    margin: 2rem auto;
-    max-width: 600px;
-}
-.empty-state-pixeltech svg {
-    color: var(--color-brand-cyan);
-    opacity: 0.7;
+.mascot-state-image {
+    width: 150px;
+    height: auto;
     margin-bottom: 1rem;
+    filter: drop-shadow(0 0 15px var(--color-accent-cyan));
 }
+
+.error-card-pixeltech h3,
 .empty-state-pixeltech h3 {
     font-family: var(--font-display-pixel);
     font-size: 1.8rem;
     color: var(--color-text-primary);
-    margin: 0 0 0.5rem 0;
+    margin: 0;
     text-transform: uppercase;
 }
+.error-card-pixeltech h3 {
+    color: var(--color-accent-red);
+    text-shadow: 0 0 10px var(--color-accent-red);
+}
+.empty-state-pixeltech h3 {
+    color: var(--color-brand-cyan);
+    text-shadow: 0 0 10px var(--color-brand-cyan);
+}
+
+.error-card-pixeltech p,
 .empty-state-pixeltech p {
     font-size: 1.1rem;
     color: var(--color-text-secondary);
     margin: 0;
+    line-height: 1.6;
 }
 /* --- Fin Estados --- */
 
 
-/* --- [REUTILIZADO] Estilos de CourseCard (de HomePage.css) --- */
-/* (Es mejor mover esto a un archivo global como index.css o CourseCard.css) */
+/* --- Estilos de CourseCard (Efecto Glass) --- */
 .course-card {
   border-radius: var(--card-radius);
-  background: var(--color-bg-light);
-  border: 2px solid #444;
+  background: rgba(42, 42, 42, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   transition: transform 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
   display: flex;
@@ -244,7 +327,7 @@
 .course-card:hover {
   transform: translateY(-10px);
   border-color: var(--color-accent-cyan);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 10px 30px rgba(0, 200, 255, 0.2);
 }
 .course-image-container {
   position: relative;
@@ -252,116 +335,36 @@
   width: 100%;
   overflow: hidden;
   flex-shrink: 0;
-  border-bottom: 2px solid #444;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   transition: border-color 0.4s ease;
 }
-.course-card:hover .course-image-container {
-  border-color: var(--color-accent-cyan);
-}
-.course-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-.course-card:hover .course-image {
-  transform: scale(1.08);
-}
-.course-price {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: var(--color-accent-magenta);
-  color: var(--color-text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 1rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 2;
-  border: 1px solid rgba(255,255,255,0.5);
-}
-.course-info {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  height: 100%;
-}
-.course-category-tag {
-  color: var(--color-accent-cyan);
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-}
-.course-title a {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  text-decoration: none;
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 2.8em;
-}
-.course-title a:hover {
-  color: var(--color-accent-cyan);
-}
-.course-description {
-  font-size: 1rem;
-  color: var(--color-text-secondary);
-  margin: 0 0 1.5rem 0;
-  line-height: 1.6;
-  flex-grow: 1;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.course-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.95rem;
-  color: var(--color-text-tertiary);
-  border-top: 1px solid #444;
-  padding-top: 1.2rem;
-  margin-top: auto;
-  flex-shrink: 0;
-}
-.course-meta span {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.course-meta svg {
-  color: var(--color-accent-cyan);
-}
+/* (El resto de .course-card... estilos se mantiene igual: .course-image, .course-price, etc.) */
 /* --- Fin Estilos CourseCard --- */
 
 
-/* --- Adaptabilidad --- */
-@media (max-width: 768px) {
+/* --- Adaptabilidad (Media Queries) --- */
+@media (max-width: 900px) {
+  .search-container {
+    grid-template-columns: 1fr; 
+    gap: 2rem;
+  }
+  .search-filters-sidebar {
+    position: static; 
+    top: 0;
+  }
   .filters-grid {
-    grid-template-columns: 1fr 1fr; /* Dos columnas en móvil */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex-direction: row;
   }
   .filter-item.search-term,
   .filter-item.clear-button {
-      grid-column: 1 / -1; /* Ocupar todo el ancho */
-  }
-  .course-grid-akademic {
-      grid-template-columns: 1fr; /* Una columna en móvil */
+      grid-column: 1 / -1; 
   }
 }
+
 @media (max-width: 480px) {
     .filters-grid {
-        grid-template-columns: 1fr; /* Una columna en móvil pequeño */
+        grid-template-columns: 1fr; 
     }
 }

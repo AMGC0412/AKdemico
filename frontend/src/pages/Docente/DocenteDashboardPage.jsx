@@ -1,156 +1,296 @@
-import React from 'react';
+/* Archivo: src/pages/Docente/DocenteDashboardPage.jsx */
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
+// [IMPORTACIÓN CORRECTA]
+import { obtenerEstadisticasDocente } from '../../services/dashboard.service'; 
 import { Navigate, Link } from 'react-router-dom';
-import './DocenteDashboardPage.css'; 
-import { FaUserCheck, FaBookOpen, FaCalendarAlt, FaCreditCard, FaUserEdit, FaExclamationTriangle, FaTimesCircle, FaRegCheckCircle, FaLock } from 'react-icons/fa'; // Añadido FaLock
+import './DocenteDashboardPage.css'; // Estilos Ultra Elite
+import { 
+    FaBookOpen, FaCalendarAlt, FaCreditCard, 
+    FaExclamationTriangle, FaTimesCircle, FaCheckCircle, 
+    FaSpinner, FaArrowRight, FaLock, FaUsers, FaChartLine, FaUniversity, FaLayerGroup, FaStar 
+} from 'react-icons/fa';
 
-// --- LÓGICA DE CARDS CORREGIDA ---
-const dashboardItems = (verificationStatus) => {
-    const isVerified = verificationStatus === 'verificado';
-    
-    return [
-        {
-            title: 'Verificación de Perfil',
-            status: verificationStatus,
-            icon: FaUserCheck,
-            description: 'Revisa el estado de tu postulación y documentos.',
-            link: '/docente/verificacion',
-            buttonText: isVerified ? 'Verificado' : 'Postular / Revisar',
-            // --- CAMBIO AQUÍ ---
-            // El botón ahora siempre será morado (secundario)
-            buttonClass: 'btn-secondary',
-            // --------------------
-            isDisabled: false, // Este card nunca se deshabilita
-        },
-        {
-            title: 'Mis Cursos y Planes',
-            icon: FaBookOpen,
-            description: 'Crea, edita y publica tus planes de estudio y lotes.',
-            link: '/docente/cursos',
-            buttonText: 'Gestionar Cursos',
-            buttonClass: 'btn-secondary', // Botón morado
-            isDisabled: !isVerified, // Deshabilitado si no está verificado
-        },
-        {
-            title: 'Disponibilidad y Horarios',
-            icon: FaCalendarAlt,
-            description: 'Define tu franja horaria semanal para recibir reservas.',
-            link: '/docente/horarios',
-            buttonText: 'Ajustar Horario',
-            buttonClass: 'btn-secondary', // Botón morado
-            isDisabled: !isVerified,
-        },
-        {
-            title: 'Pagos Pendientes',
-            icon: FaCreditCard,
-            description: 'Valida los comprobantes de pago de tus estudiantes.',
-            link: '/docente/pagos',
-            buttonText: 'Validar Pagos',
-            buttonClass: 'btn-secondary', // Botón morado
-            isDisabled: !isVerified,
-        },
-    ];
+/* --- CONFIGURACIÓN DE UI POR ESTADO (Strategy Pattern) --- */
+const UI_CONFIG = {
+    verificado: {
+        text: 'CUENTA VERIFICADA',
+        icon: FaCheckCircle,
+        style: 'status-verificado'
+    },
+    pendiente: {
+        text: 'VALIDACIÓN PENDIENTE',
+        icon: FaSpinner,
+        style: 'status-pendiente',
+        alertClass: 'alert-pendiente',
+        title: 'Documentación en Revisión',
+        desc: 'Tus credenciales están siendo analizadas por nuestro equipo académico. Te notificaremos vía email en cuanto el proceso finalice.',
+        btnText: 'Consultar Estado',
+        btnLink: '/docente/verificacion',
+        spin: true
+    },
+    rechazado: {
+        text: 'ACCIÓN REQUERIDA',
+        icon: FaTimesCircle,
+        style: 'status-rechazado',
+        alertClass: 'alert-rechazado',
+        title: 'Postulación Rechazada',
+        desc: 'Se encontraron inconsistencias en tu documentación. Por favor, revisa las observaciones del administrador y vuelve a intentarlo.',
+        btnText: 'Corregir Documentos',
+        btnLink: '/docente/verificacion'
+    },
+    no_aplica: {
+        text: 'PERFIL INCOMPLETO',
+        icon: FaExclamationTriangle,
+        style: 'status-no_aplica',
+        alertClass: 'alert-no_aplica',
+        title: 'Verificación Profesional',
+        desc: 'Para garantizar la calidad académica, requerimos validar tus credenciales antes de que puedas publicar cursos.',
+        btnText: 'Iniciar Verificación',
+        btnLink: '/docente/verificacion'
+    }
 };
-// ---------------------------------
 
+/* --- COMPONENTES VISUALES --- */
 
-// Componente Card (lógica de deshabilitado actualizada)
-const DashboardCard = ({ item }) => (
-    <div className={`dashboard-card styled ${item.isDisabled ? 'card-disabled' : ''}`}>
-        <item.icon className="card-icon" size={30} />
-        <h4>{item.title}</h4>
-        <p>{item.description}</p>
-        <Link 
-            to={!item.isDisabled ? item.link : '#'} 
-            className={`btn ${item.buttonClass} btn-dashboard ${item.isDisabled ? 'btn-disabled' : ''}`}
-            // Prevenir clic si está deshabilitado
-            onClick={(e) => item.isDisabled && e.preventDefault()} 
-        >
-            {item.buttonText}
-        </Link>
-        {/* Badge de estado (opcional, solo para el primer card) */}
-        {item.status && item.title === 'Verificación de Perfil' && (
-             <span className={`status-badge status-${item.status}`}>
-                 {item.status.toUpperCase()}
-             </span>
-        )}
-        {/* Overlay de deshabilitado (más limpio) */}
-        {item.isDisabled && (
-            <div className="card-disabled-overlay">
-                <FaLock />
-                <span>Requiere Verificación</span>
+// 1. SKELETON LOADER (Pantalla de carga futurista)
+const DashboardSkeleton = () => (
+    <div className="dashboard-page akademic-theme">
+        <div className="dashboard-header" style={{height: '300px'}}>
+            <div className="header-content" style={{width: '100%'}}>
+                <div className="skeleton" style={{width: '60%', height: '50px', marginBottom: '1rem'}}></div>
+                <div className="skeleton" style={{width: '40%', height: '20px'}}></div>
+            </div>
+        </div>
+        <div className="stats-deck">
+            <div className="skeleton" style={{height: '150px'}}></div>
+            <div className="skeleton" style={{height: '150px'}}></div>
+            <div className="skeleton" style={{height: '150px'}}></div>
+        </div>
+    </div>
+);
+
+// 2. PANEL DE ESTADÍSTICAS (Datos Reales)
+const StatsDeck = ({ stats }) => (
+    <div className="stats-deck">
+        {/* Tarjeta 1: Alumnos */}
+        <div className="stat-card">
+            <div className="stat-icon-box mint-glow">
+                <FaUsers />
+            </div>
+            <div className="stat-data">
+                <h3>{stats?.alumnos_total || 0}</h3>
+                <p>Estudiantes Activos</p>
+            </div>
+        </div>
+
+        {/* Tarjeta 2: Cursos (Planes Publicados) */}
+        <div className="stat-card">
+            <div className="stat-icon-box cyan-glow">
+                <FaUniversity />
+            </div>
+            <div className="stat-data">
+                {/* [LECTURA CORREGIDA] Lee 'cursos_publicados' */}
+                <h3>{stats?.cursos_publicados || 0}</h3>
+                <p>Cursos Publicados</p>
+            </div>
+        </div>
+
+        {/* Tarjeta 3: Ingresos */}
+        <div className="stat-card">
+            <div className="stat-icon-box purple-glow">
+                <FaChartLine />
+            </div>
+            <div className="stat-data">
+                <h3>S/. {stats?.ingresos_mes ? Number(stats.ingresos_mes).toFixed(2) : '0.00'}</h3>
+                <p>Ingresos del Mes</p>
+            </div>
+        </div>
+        
+        {/* Tarjeta 4 (Opcional): Valoración */}
+        {stats?.valoracion_promedio > 0 && (
+             <div className="stat-card">
+                <div className="stat-icon-box yellow-glow">
+                    <FaStar />
+                </div>
+                <div className="stat-data">
+                    <h3>{stats.valoracion_promedio}</h3>
+                    <p>Calificación Promedio</p>
+                </div>
             </div>
         )}
     </div>
 );
 
+// 3. TARJETA DE ALERTA (Para estados no verificados)
+const VerificationAlert = ({ config }) => (
+    <div className={`verification-alert-card ${config.alertClass}`}>
+        <div className="alert-icon-wrapper">
+            <config.icon className={config.spin ? 'fa-spin' : ''} />
+        </div>
+        <div className="alert-content">
+            <h3>{config.title}</h3>
+            <p>{config.desc}</p>
+        </div>
+        <Link to={config.btnLink} className="btn-action btn-primary">
+            {config.btnText} <FaArrowRight />
+        </Link>
+    </div>
+);
 
+// 4. TARJETA DE HERRAMIENTA (Grid Interactivo)
+const ToolCard = ({ title, icon: Icon, desc, link, isDisabled }) => (
+    <div className={`tool-card ${isDisabled ? 'disabled' : ''}`}>
+        {isDisabled && (
+            <div className="lock-screen">
+                <FaLock size={30} />
+                <span>ACCESO RESTRINGIDO</span>
+            </div>
+        )}
+        <div className="tool-icon">
+            <Icon />
+        </div>
+        <h4>{title}</h4>
+        <p>{desc}</p>
+        <Link 
+            to={isDisabled ? '#' : link} 
+            className="btn-action btn-ghost"
+            style={{ pointerEvents: isDisabled ? 'none' : 'auto' }}
+        >
+            {isDisabled ? 'Bloqueado' : 'Gestionar'} {!isDisabled && <FaArrowRight />}
+        </Link>
+    </div>
+);
+
+/* --- CONTROLADOR PRINCIPAL --- */
 const DocenteDashboardPage = () => {
-    const { usuario, loading } = useAuth();
+    const { usuario, loading: authLoading, authToken } = useAuth();
     
-    // El 'usuario' del AuthContext AHORA SÍ tiene 'estado_verificacion'
-    // gracias a la corrección del backend (users.controller.js)
-    const verificationStatus = usuario?.estado_verificacion || 'no_aplica';
+    // [CORRECCIÓN] Inicializamos el estado con la propiedad correcta
+    const [stats, setStats] = useState({ 
+        alumnos_total: 0, 
+        cursos_publicados: 0, // Propiedad utilizada en el backend
+        ingresos_mes: 0,
+        valoracion_promedio: 0
+    });
+    const [loadingStats, setLoadingStats] = useState(true);
 
-    if (loading) return <div className="page-loading">Cargando...</div>;
-    
-    if (!usuario || usuario.rol !== 'docente') {
-        return <Navigate to="/" replace />; 
-    }
+    // Efecto: Cargar Datos Reales desde BD
+    useEffect(() => {
+        let isMounted = true;
+        
+        const fetchDashboardData = async () => {
+            if (usuario?.roles?.includes('docente') && usuario?.estado_verificacion === 'verificado' && authToken) {
+                try {
+                    setLoadingStats(true);
+                    const data = await obtenerEstadisticasDocente(authToken); // Usamos authToken en la llamada
+                    if (isMounted && data) {
+                        setStats(data);
+                    }
+                } catch (error) {
+                    console.error("Error cargando dashboard:", error);
+                } finally {
+                    if (isMounted) setLoadingStats(false);
+                }
+            } else {
+                if (isMounted) setLoadingStats(false);
+            }
+        };
 
-    const items = dashboardItems(verificationStatus);
+        if (!authLoading) {
+            fetchDashboardData();
+        }
 
-    let AlertaComponent = null;
-    if (verificationStatus === 'pendiente') {
-        AlertaComponent = (
-            <div className="alert alert-warning">
-                <FaExclamationTriangle /> Tu perfil está **en revisión**. Las funciones de publicación están limitadas.
-            </div>
-        );
-    } else if (verificationStatus === 'rechazado') {
-        AlertaComponent = (
-            <div className="alert alert-error">
-                <FaTimesCircle /> Tu postulación fue **rechazada**. Revisa tus documentos en la sección de Verificación.
-            </div>
-        );
-    } else if (verificationStatus === 'no_aplica') {
-         AlertaComponent = (
-            <div className="alert alert-info">
-                <FaUserCheck /> ¡Bienvenido! El primer paso es **completar tu postulación** en "Verificación de Perfil".
-            </div>
-        );
-    }
+        return () => { isMounted = false; };
+    }, [usuario, authLoading, authToken]);
+
+    // Protecciones de Renderizado
+    if (authLoading) return <DashboardSkeleton />;
+   if (!usuario || !usuario.roles?.includes('docente')) return <Navigate to="/" replace />;
+
+    // Lógica UI
+    const estado = usuario.estado_verificacion || 'no_aplica';
+    const config = UI_CONFIG[estado] || UI_CONFIG['no_aplica'];
+    const isVerified = estado === 'verificado';
+    const StatusIcon = config.icon;
+
+    // Helper de Saludo
+    const getGreeting = () => {
+        const hour = new Date().getHours();
+        return hour < 12 ? 'BUENOS DÍAS' : hour < 18 ? 'BUENAS TARDES' : 'BUENAS NOCHES';
+    };
 
     return (
-        <div className="dashboard-page styled">
-
-            <section className="dashboard-header-styled">
-                <div className="header-info">
-                    <h1 className="welcome-header">Bienvenido, {usuario.nombre}!</h1>
-                    <p className="dashboard-summary">Panel de control de tu actividad docente. Accede a todas tus herramientas.</p>
-                </div>
-                 <div className="header-status">
-                    <span className="status-label">Estado de Verificación</span>
-                    <div className={`status-box status-${verificationStatus}`}>
-                        {verificationStatus === 'verificado' ? <FaRegCheckCircle /> : <FaTimesCircle />}
-                        {verificationStatus.replace('_', ' ').toUpperCase()}
-                    </div>
-                </div>
-            </section>
+        <div className="dashboard-page akademic-theme">
             
-            {AlertaComponent}
+            {/* 1. HEADER */}
+            <header className="dashboard-header">
+                <div className="header-content">
+                    <h1 className="welcome-title">
+                        {getGreeting()}, {usuario.nombre.split(' ')[0].toUpperCase()}
+                        
+                        {/* Chip de Estado Integrado al Título */}
+                        <div style={{display: 'inline-flex', marginLeft: '1.5rem', verticalAlign: 'middle'}}>
+                            <span className={`status-badge ${config.style}`}>
+                                <StatusIcon className={config.spin ? 'fa-spin' : ''} />
+                                {config.text}
+                            </span>
+                        </div>
+                    </h1>
+                    <p className="dashboard-desc">
+                        Bienvenido a tu centro de operaciones. Gestiona tus cursos, horarios y finanzas en tiempo real desde aquí.
+                    </p>
+                </div>
+                
+                <div className="header-mascot-wrapper">
+                    <img src="/images/pet/pet_02.png" alt="Mascota Akdemico" />
+                </div>
+            </header>
 
-            <div className="dashboard-grid">
-                {items.map((item, index) => (
-                    <DashboardCard key={index} item={item} />
-                ))}
+            {/* 2. ZONA DE DATOS O VERIFICACIÓN */}
+            {isVerified ? (
+                loadingStats ? (
+                    /* Skeleton mientras cargan stats */
+                    <div className="stats-deck">
+                        <div className="skeleton" style={{height: '140px', borderRadius: '20px'}}></div>
+                        <div className="skeleton" style={{height: '140px', borderRadius: '20px'}}></div>
+                        <div className="skeleton" style={{height: '140px', borderRadius: '20px'}}></div>
+                    </div>
+                ) : (
+                    <StatsDeck stats={stats} />
+                )
+            ) : (
+                <VerificationAlert config={config} />
+            )}
+
+            {/* 3. GRID DE HERRAMIENTAS */}
+            <div className="section-separator">
+                <FaLayerGroup /> HERRAMIENTAS DE GESTIÓN
             </div>
-
-             <div className="quick-link-perfil">
-                <Link to="/perfil" className="btn btn-tertiary">
-                    <FaUserEdit /> Editar mi Información Personal
-                </Link>
-             </div>
+            
+            <div className="tools-grid">
+                <ToolCard 
+                    title="Crear Plan" 
+                    icon={FaBookOpen} 
+                    desc="Crea nuevos planes de estudio, organiza módulos y publica contenido para tus alumnos."
+                    link="/docente/cursos"
+                    isDisabled={!isVerified}
+                />
+                <ToolCard 
+                    title="Agenda Horaria" 
+                    icon={FaCalendarAlt} 
+                    desc="Verifica tu disponibilidad semanal."
+                    link="/docente/horarios"
+                    isDisabled={!isVerified}
+                />
+                <ToolCard 
+                    title="Validación de Pagos" 
+                    icon={FaCreditCard} 
+                    desc="Revisa inscripciones pendientes y gestiona el acceso de estudiantes."
+                    link="/docente/pagos"
+                    isDisabled={!isVerified}
+                />
+            </div>
 
         </div>
     );

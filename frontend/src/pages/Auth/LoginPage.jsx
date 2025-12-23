@@ -1,90 +1,110 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-// 'Link' ya no es necesario aquí
+import { useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../../services/auth.service';
 import { useAuth } from '../../context/AuthContext';
-import './AuthPages.css'; // Mantenemos los estilos del formulario
+import { FaEnvelope, FaLock, FaArrowRight } from 'react-icons/fa';
+import './AuthForms.css';
 
-/**
- * [MODIFICADO] Se quita el layout principal (div.auth-page, div.auth-container),
- * el h2 y los enlaces inferiores (auth-links), ya que ahora vive 
- * dentro de AuthPageLayout.
- */
 const LoginPage = () => {
-  const [correo, setCorreo] = useState('');
-  const [contrasena, setContrasena] = useState('');
+  const [formData, setFormData] = useState({
+    correo: '',
+    contrasena: ''
+  });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  
   const navigate = useNavigate();
+  const location = useLocation();
   const { iniciarSesion } = useAuth();
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const from = location.state?.from?.pathname || '/';
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      const data = await login(correo, contrasena);
-      iniciarSesion(data.token); // El contexto maneja el token
-      setLoading(false);
-      
-      // [MODIFICADO] Redirige al dashboard o perfil según el rol
-      // (Esta es una mejora de UX opcional)
-      const userRol = data.rol; // Asumiendo que el login devuelve el rol
-      if (userRol === 'docente') {
-          navigate('/docente/dashboard');
-      } else if (userRol === 'administrador') {
-          navigate('/admin/dashboard'); // Si tienes panel de admin
-      } else {
-          navigate('/perfil'); // O a '/buscar' o a '/'
-      }
-
+      const data = await login(formData.correo, formData.contrasena);
+      iniciarSesion(data.token);
+      navigate(from, { replace: true });
     } catch (err) {
+      setError(err.response?.data?.mensaje || 'Credenciales incorrectas o error de conexión.');
+    } finally {
       setLoading(false);
-      if (err.response && err.response.status === 401) {
-        setError('Credenciales inválidas. Verifica tu correo y contraseña.');
-      } else {
-        setError('Ocurrió un error al intentar iniciar sesión. Inténtalo de nuevo.');
-      }
-      console.error("Error en login:", err);
     }
   };
 
-  // [MODIFICADO] Se eliminan los contenedores exteriores, el h2 y los enlaces
   return (
-    <>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label htmlFor="correo">Correo Electrónico</label>
+    <form onSubmit={handleSubmit} className="auth-form-unified">
+      <div className="auth-form-header">
+        <h2 className="auth-form-title">Bienvenido de Vuelta</h2>
+        <p className="auth-form-subtitle">Inicia sesión en tu cuenta AKdémico</p>
+      </div>
+
+      <div className="form-group-unified">
+        <label htmlFor="correo" className="form-label">Correo Electrónico</label>
+        <div className="form-input-wrapper">
+          <FaEnvelope className="form-input-icon" />
           <input
             type="email"
             id="correo"
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            value={formData.correo}
+            onChange={handleChange}
             required
             placeholder="tu@correo.com"
+            className="form-input"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="contrasena">Contraseña</label>
+      </div>
+
+      <div className="form-group-unified">
+        <label htmlFor="contrasena" className="form-label">Contraseña</label>
+        <div className="form-input-wrapper">
+          <FaLock className="form-input-icon" />
           <input
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             id="contrasena"
-            value={contrasena}
-            onChange={(e) => setContrasena(e.target.value)}
+            value={formData.contrasena}
+            onChange={handleChange}
             required
             placeholder="••••••••"
+            className="form-input"
           />
+          <button
+            type="button"
+            className="form-password-toggle"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label="Mostrar/ocultar contraseña"
+          >
+            {showPassword ? '👁️' : '👁️‍🗨️'}
+          </button>
         </div>
+      </div>
 
-        {error && <p className="error-message">{error}</p>}
+      {error && <div className="form-error">{error}</div>}
 
-        <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
-      </form>
-      {/* [ELIMINADO] El div.auth-links ya no es necesario */}
-    </>
+      <button type="submit" className="btn-submit-unified" disabled={loading}>
+        {loading ? 'Ingresando...' : (
+          <>
+            Ingresar <FaArrowRight />
+          </>
+        )}
+      </button>
+
+      <div className="auth-form-footer">
+        <a href="#reset" className="auth-link">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
   );
 };
 

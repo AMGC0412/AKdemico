@@ -1,157 +1,257 @@
-/* Estilos para DocentePagosPage */
-.docente-pagos-page {
-  padding: 2rem 0;
-  max-width: 1000px;
-  margin: 0 auto;
-  position: relative;
+/* =========================================
+   DISEÑO CYBER-FINTECH 2.0
+   ========================================= */
+
+:root {
+    --c-bg: #05050A;
+    --c-panel: #0E0E14;
+    --c-primary: #4F46E5; /* Indigo Base */
+    --c-accent: #00F0FF;  /* Cyan Neon */
+    --c-success: #00E676; /* Green Neon */
+    --c-danger: #FF2E55;  /* Red Neon */
+    --c-text: #E0E0FF;
+    --c-text-dim: #7A7A95;
+    --c-border: rgba(255, 255, 255, 0.08);
+    --font-display: 'Consolas', 'Monaco', monospace;
+    --font-body: 'Inter', system-ui, sans-serif;
 }
 
-.page-header-actions h1 {
-  font-size: 2rem;
-  color: var(--color-primary);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-.page-summary {
-    color: var(--color-text-medium);
-    font-size: 1.1rem;
-    margin-top: 0;
-    margin-bottom: 2.5rem;
+/* --- ESCENARIO --- */
+.pagos-page-wrapper {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--c-bg);
+    color: var(--c-text);
+    font-family: var(--font-body);
+    position: relative;
+    overflow-x: hidden;
 }
 
-/* --- Grid de Pagos --- */
-.pagos-list-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--spacing-lg);
+/* Fondo Reticular Animado */
+.cyber-grid-bg {
+    position: fixed; inset: 0;
+    background-image: 
+        linear-gradient(rgba(79, 70, 229, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 0;
+    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
 }
 
-.pago-card {
-  background-color: var(--color-white-frost);
-  backdrop-filter: blur(5px);
-  padding: 1.5rem;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  flex-direction: column;
+.pagos-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative; z-index: 2;
 }
 
-.pago-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #eee;
+/* --- HEADER HUD --- */
+.pagos-header {
+    background: rgba(14, 14, 20, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--c-border);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
-.pago-monto {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
+.pagos-header::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: var(--c-accent);
+    box-shadow: 0 0 20px var(--c-accent);
 }
 
-.pago-status-pending {
-  background-color: #ffc107; /* Amarillo */
-  color: #333;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.header-content {
+    display: flex; align-items: center; gap: 2rem; position: relative; z-index: 2;
 }
 
-.pago-details {
-  flex-grow: 1; /* Empuja las acciones al fondo */
-}
-.pago-details p {
-  font-size: 0.9rem;
-  margin: 0.4rem 0;
-  color: var(--color-text-medium);
-}
-.pago-details strong {
-    color: var(--color-text-dark);
+.icon-box {
+    width: 60px; height: 60px;
+    background: rgba(79, 70, 229, 0.1);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; color: var(--c-accent);
+    border: 1px solid rgba(0, 240, 255, 0.2);
 }
 
-.fecha-subida {
-    font-style: italic;
-    font-size: 0.85rem !important;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.5rem !important;
+.title-box h1 { margin: 0; font-size: 2rem; font-weight: 700; letter-spacing: -0.5px; color: #FFF; }
+.title-box p { margin: 0.5rem 0 0 0; color: var(--c-text-dim); }
+
+.stats-box {
+    margin-left: auto;
+    text-align: right;
+    background: rgba(255,255,255,0.03);
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--c-border);
+}
+.stat-label { display: block; font-size: 0.7rem; color: var(--c-text-dim); letter-spacing: 2px; margin-bottom: 0.3rem; }
+.stat-number { font-family: var(--font-display); font-size: 2rem; color: var(--c-accent); font-weight: 700; text-shadow: 0 0 15px rgba(0, 240, 255, 0.4); }
+
+/* --- GRID DE TICKETS --- */
+.tickets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
 }
 
-/* Enlace al Comprobante */
-.btn-comprobante-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    color: var(--color-accent-blue);
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-decoration: none;
-}
-.btn-comprobante-link:hover {
-    color: var(--color-primary);
-    text-decoration: underline;
+/* TICKET DIGITAL */
+.cyber-ticket {
+    background: var(--c-panel);
+    border: 1px solid var(--c-border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    animation: fadeInUp 0.5s ease-out backwards;
 }
 
-/* Acciones */
-.pago-acciones {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
+.cyber-ticket:hover {
+    transform: translateY(-8px);
+    border-color: rgba(79, 70, 229, 0.5);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
 }
 
-.btn-accion-sm {
-    flex: 1; /* Ocupan el mismo ancho */
-    padding: 10px 0;
-    font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+.ticket-status-bar {
+    height: 3px; width: 100%;
+    background: linear-gradient(90deg, var(--c-primary), var(--c-accent));
 }
 
-/* Estilo del botón Rechazar */
-.btn-danger { 
-    background-color: #dc3545; 
-}
-.btn-danger:hover {
-    background-color: #c82333;
-}
-
-
-/* No Data Box */
-.no-data-box {
-  text-align: center;
-  padding: 3rem;
-  max-width: 600px;
-  margin: 2rem auto;
-}
-.no-data-box h3 {
-    color: var(--color-secondary-dark);
+/* Top: Dinero e ID */
+.ticket-header {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px dashed var(--c-border);
+    display: flex; justify-content: space-between; align-items: center;
 }
 
-/* Overlay Spinner para la Acción */
-.overlay-spinner {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: rgba(255, 255, 255, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 20;
-    border-radius: var(--radius-lg);
-    color: var(--color-primary);
+.amount-group { font-family: var(--font-display); }
+.currency { font-size: 1.2rem; color: var(--c-text-dim); margin-right: 4px; }
+.value { font-size: 2rem; color: #FFF; font-weight: 700; }
+
+.id-badge {
+    font-family: var(--font-display); font-size: 0.8rem;
+    background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px;
+    color: var(--c-text-dim); display: flex; align-items: center; gap: 4px;
 }
+
+/* Cuerpo */
+.ticket-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.2rem; }
+
+.info-group label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.7rem; color: var(--c-text-dim); letter-spacing: 1px; margin-bottom: 4px;
+}
+.info-value { font-size: 1rem; color: #FFF; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.info-value.highlight { color: var(--c-accent); }
+.info-sub { font-size: 0.85rem; color: #666; }
+
+.info-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 0.8rem; color: var(--c-text-dim);
+    background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px;
+}
+.status-dot {
+    color: #FFD700; font-weight: bold; font-size: 0.7rem;
+    display: flex; align-items: center; gap: 6px;
+}
+.status-dot::before {
+    content: ''; width: 6px; height: 6px; background: #FFD700; border-radius: 50%;
+    box-shadow: 0 0 8px #FFD700; animation: pulse 2s infinite;
+}
+
+/* Botón Evidencia */
+.btn-evidence {
+    background: transparent; border: 1px solid var(--c-border); color: var(--c-text);
+    padding: 0.8rem; border-radius: 8px; width: 100%;
+    cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+    transition: 0.2s;
+    margin-top: 0.5rem;
+}
+.btn-evidence:hover { background: rgba(255,255,255,0.05); border-color: var(--c-text-dim); }
+.eye { color: var(--c-accent); }
+
+/* Footer Acciones */
+.ticket-footer {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-top: 1px solid var(--c-border);
+}
+
+.action-btn {
+    padding: 1.2rem; border: none; background: transparent;
+    font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
+    cursor: pointer; transition: 0.2s; letter-spacing: 1px;
+}
+
+.action-btn.approve { color: var(--c-success); background: rgba(0, 230, 118, 0.05); }
+.action-btn.approve:hover { background: var(--c-success); color: #000; box-shadow: 0 0 20px rgba(0, 230, 118, 0.3); }
+
+.action-btn.reject { color: var(--c-danger); border-right: 1px solid var(--c-border); }
+.action-btn.reject:hover { background: rgba(255, 46, 85, 0.1); color: #FFF; }
+
+/* --- MODAL DE ALTA TECNOLOGÍA --- */
+.cyber-modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0, 0, 5, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex; justify-content: center; align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.cyber-modal-window {
+    background: var(--c-panel);
+    border: 1px solid var(--c-accent);
+    box-shadow: 0 0 50px rgba(0, 240, 255, 0.1);
+    border-radius: 12px;
+    padding: 4px; /* Efecto borde doble */
+    max-width: 90vw; max-height: 90vh;
+    display: flex; flex-direction: column;
+}
+
+.cyber-modal-header {
+    background: rgba(0, 240, 255, 0.1);
+    padding: 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+}
+.cyber-modal-header h4 { margin: 0; color: var(--c-accent); font-family: var(--font-display); letter-spacing: 2px; }
+.cyber-modal-header button { background: none; border: none; color: var(--c-accent); font-size: 1.2rem; cursor: pointer; }
+
+.cyber-modal-content {
+    background: #000; padding: 1rem;
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden;
+}
+.cyber-modal-content img { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 4px; }
+
+/* --- TOAST --- */
+.cyber-toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 200;
+    background: var(--c-panel); border: 1px solid;
+    padding: 1rem 1.5rem; border-radius: 8px;
+    display: flex; align-items: center; gap: 1rem;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.cyber-toast.success { border-color: var(--c-success); color: var(--c-success); }
+.cyber-toast.warning { border-color: var(--c-danger); color: var(--c-danger); }
+.toast-icon { font-size: 1.2rem; }
+
+/* --- UTILIDADES --- */
+.loader-cyber { text-align: center; color: var(--c-accent); margin-top: 4rem; font-family: var(--font-display); letter-spacing: 2px; }
+.spin-icon { animation: spin 1s linear infinite; font-size: 2rem; margin-bottom: 1rem; }
+
+.empty-state-cyber {
+    text-align: center; padding: 4rem;
+    border: 1px dashed var(--c-border); border-radius: 16px;
+    background: rgba(255,255,255,0.02);
+}
+.empty-icon { font-size: 3rem; color: var(--c-text-dim); margin-bottom: 1rem; opacity: 0.5; }
+
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }

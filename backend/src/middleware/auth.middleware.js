@@ -1,40 +1,36 @@
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { query } from '../config/database.js'; // Asegúrate de importar tu función de query
 
-/**
- * Middleware para verificar el Token (JWT) y proteger rutas.
- */
-export const protegerRuta = (req, res, next) => {
-  // 1. Obtener el token del encabezado 'Authorization'
+export const protegerRuta = async (req, res, next) => {
   const encabezadoAuth = req.headers.authorization;
 
-  // 2. Verificar si el token existe
-  if (!encabezadoAuth) {
+  if (!encabezadoAuth || !encabezadoAuth.startsWith('Bearer ')) {
     return res.status(401).json({ mensaje: 'Acceso denegado. No se proporcionó token.' });
   }
 
-  // El token viene en formato "Bearer [token]"
-  // Lo separamos para quedarnos solo con el token
   const token = encabezadoAuth.split(' ')[1];
 
-  if (!token) {
-    return res.status(401).json({ mensaje: 'Acceso denegado. Formato de token inválido.' });
-  }
-
   try {
-    // 3. Verificar si el token es válido
     const claveSecreta = process.env.JWT_SECRET;
     const payload = jwt.verify(token, claveSecreta);
 
-    // 4. Si es válido, adjuntamos los datos del usuario (el payload)
-    // a la petición (req) para que las futuras funciones lo puedan usar.
-    req.usuario = payload; // ej: req.usuario.id, req.usuario.rol
+    // --- CORRECCIÓN CRÍTICA ---
+    // Si el token es antiguo y no tiene el array 'roles', los buscamos en la DB
+    if (!payload.roles) {
+      const rolesRows = await query(
+        `SELECT r.nombre FROM roles r 
+         JOIN usuario_roles ur ON r.id = ur.rol_id 
+         WHERE ur.usuario_id = ?`, 
+        [payload.id]
+      );
+      payload.roles = rolesRows.map(row => row.nombre);
+    }
 
-    // 5. ¡Pase! Le damos permiso para continuar a la siguiente función
+    req.usuario = payload; 
     next();
 
   } catch (error) {
-    // Si jwt.verify falla (token expirado, firma inválida)
     console.error('Error de token:', error.message);
     return res.status(401).json({ mensaje: 'Token inválido o expirado.' });
   }

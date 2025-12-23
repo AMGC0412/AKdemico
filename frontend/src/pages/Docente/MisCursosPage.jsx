@@ -1,88 +1,63 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 
-// --- IMPORTACIONES (Corregidas y listas) ---
+// --- IMPORTACIONES ---
 import { obtenerMisPlanesConLotes } from '../../services/planes.service.js';
 import { eliminarLotePorId } from '../../services/lote.service.js';
-// ---------------------------------------------------
-
 import { useAuth } from '../../context/AuthContext';
 import './MisCursosPage.css'; 
 import { 
     FaPlus, FaBook, FaListUl, FaSpinner, 
     FaEdit, FaTrashAlt, FaCalendarCheck, 
     FaTimesCircle, FaCheckCircle, FaExclamationTriangle,
-    FaUsers, FaChalkboardTeacher, FaCalendarAlt, FaChevronDown
+    FaUsers, FaChalkboardTeacher, FaCalendarAlt, FaChevronDown,
+    FaRegCalendarAlt, FaRegUser, FaLayerGroup, FaDollarSign 
 } from 'react-icons/fa';
 
-// --- Sub-componente: PlanNavItem (Panel Izquierdo) ---
-const PlanNavItem = ({ plan, isActive, onClick }) => {
-    
-    const stats = useMemo(() => {
-        const total = plan.lotes.length;
-        if (total === 0) return { programado: 0, en_curso: 0, finalizado: 0, total };
-        
-        const programado = plan.lotes.filter(l => l.estado === 'programado').length;
-        const en_curso = plan.lotes.filter(l => l.estado === 'en_curso').length;
-        const finalizado = plan.lotes.filter(l => l.estado === 'finalizado').length;
-        
-        return {
-            programado: (programado / total) * 100,
-            en_curso: (en_curso / total) * 100,
-            finalizado: (finalizado / total) * 100,
-            total
-        };
-    }, [plan.lotes]);
 
-    const gradient = `conic-gradient(
-        var(--color-status-programado) 0% ${stats.programado}%,
-        var(--color-status-en_curso) ${stats.programado}% ${stats.programado + stats.en_curso}%,
-        var(--color-status-finalizado) ${stats.programado + stats.en_curso}% ${stats.programado + stats.en_curso + stats.finalizado}%,
-        #e0e0e0 ${stats.programado + stats.en_curso + stats.finalizado}% 100%
-    )`;
-
-    return (
-        <button
-            className={`plan-nav-item ${isActive ? 'active' : ''}`}
-            onClick={onClick}
-        >
-            <div className="plan-nav-chart">
-                <div className="donut-chart" style={{ background: gradient }}>
-                    <span>{stats.total}</span>
-                </div>
-            </div>
-            <div className="plan-nav-info">
-                <span className="plan-nav-title">{plan.titulo}</span>
-                <span className="plan-nav-desc">{plan.descripcion || "Sin descripción"}</span>
-            </div>
-        </button>
-    );
+// --- FUNCIÓN AUXILIAR ---
+const getEstadoLote = (lote) => {
+    if (lote.estado === 'cancelado' || lote.estado === 'finalizado') {
+        return lote.estado;
+    }
+    if (lote.fecha_fin && new Date(lote.fecha_fin) < new Date()) {
+        return 'finalizado';
+    }
+    return lote.estado;
 };
 
-// --- Sub-componente: PlanHeaderCard (La nueva cabecera clickeable) ---
+// --- Sub-componente: PlanHeaderCard ---
 const PlanHeaderCard = ({ plan, isOpen, onToggle }) => {
-    // Calculamos los KPIs para el dashboard
     const kpis = useMemo(() => {
-        const lotesActivos = plan.lotes.filter(l => l.estado === 'programado' || l.estado === 'en_curso');
+        const lotesReales = plan.lotes.map(l => ({ ...l, estado_real: getEstadoLote(l) }));
+        const lotesActivos = lotesReales.filter(l => l.estado_real === 'programado' || l.estado_real === 'en_curso');
         
         const totalEstudiantes = lotesActivos.reduce((sum, lote) => {
-            return sum + (lote.cupos - (lote.cupos_actuales ?? lote.cupos));
+            return sum + (lote.cupos - (lote.cupos_actuales ?? 0)); 
+        }, 0);
+        
+        const ingresoPotencial = plan.lotes.reduce((sum, lote) => {
+            return sum + (lote.cupos * (lote.precio || 0));
         }, 0);
 
-        const proximoLote = plan.lotes
-            .filter(l => l.estado === 'programado' && new Date(l.fecha_inicio) > new Date())
+        const proximoLote = lotesReales
+            .filter(l => l.estado_real === 'programado' && new Date(l.fecha_inicio) > new Date())
             .sort((a, b) => new Date(a.fecha_inicio) - new Date(b.fecha_inicio))[0];
 
         return {
             totalLotes: plan.lotes.length,
             totalEstudiantes,
+            ingresoPotencial,
             proximoInicio: proximoLote ? new Date(proximoLote.fecha_inicio).toLocaleDateString('es-PE') : 'N/A'
         };
-    }, [plan]);
+    }, [plan.lotes]);
+    
+    const formatCurrency = (amount) => {
+        return amount.toLocaleString('es-PE', { style: 'currency', currency: 'PEN', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    };
 
     return (
         <div className={`plan-header-card ${isOpen ? 'active' : ''}`} onClick={onToggle}>
-            {/* Info principal del Plan */}
             <div className="plan-header-info">
                 <FaBook className="plan-header-icon" />
                 <div className="plan-header-texto">
@@ -91,39 +66,51 @@ const PlanHeaderCard = ({ plan, isOpen, onToggle }) => {
                 </div>
             </div>
 
-            {/* KPIs (Estadísticas clave) */}
             <div className="plan-kpi-stats">
-                <div className="kpi-stat-item">
-                    <FaChalkboardTeacher />
-                    <span>{kpis.totalLotes} {kpis.totalLotes === 1 ? 'Lote' : 'Lotes'}</span>
+                <div className="kpi-stat-item lotes">
+                    <span className="kpi-label"><FaLayerGroup /> Lotes Totales</span>
+                    <span className="kpi-value">{kpis.totalLotes}</span>
                 </div>
-                <div className="kpi-stat-item">
-                    <FaUsers />
-                    <span>{kpis.totalEstudiantes} {kpis.totalEstudiantes === 1 ? 'Est.' : 'Ests.'}</span>
+                <div className="kpi-stat-item students">
+                    <span className="kpi-label"><FaRegUser /> Estudiantes Activos</span>
+                    <span className="kpi-value">{kpis.totalEstudiantes}</span>
                 </div>
-                <div className="kpi-stat-item">
-                    <FaCalendarAlt />
-                    <span>Inicia: {kpis.proximoInicio}</span>
+                <div className="kpi-stat-item revenue">
+                    <span className="kpi-label"><FaDollarSign /> Ingreso Potencial</span>
+                    <span className="kpi-value">{formatCurrency(kpis.ingresoPotencial)}</span>
+                </div>
+                <div className="kpi-stat-item date">
+                    <span className="kpi-label"><FaRegCalendarAlt /> Próximo Inicio</span>
+                    <span className="kpi-value">{kpis.proximoInicio}</span>
                 </div>
             </div>
             
-            {/* Flecha del Acordeón */}
             <FaChevronDown className="accordion-arrow" />
         </div>
     );
 };
 
-// --- Sub-componente: LoteCard (Diseño atractivo) ---
+// --- Sub-componente: LoteCard ---
 const LoteCard = ({ lote, onLoteEliminado }) => {
-    const estadoClase = `lote-card status-${lote.estado || 'programado'}`;
+    const estadoReal = getEstadoLote(lote);
+    const estadoClase = `lote-card status-${estadoReal}`;
+    
     const cuposTotales = lote.cupos;
     const cuposOcupados = cuposTotales - (lote.cupos_actuales ?? 0);
     const porcentajeOcupado = cuposTotales > 0 ? (cuposOcupados / cuposTotales) * 100 : 0;
     const [deleting, setDeleting] = useState(false);
     const [deleteError, setDeleteError] = useState(null);
 
+    const getProgressColorClass = () => {
+        if (porcentajeOcupado > 80) return 'high';
+        if (porcentajeOcupado >= 50) return 'medium';
+        return 'low';
+    };
+    
+    const isEditable = estadoReal === 'programado';
+
     const handleEliminar = async () => {
-        if (!window.confirm(`¿Estás seguro de eliminar el lote "${lote.id}"?`)) return;
+        if (!window.confirm(`¿Estás seguro de eliminar el lote "${lote.id}"? Esta acción es irreversible.`)) return;
         setDeleting(true);
         setDeleteError(null);
         try {
@@ -139,23 +126,32 @@ const LoteCard = ({ lote, onLoteEliminado }) => {
         <div className={estadoClase}>
             <div className="lote-card-contenido">
                 <div className="lote-info-principal">
-                    <span className="lote-estado-label">{lote.estado?.replace('_', ' ').toUpperCase()}</span>
+                    <span className="lote-estado-label">{estadoReal?.replace('_', ' ').toUpperCase()}</span>
                     <span className="lote-fechas">
                         <FaCalendarCheck /> {new Date(lote.fecha_inicio).toLocaleDateString('es-PE')}
+                        {lote.fecha_fin && ` - ${new Date(lote.fecha_fin) .toLocaleDateString('es-PE')}`}
                     </span>
                 </div>
                 <div className="lote-cupos-visual">
                     <div className="cupos-texto">
-                        <span>Cupos</span>
+                        <span>Cupos Ocupados</span>
                         <span>{cuposOcupados} / {cuposTotales}</span>
                     </div>
                     <div className="cupos-barra">
-                        <div className="cupos-barra-progreso" style={{ width: `${porcentajeOcupado}%` }}></div>
+                        <div 
+                            className={`cupos-barra-progreso ${getProgressColorClass()}`} 
+                            style={{ width: `${porcentajeOcupado}%` }}
+                        ></div>
                     </div>
                 </div>
                 <div className="lote-acciones">
-                    <Link to={`/docente/lotes/editar/${lote.id}`} className="btn-accion edit" title="Editar Lote">
-                        <FaEdit /> <span>Editar</span>
+                    <Link 
+                        to={`/docente/lotes/editar/${lote.id}`} 
+                        className={`btn-accion edit ${!isEditable ? 'btn-secondary' : ''}`} 
+                        title={isEditable ? "Editar Lote" : "No editable"}
+                        style={{ pointerEvents: isEditable ? 'auto' : 'none', opacity: isEditable ? 1 : 0.5 }}
+                    >
+                        <FaEdit /> <span>Editar {isEditable ? '' : ' (Finalizado)'}</span>
                     </Link>
                     <button 
                         onClick={handleEliminar} 
@@ -163,7 +159,7 @@ const LoteCard = ({ lote, onLoteEliminado }) => {
                         disabled={deleting}
                         title="Eliminar Lote"
                     >
-                        {deleting ? <FaSpinner className="spinner" /> : <><FaTrashAlt /> <span>Eliminar</span></>}
+                        {deleting ? <FaSpinner className="spinner" /> : <><FaTrashAlt /> <span>Eliminar Lote</span></>}
                     </button>
                 </div>
             </div>
@@ -177,91 +173,82 @@ const LoteCard = ({ lote, onLoteEliminado }) => {
 };
 
 
-// --- Componente Principal: MisCursosPage (El Portafolio) ---
+// --- Componente Principal: MisCursosPage ---
 const MisCursosPage = () => {
     
-    // 1. Llamamos a useAuth() y declaramos todos los estados PRIMERO
-    const { usuario } = useAuth(); 
+    // [MODIFICADO] Extraemos authLoading para sincronizar la validación de roles
+    const { usuario, loading: authLoading } = useAuth(); 
     const [planesConLotes, setPlanesConLotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
-    // Estado clave del acordeón
     const [openPlanId, setOpenPlanId] = useState(null); 
 
-    // 2. Definimos cargarDatos con useCallback
     const cargarDatos = useCallback(async (mantenerSeleccion = false) => {
+        // [CORRECCIÓN CRÍTICA] Validación por arreglo de roles
+        if (!usuario || !usuario.roles?.includes('docente')) return; 
         
-        if (!usuario) { 
-            return; 
-        }
-        
-        setLoading(true);
-        setError(null);
+        setLoading(true); setError(null);
         try {
             const data = await obtenerMisPlanesConLotes();
             setPlanesConLotes(data);
             
-            // Lógica para establecer el estado de 'openPlanId' de forma segura
             setOpenPlanId(prevId => {
                 const planExists = data.find(p => p.id === prevId);
-
-                if (mantenerSeleccion && planExists) {
-                    // Mantener el plan abierto si el flag está activo y existe
-                    return prevId;
-                } else if (data.length > 0) {
-                    // Abrir el primer plan si no hay selección válida
-                    return data[0].id;
-                }
-                // Si no hay planes, cerrar todo
+                if (mantenerSeleccion && planExists) return prevId;
+                else if (data.length > 0) return data[0].id;
                 return null;
             });
-
         } catch (err) {
             setError(err.mensaje || "Error al cargar tus cursos y planes.");
         } finally {
             setLoading(false);
         }
-    // Añadimos 'usuario' y quitamos 'selectedPlanId' de dependencias, ya que lo gestionamos con setOpenPlanId(prevId => ...)
     }, [usuario]); 
 
-    // 3. useEffect ahora depende de 'cargarDatos'
-    useEffect(() => {
-        cargarDatos();
-    }, [cargarDatos]); 
+    // [MODIFICADO] Esperar a que la autenticación termine antes de cargar datos
+    useEffect(() => { 
+        if (!authLoading) {
+            cargarDatos(); 
+        }
+    }, [cargarDatos, authLoading]); 
     
-    // Handler para cuando un lote se elimina (sin cambios)
     const handleLoteEliminado = (mensajeExito) => {
         setSuccessMessage(mensajeExito);
-        // Recarga, manteniendo el plan abierto (flag true)
         cargarDatos(true); 
         setTimeout(() => setSuccessMessage(null), 4000);
     };
 
-    // --- NUEVO HANDLER PARA EL ACORDEÓN ---
     const handleTogglePlan = (planId) => {
-        // Si hago clic en el que ya está abierto, lo cierro (null)
-        // Si hago clic en uno nuevo, lo abro (planId)
         setOpenPlanId(prevId => (prevId === planId ? null : planId));
     };
-    // --------------------------------------
 
-    // --- Renderizado de Casos Especiales (Carga, Error, Vacío) ---
+    // --- [NUEVO] PROTECCIONES DE RENDERIZADO ---
+    if (authLoading) {
+        return <div className="page-loading"><FaSpinner className="spinner" /> Verificando Credenciales...</div>;
+    }
+
+    // Doble seguridad: Si no es docente, redirigir a inicio
+    if (!usuario || !usuario.roles?.includes('docente')) {
+        return <Navigate to="/" replace />;
+    }
+
+    // --- Renderizado Casos Especiales ---
     if (loading && planesConLotes.length === 0) {
-        return <div className="page-loading"><FaSpinner className="spinner" /> Cargando tu Portafolio...</div>;
+        return <div className="page-loading"><FaSpinner className="spinner" /> Cargando Portafolio...</div>;
     }
 
     if (error) {
-        return <div className="page-container"><div className="message error"><FaTimesCircle /> {error}</div></div>;
+        return <div className="mis-cursos-page"><div className="message error"><FaTimesCircle /> {error}</div></div>;
     }
 
     if (planesConLotes.length === 0 && !loading) {
         return (
-            <div className="page-container">
+            <div className="mis-cursos-page">
                 <div className="no-data-box frosted-glass">
                     <FaExclamationTriangle className="no-data-icon" />
                     <h3>Tu portafolio está vacío</h3>
-                    <p>Para publicar un curso (Lote), primero necesitas crear un Plan de Estudio.</p>
+                    <p>Para publicar un curso, primero necesitas crear un Plan de Estudio.</p>
                     <Link to="/docente/planes/crear" className="btn btn-primary">
                         <FaPlus /> Crear tu primer Plan
                     </Link>
@@ -270,69 +257,57 @@ const MisCursosPage = () => {
         );
     }
 
-    // --- RENDERIZADO PRINCIPAL (El Portafolio en Acordeón) ---
     return (
-        <div className="page-container mis-cursos-page accordion-layout">
-            
-            <div className="page-header-actions">
-                <h1><FaListUl /> Mi Portafolio de Cursos</h1>
+        <div className="mis-cursos-page">
+            <div className="mis-cursos-header-panel">
+                <div className="header-title-group">
+                    <h1><FaListUl /> Mi Portafolio</h1>
+                    <p className="header-subtitle">Gestión centralizada de planes de estudio y lotes activos.</p>
+                </div>
                 <Link to="/docente/planes/crear" className="btn btn-primary">
                     <FaPlus /> Crear Nuevo Plan
                 </Link>
             </div>
 
-            {/* Mensajes de éxito/recarga */}
-            {successMessage && <div className="message success"><FaCheckCircle /> {successMessage}</div>}
-            {loading && planesConLotes.length > 0 && <div className="page-loading-inline"><FaSpinner className="spinner" /> Actualizando...</div>}
+            <div className="mis-cursos-content">
+                {successMessage && <div className="message success"><FaCheckCircle /> {successMessage}</div>}
+                {loading && planesConLotes.length > 0 && <div className="page-loading-inline"><FaSpinner className="spinner" /> Actualizando...</div>}
 
-            {/* --- El Acordeón de Planes --- */}
-            <div className="plan-accordion">
-                {planesConLotes.map(plan => (
-                    <div className="plan-accordion-item" key={plan.id}>
-                        {/* 1. La Cabecera Clickeable con KPIs */}
-                        <PlanHeaderCard
-                            plan={plan}
-                            isOpen={openPlanId === plan.id}
-                            onToggle={() => handleTogglePlan(plan.id)}
-                        />
-                        
-                        {/* 2. El Contenido Colapsable (Grid de Lotes) */}
-                        <div className={`plan-content-wrapper ${openPlanId === plan.id ? 'open' : ''}`}>
-                            <div className="plan-content-interior">
-                                <div className="lotes-grid-header">
-                                    <Link 
-                                        to={`/docente/planes/editar/${plan.id}`} 
-                                        className="btn btn-secondary btn-sm"
-                                    >
-                                        <FaEdit /> Editar Plan
-                                    </Link>
-                                    <Link 
-                                        to={`/docente/lotes/crear?planId=${plan.id}`} 
-                                        className="btn btn-primary btn-sm"
-                                    >
-                                        <FaPlus /> Publicar Nuevo Lote
-                                    </Link>
-                                </div>
-                                
-                                <div className="lotes-grid">
-                                    {plan.lotes.length > 0 ? (
-                                        plan.lotes.map(lote => (
-                                            <LoteCard 
-                                                key={lote.id} 
-                                                lote={lote} 
-                                                onLoteEliminado={handleLoteEliminado} 
-                                            />
-                                        ))
-                                    ) : (
-                                        <p className="no-lotes-msg">Aún no has programado lotes para este plan.</p>
-                                    )}
+                <div className="plan-accordion">
+                    {planesConLotes.map(plan => (
+                        <div className="plan-accordion-item" key={plan.id}>
+                            <PlanHeaderCard
+                                plan={plan}
+                                isOpen={openPlanId === plan.id}
+                                onToggle={() => handleTogglePlan(plan.id)}
+                            />
+                            
+                            <div className={`plan-content-wrapper ${openPlanId === plan.id ? 'open' : ''}`}>
+                                <div className="plan-content-interior">
+                                    <div className="lotes-grid-header">
+                                        <Link to={`/docente/planes/editar/${plan.id}`} className="btn btn-secondary btn-sm">
+                                            <FaEdit /> Editar Plan
+                                        </Link>
+                                        <Link to={`/docente/lotes/crear?planId=${plan.id}`} className="btn btn-primary btn-sm">
+                                            <FaPlus /> Publicar Nuevo Lote
+                                        </Link>
+                                    </div>
+                                    
+                                    <div className="lotes-grid">
+                                        {plan.lotes.length > 0 ? (
+                                            plan.lotes.map(lote => (
+                                                <LoteCard key={lote.id} lote={lote} onLoteEliminado={handleLoteEliminado} />
+                                            ))
+                                        ) : (
+                                            <p className="no-lotes-msg">Aún no has programado lotes para este plan.</p>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
-            
         </div>
     );
 };

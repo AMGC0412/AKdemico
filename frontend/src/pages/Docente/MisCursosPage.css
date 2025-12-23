@@ -1,358 +1,382 @@
-/* --- Variables y Estilos Base --- */
+/* =================================================================
+   ARCHIVO: MisCursosPage.css
+   DISEÑO: PORTFOLIO COMMAND DECK (Sincronizado con DocenteDashboard)
+   ESTILO: Ultra High-Fidelity | Cyber-Tech
+   ================================================================= */
+
 :root {
-    --color-primary: #6d41dc;
-    --color-secondary: #00bcd4;
-    --color-danger: #e94158;
-    --color-success: #00c853;
-    --color-warn: #ffab00;
-    --color-text: #222;
-    --color-text-light: #666;
-    --color-bg-light: #f4f6f8;
-    --border-radius-main: 12px;
+    /* --- HERENCIA DEL SISTEMA DOCENTE (DocenteDashboardPage.css) --- */
+    --doc-core-blue: #3340CC;       /* ÍNDIGO (Predominante) */
+    --doc-core-cyan: #00F3FF;       /* Acento Tecnológico */
+    --doc-core-purple: #7B2CBF;     /* Profundidad */
+    --doc-core-dark: #020206;       /* Fondo Vacío */
     
-    /* ¡Colores de Estado ahora usados en gráficos! */
-    --color-status-programado: #0d47a1;
-    --color-status-en_curso: #1b5e20;
-    --color-status-finalizado: #4a148c;
-    --color-status-cancelado: #b71c1c;
+    --doc-state-success: #05FF00;   /* Activo / En Curso */
+    --doc-state-warning: #FFD600;   /* Programado / Pendiente */
+    --doc-state-danger: #FF003C;    /* Cancelado */
+    --doc-state-neutral: #8888AA;   /* Finalizado */
+
+    --doc-bg-panel: rgba(15, 15, 25, 0.96); 
+    --doc-bg-header: rgba(51, 64, 204, 0.08); 
+    --doc-border-dim: rgba(51, 64, 204, 0.25); 
+    --doc-border-lit: rgba(51, 64, 204, 0.8);  
+
+    --doc-font-tech: '04b30', 'Consolas', monospace; 
+    --doc-font-ui: 'Poppins', sans-serif; 
+    
+    --doc-radius: 12px;
 }
 
-/* --- (A) ESTRUCTURA DE PÁGINA "PORTAFOLIO" --- */
-.accordion-layout {
+/* =========================================
+   1. ENTORNO Y FONDO (ATMÓSFERA)
+   ========================================= */
+
+.mis-cursos-page {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--doc-core-dark);
+    color: #F0F0F0;
+    font-family: var(--doc-font-ui);
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 3rem;
 }
 
-.page-header-actions {
-    display: flex;
-    justify-content: space-between;
+/* Fondo Atmosférico + Grid Overlay (Igual que Dashboard) */
+.mis-cursos-page::before {
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        radial-gradient(circle at 50% 0%, rgba(51, 64, 204, 0.15), transparent 70%),
+        linear-gradient(rgba(51, 64, 204, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(51, 64, 204, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.6;
+    pointer-events: none; z-index: 0;
+}
+
+/* Scanlines CRT */
+.mis-cursos-page::after {
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px);
+    pointer-events: none; z-index: 0; opacity: 0.3;
+}
+
+/* =========================================
+   2. HEADER PANEL (COMMAND DECK)
+   ========================================= */
+
+.mis-cursos-header-panel {
+    position: relative;
+    z-index: 2;
+    background: var(--doc-bg-panel);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--doc-border-dim);
+    border-radius: var(--doc-radius);
+    
+    /* Borde Superior de Energía */
+    border-top: 4px solid var(--doc-core-blue);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    
+    padding: 2.5rem;
+    display: flex; 
+    justify-content: space-between; 
     align-items: center;
     flex-wrap: wrap;
-    gap: 1rem;
-}
-.page-header-actions h1 {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: 0;
-    color: var(--color-text);
+    gap: 2rem;
+    overflow: hidden;
+    animation: slideDown 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* --- (B) EL ACORDEÓN DE PLANES --- */
-.plan-accordion {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem; /* Espacio entre cada plan */
+@keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Decoración Lateral Brillante */
+.mis-cursos-header-panel::after {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+    background: linear-gradient(to bottom, var(--doc-core-blue), transparent);
+    box-shadow: 0 0 15px var(--doc-core-blue);
 }
+
+.header-title-group h1 {
+    font-family: var(--doc-font-tech);
+    font-size: 2.5rem;
+    margin: 0;
+    line-height: 1;
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 1rem;
+    
+    background: linear-gradient(90deg, #FFFFFF 0%, var(--doc-core-blue) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(51, 64, 204, 0.4));
+}
+
+.header-subtitle {
+    color: #B0B0CC;
+    font-size: 1rem;
+    margin-top: 0.8rem;
+    max-width: 600px;
+    border-left: 2px solid var(--doc-border-dim);
+    padding-left: 1rem;
+}
+
+/* Botón Primario (Sólido Táctico) */
+.btn-primary {
+    background: var(--doc-core-blue);
+    border: none;
+    border-radius: 6px;
+    padding: 1rem 2rem;
+    color: #FFF;
+    font-family: var(--doc-font-tech);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.8rem;
+    box-shadow: 0 4px 15px rgba(51, 64, 204, 0.4);
+    position: relative; overflow: hidden;
+}
+
+.btn-primary:hover {
+    background: #4050FF;
+    box-shadow: 0 0 25px rgba(51, 64, 204, 0.6);
+    transform: translateY(-2px);
+}
+
+/* =========================================
+   3. ACORDEÓN DE PLANES (DATA DECKS)
+   ========================================= */
+
+.mis-cursos-content {
+    position: relative; z-index: 2;
+    animation: fadeIn 0.8s ease-out 0.2s forwards; opacity: 0;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.plan-accordion { display: flex; flex-direction: column; gap: 1.5rem; }
 
 .plan-accordion-item {
-    background: #ffffff;
-    border-radius: var(--border-radius-main);
-    border: 1px solid #e0e0e0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    background: linear-gradient(160deg, rgba(51, 64, 204, 0.02), var(--doc-bg-panel));
+    border: 1px solid var(--doc-border-dim);
+    border-radius: var(--doc-radius);
     transition: all 0.3s ease;
 }
-/* Estilo "activo" para el plan seleccionado */
+
+/* Estado Activo del Plan: Borde Iluminado */
 .plan-accordion-item:has(.plan-header-card.active) {
-    border-color: var(--color-primary);
-    box-shadow: 0 6px 20px rgba(109, 65, 220, 0.1);
+    border-color: var(--doc-core-blue);
+    box-shadow: 0 0 30px rgba(51, 64, 204, 0.15);
 }
 
-/* --- (C) LA CABECERA-TARJETA CLICKEABLE --- */
+/* --- CABECERA DEL PLAN (Interactivo) --- */
 .plan-header-card {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    padding: 1.5rem;
+    display: flex; align-items: center; gap: 2rem;
+    padding: 2rem;
     cursor: pointer;
-    border-radius: var(--border-radius-main);
-    transition: background-color 0.2s ease;
+    border-radius: var(--doc-radius);
+    transition: background 0.3s ease;
+    position: relative;
 }
 .plan-header-card:not(.active):hover {
-    background-color: var(--color-bg-light);
+    background: rgba(51, 64, 204, 0.05);
 }
 .plan-header-card.active {
+    background: rgba(51, 64, 204, 0.08);
+    border-bottom: 1px solid var(--doc-border-dim);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
 
 .plan-header-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 1.25rem;
-    flex-grow: 1; /* Ocupa el espacio */
-    min-width: 0;
+    display: flex; align-items: flex-start; gap: 1.5rem;
+    flex-grow: 1; min-width: 0;
 }
 .plan-header-icon {
-    font-size: 1.75rem;
-    color: var(--color-primary);
-    margin-top: 0.25rem;
+    font-size: 2rem; color: var(--doc-core-blue);
+    filter: drop-shadow(0 0 8px var(--doc-core-blue));
 }
 .plan-header-texto h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: var(--color-text);
+    margin: 0; font-size: 1.4rem; color: #FFF;
+    font-family: var(--doc-font-ui); font-weight: 600;
 }
 .plan-header-texto p {
-    margin: 0;
-    color: var(--color-text-light);
-    font-size: 0.95rem;
+    margin: 0.3rem 0 0 0; color: var(--doc-state-neutral); font-size: 0.9rem;
 }
 
-/* ¡LOS KPIs EN LA CABECERA! */
+/* --- KPI STATS (Mini Dashboard dentro del Plan) --- */
 .plan-kpi-stats {
-    display: flex;
-    gap: 1.5rem;
-    flex-shrink: 0; /* No se encoge */
-    margin: 0 1rem;
+    display: flex; gap: 3rem; margin: 0 2rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    padding-left: 2rem;
 }
-.kpi-stat-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-light);
+.kpi-stat-item { display: flex; flex-direction: column; }
+.kpi-label {
+    font-size: 0.7rem; color: #888; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 0.2rem; display: flex; align-items: center; gap: 0.5rem;
 }
-.kpi-stat-item svg {
-    font-size: 1.1rem;
-    color: var(--color-text-light);
+.kpi-value {
+    font-family: var(--doc-font-tech); font-size: 1.5rem; color: #FFF;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 
-/* Flecha del Acordeón */
+/* Colores KPI */
+.kpi-stat-item.students .kpi-value { color: var(--doc-core-cyan); text-shadow: 0 0 10px var(--doc-core-cyan); }
+.kpi-stat-item.revenue .kpi-value { color: var(--doc-core-purple); text-shadow: 0 0 10px var(--doc-core-purple); }
+
 .accordion-arrow {
-    font-size: 1.2rem;
-    color: var(--color-text-light);
-    transition: transform 0.3s ease;
+    font-size: 1.2rem; color: var(--doc-core-cyan); transition: 0.4s ease;
 }
-.plan-header-card.active .accordion-arrow {
-    transform: rotate(180deg);
-}
+.plan-header-card.active .accordion-arrow { transform: rotate(180deg); }
 
-/* --- (D) EL CONTENIDO COLAPSABLE (GRID DE LOTES) --- */
+
+/* --- CONTENIDO INTERIOR (Grid de Lotes) --- */
 .plan-content-wrapper {
-    /* La magia del acordeón */
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.4s ease-out;
+    max-height: 0; overflow: hidden; transition: max-height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.plan-content-wrapper.open {
-    max-height: 2000px; /* Alto máximo (ajústalo si es necesario) */
-}
+.plan-content-wrapper.open { max-height: 5000px; }
 
 .plan-content-interior {
-    padding: 1.5rem;
-    padding-top: 0; /* Se une con la cabecera */
-    border-top: 1px solid #e0e0e0;
-    background: var(--color-bg-light); /* Fondo sutil para el contenido */
-    border-bottom-left-radius: var(--border-radius-main);
-    border-bottom-right-radius: var(--border-radius-main);
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.3); /* Fondo interior más oscuro */
+    border-bottom-left-radius: var(--doc-radius);
+    border-bottom-right-radius: var(--doc-radius);
 }
 
 .lotes-grid-header {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding: 1.5rem 0;
+    display: flex; justify-content: flex-end; gap: 1rem;
+    padding-bottom: 1.5rem; margin-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--doc-border-dim);
 }
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid var(--doc-core-blue);
+    color: var(--doc-core-blue);
+    font-family: var(--doc-font-tech);
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    transition: 0.3s;
+    text-decoration: none; display: flex; align-items: center; gap: 0.5rem;
+}
+.btn-secondary:hover {
+    background: rgba(51, 64, 204, 0.15); color: #FFF; border-color: #FFF;
+    box-shadow: 0 0 15px rgba(51, 64, 204, 0.4);
+}
+
+/* =========================================
+   4. TARJETA DE LOTE (CHIP MODULE)
+   ========================================= */
 
 .lotes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-.no-lotes-msg {
-    color: var(--color-text-light);
-    font-style: italic;
-    font-size: 1.1rem;
-    padding: 2rem;
-    text-align: center;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 2rem;
 }
 
-/* --- (E) LA TARJETA DEL LOTE (LoteCard) --- */
 .lote-card {
-    background: #ffffff;
-    border-radius: 8px;
-    border: 1px solid #dbe0e4;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border-left-width: 5px; 
-    border-left-style: solid;
-    transition: box-shadow 0.2s ease;
-    flex-shrink: 0;
+    /* Diseño poligonal tech */
+    background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(10,10,15,0.8) 100%);
+    border: 1px solid var(--doc-border-dim);
+    /* Clip path para esquina recortada */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    padding: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 220px;
+    display: flex; flex-direction: column;
 }
-.lote-card:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-.lote-card.status-programado { border-left-color: var(--color-status-programado); }
-.lote-card.status-en_curso { border-left-color: var(--color-status-en_curso); }
-.lote-card.status-finalizado { border-left-color: var(--color-status-finalizado); }
-.lote-card.status-cancelado { border-left-color: var(--color-status-cancelado); }
 
-.lote-card-contenido {
-    padding: 1.25rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
+.lote-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--doc-core-blue);
+    background: linear-gradient(145deg, rgba(51,64,204,0.1), rgba(10,10,15,0.9));
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
+
+/* Bordes laterales indicadores de estado */
+.lote-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%;
+}
+.lote-card.status-programado::before { background: var(--doc-core-cyan); box-shadow: 0 0 10px var(--doc-core-cyan); }
+.lote-card.status-en_curso::before { background: var(--doc-state-success); box-shadow: 0 0 10px var(--doc-state-success); }
+.lote-card.status-finalizado { opacity: 0.7; }
+.lote-card.status-finalizado::before { background: var(--doc-state-neutral); }
+.lote-card.status-cancelado::before { background: var(--doc-state-danger); box-shadow: 0 0 10px var(--doc-state-danger); }
+
+.lote-card-contenido { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; flex-grow: 1; }
 
 .lote-info-principal {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 0.8rem;
 }
-.lote-fechas {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
-    color: var(--color-text-light);
-    font-weight: 500;
-}
+
 .lote-estado-label {
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--color-text-light);
+    font-family: var(--doc-font-tech); font-size: 0.75rem; padding: 0.2rem 0.6rem;
+    border-radius: 2px; text-transform: uppercase; letter-spacing: 1px;
+}
+/* Estilos Específicos de Badge */
+.status-programado .lote-estado-label { background: rgba(0, 243, 255, 0.1); color: var(--doc-core-cyan); border: 1px solid var(--doc-core-cyan); }
+.status-en_curso .lote-estado-label { background: rgba(5, 255, 0, 0.1); color: var(--doc-state-success); border: 1px solid var(--doc-state-success); }
+.status-finalizado .lote-estado-label { background: rgba(255, 255, 255, 0.05); color: var(--doc-state-neutral); border: 1px solid var(--doc-state-neutral); }
+
+.lote-fechas {
+    font-size: 0.85rem; color: #B0B0CC; display: flex; align-items: center; gap: 0.4rem;
 }
 
-.lote-cupos-visual { width: 100%; }
+/* Barra de Progreso Glowing */
+.lote-cupos-visual { margin-top: auto; }
 .cupos-texto {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-    margin-bottom: 0.25rem;
+    display: flex; justify-content: space-between; font-family: var(--doc-font-tech);
+    font-size: 0.8rem; margin-bottom: 0.4rem; color: #888;
 }
-.cupos-texto span:first-child { font-weight: 500; }
-.cupos-barra {
-    width: 100%;
-    height: 8px;
-    background: #e0e0e0;
-    border-radius: 4px;
-    overflow: hidden;
-}
-.cupos-barra-progreso {
-    height: 100%;
-    background: var(--color-primary);
-    border-radius: 4px;
-    transition: width 0.5s ease;
-}
+.cupos-texto span:last-child { color: #FFF; }
 
+.cupos-barra {
+    height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;
+}
+.cupos-barra-progreso { height: 100%; transition: width 1s ease; }
+.cupos-barra-progreso.low { background: var(--doc-state-success); box-shadow: 0 0 10px var(--doc-state-success); }
+.cupos-barra-progreso.medium { background: var(--doc-state-warning); box-shadow: 0 0 10px var(--doc-state-warning); }
+.cupos-barra-progreso.high { background: var(--doc-state-danger); box-shadow: 0 0 10px var(--doc-state-danger); }
+
+/* Botones de Acción dentro de la tarjeta */
 .lote-acciones {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-    border-top: 1px solid #f0f0f0;
-    padding-top: 1.25rem;
-    margin-top: 0.25rem;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem;
 }
 .btn-accion {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.6rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    background: transparent; border: 1px solid rgba(255,255,255,0.1); color: #AAA;
+    font-family: var(--doc-font-ui); font-size: 0.85rem; padding: 0.6rem;
+    display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+    text-decoration: none; transition: 0.3s; border-radius: 4px; cursor: pointer;
 }
-.btn-accion:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-accion.edit { background: #f0f0f0; color: var(--color-text); }
-.btn-accion.edit:hover { background: #e0e0e0; }
-.btn-accion.delete { background: transparent; color: var(--color-danger); }
-.btn-accion.delete:hover { background: #ffebee; }
+.btn-accion:hover { background: rgba(255,255,255,0.05); color: #FFF; border-color: #FFF; }
 
-.error-delete-lote {
-    color: var(--color-danger);
-    font-size: 0.9rem;
-    font-weight: 500;
-    display: block;
-    padding: 0 1.25rem 1.25rem 1.25rem;
-    margin-top: -1rem;
-}
+.btn-accion.edit:hover { border-color: var(--doc-core-cyan); color: var(--doc-core-cyan); box-shadow: inset 0 0 10px rgba(0,243,255,0.1); }
+.btn-accion.delete:hover { border-color: var(--doc-state-danger); color: var(--doc-state-danger); box-shadow: inset 0 0 10px rgba(255,0,60,0.1); }
 
-/* --- ESTADOS GLOBALES (Loading, Error, No Data) --- */
-.page-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 60vh;
-    gap: 1rem;
-    font-size: 1.2rem;
-    color: var(--color-text-light);
+/* --- RESPONSIVE --- */
+@media (max-width: 900px) {
+    .plan-kpi-stats {
+        border-left: none; border-top: 1px dashed rgba(255,255,255,0.1);
+        padding-left: 0; padding-top: 1rem; width: 100%;
+        display: grid; grid-template-columns: 1fr 1fr;
+    }
 }
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-.page-loading .spinner {
-    font-size: 2rem;
-    color: var(--color-primary);
-    animation: spin 1s linear infinite;
+@media (max-width: 768px) {
+    .mis-cursos-header-panel { flex-direction: column; text-align: center; }
+    .header-subtitle { border-left: none; padding-left: 0; }
+    .plan-header-card { flex-direction: column; align-items: flex-start; }
+    .accordion-arrow { position: absolute; top: 1.5rem; right: 1.5rem; }
+    .lotes-grid { grid-template-columns: 1fr; }
 }
 
-.page-loading-inline {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.1rem;
-    color: var(--color-primary);
-    padding: 1rem;
-}
-.page-loading-inline .spinner {
-    animation: spin 1s linear infinite;
-}
-
-.message {
-    padding: 1rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1.1rem;
-    font-weight: 500;
-    margin-bottom: 1rem; /* Añadido para separar del contenido */
-}
-.message.error {
-    background-color: #ffebee;
-    border: 1px solid var(--color-danger);
-    color: var(--color-danger);
-}
-.message.success {
-    background-color: #e8f5e9;
-    border: 1px solid var(--color-success);
-    color: #0c6210;
-}
-
+/* --- MENSAJES DE ESTADO --- */
 .no-data-box {
-    text-align: center;
-    padding: 3rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    border: 2px dashed #dbe0e4;
-    border-radius: var(--border-radius-main);
-    background: rgba(255, 255, 255, 0.7);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    background: rgba(20,20,30,0.8); border: 1px dashed var(--doc-border-dim);
+    border-radius: var(--doc-radius); padding: 4rem; text-align: center; margin-top: 2rem;
 }
-.no-data-icon {
-    font-size: 3rem;
-    color: var(--color-warn);
-}
-.no-data-box h3 {
-    margin: 0;
-    color: var(--color-text);
-}
-.no-data-box p {
-    margin: 0;
-    font-size: 1.1rem;
-    color: var(--color-text-light);
-    max-width: 400px;
+.no-data-icon { font-size: 3rem; color: var(--doc-core-cyan); margin-bottom: 1rem; }
+.message.success {
+    background: rgba(5, 255, 0, 0.1); border: 1px solid var(--doc-state-success);
+    color: var(--doc-state-success); padding: 1rem; border-radius: 6px; font-family: var(--doc-font-tech);
 }

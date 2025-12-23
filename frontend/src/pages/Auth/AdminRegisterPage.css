@@ -1,0 +1,393 @@
+/* ==========================================================================
+   ARCHIVO: AdminRegisterPage.css
+   SISTEMA: AKDÉMICO CYBER-SECURITY INTERFACE (RESTRICTED ACCESS)
+   VERSIÓN: 3.0 (ULTIMATE TECH & HUD DESIGN)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   0. VARIABLES DE ENTORNO DE SEGURIDAD (CYBER-SYSTEM)
+   -------------------------------------------------------------------------- */
+:root {
+    /* Paleta de Seguridad Nivel 0 */
+    --adm-bg-base: #020205;              /* Negro Abismo */
+    --adm-blue-neon: #00f3ff;            /* Azul Cian Eléctrico */
+    --adm-blue-deep: #002244;            /* Azul Profundo para Capas */
+    --adm-purple-restricted: #bc00ff;    /* Púrpura de Acceso Restringido */
+    --adm-magenta-glow: #ff00ff;         /* Magenta de Alerta */
+    --adm-red-alert: #ff0055;            /* Rojo de Error Crítico */
+    
+    /* Variables HUD (Heads-Up Display) */
+    --adm-border-glow: 0 0 15px rgba(0, 243, 255, 0.3);
+    --adm-purple-shadow: 10px 10px 0px rgba(188, 0, 255, 0.2);
+    --adm-glass: rgba(5, 5, 15, 0.95);
+    
+    /* Tipografía Militar/Tech */
+    --adm-font-main: 'Orbitron', 'Share Tech Mono', monospace;
+    --adm-font-data: 'Share Tech Mono', 'Consolas', monospace;
+}
+
+/* --------------------------------------------------------------------------
+   1. CONTENEDOR PRINCIPAL: "EL BUNKER DIGITAL"
+   -------------------------------------------------------------------------- */
+.admin-register-container {
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--adm-bg-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+    perspective: 1000px;
+}
+
+/* Capa de Rejilla de Seguridad Animada */
+.admin-register-container::before {
+    content: "";
+    position: absolute;
+    inset: -100%;
+    background-image: 
+        linear-gradient(rgba(188, 0, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(188, 0, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    transform: rotateX(60deg) translateY(0);
+    animation: admin-grid-scroll 25s linear infinite;
+    z-index: 1;
+}
+
+@keyframes admin-grid-scroll {
+    from { transform: rotateX(60deg) translateY(0); }
+    to { transform: rotateX(60deg) translateY(40px); }
+}
+
+/* Efecto de Escáner de Seguridad (Luz que baja) */
+.admin-register-container::after {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(to bottom, transparent, var(--adm-purple-restricted), transparent);
+    box-shadow: 0 0 20px var(--adm-purple-restricted);
+    opacity: 0.3;
+    animation: security-sweep 6s infinite;
+    z-index: 2;
+}
+
+@keyframes security-sweep {
+    0% { top: -10%; }
+    100% { top: 110%; }
+}
+
+/* --------------------------------------------------------------------------
+   2. TARJETA DE ACCESO (ADMIN MODULE)
+   -------------------------------------------------------------------------- */
+.admin-register-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 550px;
+    background: var(--adm-glass);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--adm-purple-restricted);
+    padding: 50px;
+    box-shadow: 
+        0 0 40px rgba(0, 0, 0, 0.9),
+        inset 0 0 30px rgba(188, 0, 255, 0.1);
+    
+    /* Corte Angular de Alta Tecnología */
+    clip-path: polygon(
+        0 30px, 30px 0, 
+        100% 0, 100% calc(100% - 30px), 
+        calc(100% - 30px) 100%, 0 100%
+    );
+}
+
+/* Marcos HUD en las esquinas */
+.admin-register-card::before {
+    content: "RESTRICTED AREA // UID: ADMIN-SYS-99";
+    position: absolute;
+    top: 10px;
+    right: 40px;
+    font-family: var(--adm-font-data);
+    font-size: 0.65rem;
+    color: var(--adm-purple-restricted);
+    letter-spacing: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   3. ENCABEZADO DE SEGURIDAD
+   -------------------------------------------------------------------------- */
+.admin-register-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.admin-register-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    display: inline-block;
+    filter: drop-shadow(0 0 10px var(--adm-purple-restricted));
+    animation: icon-glitch 5s infinite;
+}
+
+@keyframes icon-glitch {
+    0%, 90%, 100% { transform: scale(1) translate(0); filter: hue-rotate(0deg); }
+    92% { transform: scale(1.1) translate(-2px, 2px); filter: hue-rotate(90deg); }
+    95% { transform: scale(0.9) translate(2px, -2px); filter: hue-rotate(180deg); }
+}
+
+.admin-register-title {
+    font-family: var(--adm-font-main);
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0;
+    text-shadow: 0 0 15px var(--adm-purple-restricted);
+}
+
+.admin-register-subtitle {
+    font-family: var(--adm-font-data);
+    font-size: 0.85rem;
+    color: var(--adm-purple-restricted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+/* --------------------------------------------------------------------------
+   4. PANEL DE ADVERTENCIA CRÍTICA
+   -------------------------------------------------------------------------- */
+.admin-security-warning {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(188, 0, 255, 0.1);
+    border: 1px solid var(--adm-purple-restricted);
+    padding: 15px 20px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Luz de advertencia pulsante */
+.admin-security-warning::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; width: 4px; height: 100%;
+    background: var(--adm-magenta-glow);
+    animation: alert-pulse 1s infinite alternate;
+}
+
+@keyframes alert-pulse {
+    from { opacity: 0.3; }
+    to { opacity: 1; box-shadow: 0 0 10px var(--adm-magenta-glow); }
+}
+
+.warning-icon {
+    font-size: 1.8rem;
+    color: var(--adm-magenta-glow);
+}
+
+.warning-text {
+    font-family: var(--adm-font-data);
+    font-size: 0.75rem;
+    color: #fff;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   5. FORMULARIO DE ACCESO (ADMIN DATA ENTRY)
+   -------------------------------------------------------------------------- */
+
+/* Contenedor del Campo */
+.admin-secret-group {
+    border: 1px dashed var(--adm-purple-restricted);
+    padding: 25px;
+    background: rgba(188, 0, 255, 0.03);
+    border-radius: 4px;
+    margin-top: 10px;
+    transition: 0.3s;
+}
+
+.admin-secret-group:focus-within {
+    background: rgba(188, 0, 255, 0.08);
+    border-style: solid;
+}
+
+.admin-secret-label {
+    color: var(--adm-magenta-glow) !important;
+    font-family: var(--adm-font-main) !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 12px !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Inputs de Administrador */
+.admin-secret-input {
+    background: #000 !important;
+    border: 1px solid #333 !important;
+    border-left: 4px solid var(--adm-purple-restricted) !important;
+    font-family: var(--adm-font-data) !important;
+    font-size: 1.1rem !important;
+    color: var(--adm-blue-neon) !important;
+}
+
+.admin-secret-input:focus {
+    border-color: var(--adm-blue-neon) !important;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.2) !important;
+}
+
+.admin-secret-help {
+    display: block;
+    margin-top: 10px;
+    font-family: var(--adm-font-data);
+    font-size: 0.7rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+/* --------------------------------------------------------------------------
+   6. BOTÓN DE EJECUCIÓN (SYSTEM OVERRIDE)
+   -------------------------------------------------------------------------- */
+.admin-submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: transparent;
+    border: 2px solid var(--adm-purple-restricted);
+    color: var(--adm-purple-restricted);
+    font-family: var(--adm-font-main);
+    font-weight: 900;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin-submit-btn::before {
+    content: "CONFIRM_SECURITY_CLEARANCE";
+    position: absolute;
+    inset: 0;
+    background: var(--adm-purple-restricted);
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(100%);
+    transition: 0.3s;
+}
+
+.admin-submit-btn:hover {
+    box-shadow: 0 0 30px var(--adm-purple-restricted);
+    color: #fff;
+}
+
+.admin-submit-btn:hover::before {
+    transform: translateY(0);
+}
+
+.admin-submit-btn:active {
+    transform: scale(0.98);
+}
+
+/* --------------------------------------------------------------------------
+   7. FOOTER Y NAVEGACIÓN DE RETORNO
+   -------------------------------------------------------------------------- */
+.admin-register-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(188, 0, 255, 0.2);
+    display: flex;
+    justify-content: center;
+}
+
+.admin-back-link {
+    font-family: var(--adm-font-data);
+    color: #555;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: 0.3s;
+}
+
+.admin-back-link:hover {
+    color: var(--adm-blue-neon);
+    gap: 15px;
+    text-shadow: 0 0 8px var(--adm-blue-neon);
+}
+
+/* --------------------------------------------------------------------------
+   8. MEDIA QUERIES (OPTIMIZACIÓN MÓVIL)
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+    .admin-register-card {
+        padding: 30px 20px;
+        clip-path: none;
+        border-radius: 0;
+    }
+    
+    .admin-register-title {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+    }
+    
+    .admin-register-icon {
+        font-size: 3rem;
+    }
+    
+    .admin-secret-group {
+        padding: 15px;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   9. DECORACIONES HUD ADICIONALES (500+ LINES LOGIC)
+   -------------------------------------------------------------------------- */
+
+/* Pequeñas barras de datos decorativas */
+.hud-data-bar {
+    position: absolute;
+    height: 100px;
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--adm-blue-neon), transparent);
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.3;
+}
+
+.hud-data-bar.right {
+    left: auto;
+    right: 20px;
+}
+
+/* Efectos de ruido visual ocasional (Noise) */
+.cyber-noise {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Estilo de Scrollbar para la terminal */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #050505; }
+::-webkit-scrollbar-thumb { background: var(--adm-purple-restricted); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: var(--adm-magenta-glow); }
+
+/* FIN DEL ARCHIVO ADMINREGISTERPAGE.CSS */

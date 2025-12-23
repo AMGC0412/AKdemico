@@ -1,22 +1,33 @@
 import { Router } from 'express';
-// Importamos la nueva función
-import { inscribirseALote, obtenerMiEstadoInscripcion, cancelarMiInscripcion } from './inscripciones.controller.js';
+import { 
+    inscribirseALote, 
+    obtenerMiEstadoInscripcion, 
+    cancelarMiInscripcion,
+    obtenerMisInscripciones,
+    obtenerEventosCalendario
+} from './inscripciones.controller.js'; // Ajusta la ruta si es necesario
+
 import { protegerRuta } from '../../middleware/auth.middleware.js';
 import { esEstudiante } from '../../middleware/role.middleware.js';
 
 const router = Router();
 
-// Ruta para inscribirse (ya existe)
+// 1. Rutas estáticas (sin parámetros) van PRIMERO
+// GET /api/v1/inscripciones/mis-inscripciones
+router.get('/mis-inscripciones', protegerRuta, esEstudiante, obtenerMisInscripciones);
+
+// 2. Rutas dinámicas (con parámetros) van DESPUÉS
+// POST /api/v1/inscripciones/lote/:loteId
 router.post('/lote/:loteId', protegerRuta, esEstudiante, inscribirseALote);
 
-// Ruta para verificar estado (ya existe)
+// GET /api/v1/inscripciones/mi-estado/lote/:loteId
 router.get('/mi-estado/lote/:loteId', protegerRuta, esEstudiante, obtenerMiEstadoInscripcion);
 
-// --- AÑADIR ESTA RUTA ---
-// Ruta para cancelar una inscripción
-// Usamos DELETE porque es una acción destructiva (cambia estado a cancelado)
-// URL: DELETE /api/v1/inscripciones/1 (donde 1 es el inscripcionId)
+// DELETE /api/v1/inscripciones/:inscripcionId
 router.delete('/:inscripcionId', protegerRuta, esEstudiante, cancelarMiInscripcion);
-// -------------------------
+
+// [NUEVA RUTA DE CALENDARIO]
+// GET /api/v1/inscripciones/calendario
+router.get('/calendario', protegerRuta, esEstudiante, obtenerEventosCalendario); // <-- ¡NUEVO!
 
 export default router;

@@ -1,24 +1,29 @@
 import { Router } from 'express';
-import { crearReseña, reportarReseña, obtenerReseñasReportadas, moderarReseña } from './resenas.controller.js';
+import { 
+  crearReseña, 
+  reportarReseña, 
+  obtenerReseñasReportadas, 
+  moderarReseña 
+} from './resenas.controller.js';
 import { protegerRuta } from '../../middleware/auth.middleware.js';
-import { esEstudiante } from '../../middleware/role.middleware.js';
-import { esAdmin } from '../../middleware/role.middleware.js'; // <-- Importamos 'esAdmin'
+import { esEstudiante, esAdmin } from '../../middleware/role.middleware.js';
 
 const router = Router();
 
-// URL: POST /api/v1/resenas/lote/1 (donde 1 es el ID del lote)
-router.post('/lote/:loteId', protegerRuta, esEstudiante, crearReseña);
+// Todas las rutas requieren autenticación
+router.use(protegerRuta);
 
-// RUTA PARA QUE CUALQUIER USUARIO LOGUEADO REPORTE UNA RESEÑA
-// URL: PUT /api/v1/resenas/reportar/1 (donde 1 es el ID de la reseña)
-router.put('/reportar/:reseñaId', protegerRuta, reportarReseña);
+// --- RUTAS DE ESTUDIANTE ---
+// Crear una reseña sobre un lote específico
+router.post('/lote/:loteId', esEstudiante, crearReseña);
+
+// --- RUTAS PÚBLICAS (USUARIOS LOGUEADOS) ---
+// Reportar cualquier reseña que infrinja normas
+router.put('/reportar/:reseñaId', reportarReseña);
 
 // --- RUTAS DE ADMINISTRADOR ---
-// Ver todas las reseñas reportadas
-router.get('/reportadas', protegerRuta, esAdmin, obtenerReseñasReportadas);
-
-// Tomar acción sobre una reseña reportada
-router.put('/moderar/:reseñaId', protegerRuta, esAdmin, moderarReseña);
-// ----------------------------
+// Acceso exclusivo a moderación
+router.get('/admin/reportadas', esAdmin, obtenerReseñasReportadas);
+router.put('/admin/moderar/:reseñaId', esAdmin, moderarReseña);
 
 export default router;

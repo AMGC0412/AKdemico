@@ -6,7 +6,7 @@ import {
   aprobarVerificacion,
   rechazarVerificacion,
   obtenerTodosLosUsuarios,
-  actualizarRolUsuario,
+  actualizarRolesUsuario,
   obtenerResenasReportadas, // <-- [NUEVO]
   aprobarResena,             // <-- [NUEVO]
   ocultarResena              // <-- [NUEVO]
@@ -26,7 +26,7 @@ router.put('/verificaciones/:id/rechazar', protegerRuta, esAdmin, rechazarVerifi
 
 // --- RUTAS DE GESTIÓN DE USUARIOS ---
 router.get('/usuarios', protegerRuta, esAdmin, obtenerTodosLosUsuarios);
-router.put('/usuarios/:id/rol', protegerRuta, esAdmin, actualizarRolUsuario);
+router.put('/usuarios/:id/roles', protegerRuta, esAdmin, actualizarRolesUsuario); // Plural 'roles'
 
 // --- [NUEVO] RUTAS DE GESTIÓN DE MODERACIÓN (Reseñas US-24) ---
 

@@ -21,7 +21,7 @@ const RoleBadge = ({ rol, estadoVerificacion }) => {
     const esVerificado = estadoVerificacion === 'verificado';
 
     return (
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div className="role-badge-container">
             <span className={`profile-role-badge ${className}`}>{text}</span>
             {esDocente && esVerificado && (
                 <span className="profile-role-badge role-verificado" title="Docente Verificado">

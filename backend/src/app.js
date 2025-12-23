@@ -19,6 +19,8 @@ import rutasPagos from './api/pagos/pagos.routes.js';
 import rutasReseñas from './api/resenas/resenas.routes.js';
 import rutasTaxonomia from './api/taxonomia/taxonomia.routes.js';
 import rutasAdmin from './api/admin/admin.routes.js';
+import rutasDashboard from './api/dashboard/dashboard.routes.js'; // <-- ¡IMPORTACIÓN AÑADIDA!
+import catalogoRoutes from './api/catalogo/catalogo.routes.js'; // Ajusta la ruta según donde esté tu app.js
 
 const app = express();
 
@@ -39,6 +41,9 @@ app.use('/api/v1/pagos', rutasPagos);
 app.use('/api/v1/resenas', rutasReseñas);
 app.use('/api/v1/taxonomia', rutasTaxonomia);
 app.use('/api/v1/admin', rutasAdmin);
+app.use('/api/v1/dashboard', rutasDashboard); // <-- ¡REGISTRO AÑADIDO!
+app.use('/api/v1/catalogos', catalogoRoutes);
+
 // --- [CORREGIDO] Servir archivos estáticos ---
 
 // 1. Esto es necesario para que __dirname funcione con ES Modules
@@ -53,5 +58,9 @@ const uploadsPath = path.join(__dirname, '..', 'uploads');
 app.use('/files', express.static(uploadsPath));
 
 // ---------------------------------------------
+
+app.get('/', (req, res) => {
+  res.send('El servidor backend está funcionando correctamente 🚀');
+});
 
 export default app;

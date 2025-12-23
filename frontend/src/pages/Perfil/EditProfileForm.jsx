@@ -59,20 +59,20 @@ const EditProfileForm = ({ usuario, token, onSaveSuccess, onCancel }) => {
         <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} required />
       </div>
       <div className="form-group form-group-readonly">
-        <label htmlFor="correo">Correo Electrónico (No se puede cambiar)</label>
+        <label htmlFor="correo">Correo Electrónico (Solo Lectura)</label>
         <input type="email" id="correo" name="correo" value={usuario.correo} readOnly disabled />
       </div>
       <div className="form-group">
-        <label htmlFor="ciudad">Ciudad (Opcional)</label>
+        <label htmlFor="ciudad">Ciudad</label>
         <input type="text" id="ciudad" name="ciudad" value={formData.ciudad} onChange={handleChange} placeholder="Ej: Cusco, Perú" />
       </div>
       <div className="form-group">
-        <label htmlFor="biografia">Biografía (Opcional)</label>
-        <textarea id="biografia" name="biografia" value={formData.biografia} onChange={handleChange} placeholder="Cuéntanos un poco sobre ti..." />
+        <label htmlFor="biografia">Biografía</label>
+        <textarea id="biografia" name="biografia" value={formData.biografia} onChange={handleChange} placeholder="Cuéntanos un poco sobre ti..." rows="4" />
       </div>
       <div className="form-group">
-        <label htmlFor="foto_url">URL de tu Foto de Perfil (Opcional)</label>
-        <input type="text" id="foto_url" name="foto_url" value={formData.foto_url} onChange={handleChange} placeholder="https://... (en el futuro podrás subirla)" />
+        <label htmlFor="foto_url">URL de Avatar</label>
+        <input type="text" id="foto_url" name="foto_url" value={formData.foto_url} onChange={handleChange} placeholder="https://..." />
       </div>
       
       {success && <div className="profile-message success">{success}</div>}
@@ -83,7 +83,7 @@ const EditProfileForm = ({ usuario, token, onSaveSuccess, onCancel }) => {
           Cancelar
         </button>
         <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? <><FaSpinner className="fa-spin" /> Guardando...</> : <><FaSave /> Guardar Cambios</>}
+          {loading ? <><FaSpinner className="fa-spin" /> Procesando...</> : <><FaSave /> Guardar Cambios</>}
         </button>
       </div>
     </form>

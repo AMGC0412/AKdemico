@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { getReportedResenas, approveResena, hideResena } from '../../services/admin.service';
 import { 
-  FaSpinner, FaExclamationTriangle, FaCheckCircle, FaCheck, FaTimes, FaStar, FaQuoteLeft, FaUser, FaChalkboardTeacher
+  FaSpinner, FaExclamationTriangle, FaCheckCircle, FaCheck, FaTimes, FaStar, FaQuoteLeft, FaUser, FaChalkboardTeacher, FaExclamationCircle
 } from 'react-icons/fa';
 // Reutilizamos estilos del admin
-import './AdminVerificationPage.css';
-import './AdminModeracionPage.css'; // Crearemos este CSS
+import './AdminModeracionPage.css'; 
 
 /**
- * Página principal para la Moderación de Reseñas (US-24)
+ * Componente principal para la Moderación de Reseñas (US-24)
  */
 const AdminModeracionPage = () => {
   const [resenas, setResenas] = useState([]);
@@ -40,27 +39,18 @@ const AdminModeracionPage = () => {
 
   // --- Handlers de Acciones ---
 
-  const handleApprove = async (resenaId) => {
+  const handleAction = async (resenaId, actionType) => {
     setProcessingId(resenaId);
     try {
-      await approveResena(resenaId);
+      if (actionType === 'approve') {
+        await approveResena(resenaId);
+      } else {
+        await hideResena(resenaId);
+      }
       // Refrescar la lista quitando la reseña procesada
       setResenas(resenas.filter(r => r.id !== resenaId));
     } catch (err) {
-      setError(err.message); // Mostrar error en la parte superior
-    } finally {
-      setProcessingId(null);
-    }
-  };
-  
-  const handleHide = async (resenaId) => {
-    setProcessingId(resenaId);
-    try {
-      await hideResena(resenaId);
-      // Refrescar la lista quitando la reseña procesada
-      setResenas(resenas.filter(r => r.id !== resenaId));
-    } catch (err) {
-      setError(err.message);
+      setError(err.message || `Error al ${actionType === 'approve' ? 'aprobar' : 'ocultar'}.`); 
     } finally {
       setProcessingId(null);
     }
@@ -69,9 +59,9 @@ const AdminModeracionPage = () => {
   // 1. Estado de Carga
   if (isLoading) {
     return (
-      <div className="admin-page-loader">
-        <FaSpinner className="fa-spin" size="3em" />
-        <p>Cargando cola de moderación...</p>
+      <div className="admin-page-state loading">
+        <FaSpinner className="spin-icon" />
+        <p>CALIBRANDO SISTEMA / CARGANDO COLA DE MODERACIÓN...</p>
       </div>
     );
   }
@@ -79,9 +69,9 @@ const AdminModeracionPage = () => {
   // 2. Estado de Error
   if (error && !isLoading) {
     return (
-      <div className="admin-page-error">
-        <FaExclamationTriangle size="3em" />
-        <h3>Error al Cargar</h3>
+      <div className="admin-page-state error">
+        <FaExclamationTriangle className="error-icon" />
+        <h3>FALLA CRÍTICA</h3>
         <p>{error}</p>
       </div>
     );
@@ -91,27 +81,35 @@ const AdminModeracionPage = () => {
   return (
     <div className="admin-moderacion-page">
       <header className="admin-page-header">
-        <h2>Moderación de Reseñas</h2>
-        <p>Revisa las reseñas reportadas por los usuarios y toma una acción.</p>
+        <h2>TERMINAL TÁCTICO DE AMENAZAS</h2>
+        <p>Revisa la cola de reseñas reportadas por contenido inapropiado y toma una decisión final de publicación u ocultamiento.</p>
       </header>
+      
+      {/* Mensaje de Alerta (Barra superior para errores) */}
+      {error && <div className="alert-bar danger"><FaExclamationCircle/> {error}</div>}
 
       {/* Si no hay reseñas pendientes */}
       {resenas.length === 0 ? (
         <div className="admin-empty-state">
-          <FaCheckCircle size="4em" />
-          <h3>¡Cola Limpia!</h3>
-          <p>No hay reseñas pendientes de moderación.</p>
+          <FaCheckCircle className="empty-icon" />
+          <h3>¡COLA LIMPIA!</h3>
+          <p>No hay registros de amenazas pendientes de moderación.</p>
         </div>
       ) : (
         <div className="moderacion-list-container">
-          {resenas.map((resena) => (
-            <div key={resena.id} className="moderacion-card">
+          {resenas.map((resena, index) => (
+            <div key={resena.id} className="moderacion-card" style={{ animationDelay: `${index * 0.1}s` }}>
+              
+              {/* CINTA DE ALERTA LATERAL */}
+              <div className="card-alert-indicator"></div> 
+
               <header className="moderacion-card-header">
                 <div className="moderacion-info">
-                  <span><FaUser /> <strong>Autor:</strong> {resena.autor_nombre}</span>
-                  <span><FaChalkboardTeacher /> <strong>Docente:</strong> {resena.docente_nombre}</span>
+                  <span className="info-title"><FaUser /> Autor: <strong>{resena.autor_nombre}</strong></span>
+                  <span className="info-title"><FaChalkboardTeacher /> Docente: <strong>{resena.docente_nombre}</strong></span>
                 </div>
                 <div className="moderacion-rating">
+                  <span className="rating-value">{resena.calificacion}.0</span>
                   {/* Genera las estrellas */}
                   {[...Array(5)].map((_, i) => (
                     <FaStar key={i} className={i < resena.calificacion ? 'star-filled' : 'star-empty'} />
@@ -126,20 +124,20 @@ const AdminModeracionPage = () => {
               
               <footer className="moderacion-card-actions">
                 <button 
-                  className="btn btn-danger btn-small"
-                  onClick={() => handleHide(resena.id)}
+                  className="btn btn-danger btn-action-small"
+                  onClick={() => handleAction(resena.id, 'hide')}
                   disabled={processingId === resena.id}
                 >
-                  {processingId === resena.id ? <FaSpinner className="fa-spin" /> : <FaTimes />}
-                  Ocultar Reseña
+                  {processingId === resena.id ? <FaSpinner className="spin"/> : <FaTimes />}
+                  OCULTAR (AMENAZA)
                 </button>
                 <button 
-                  className="btn btn-primary btn-small"
-                  onClick={() => handleApprove(resena.id)}
+                  className="btn btn-primary btn-action-small"
+                  onClick={() => handleAction(resena.id, 'approve')}
                   disabled={processingId === resena.id}
                 >
-                  {processingId === resena.id ? <FaSpinner className="fa-spin" /> : <FaCheck />}
-                  Aprobar (Restaurar)
+                  {processingId === resena.id ? <FaSpinner className="spin"/> : <FaCheck />}
+                  APROBAR (RESTAURAR)
                 </button>
               </footer>
             </div>

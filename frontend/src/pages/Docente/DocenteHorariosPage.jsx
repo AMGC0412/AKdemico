@@ -1,176 +1,149 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { FaCalendarAlt, FaPlus, FaTrashAlt, FaSpinner, FaSave, FaTimesCircle, FaCheckCircle } from 'react-icons/fa';
-import './DocenteForm.css'; // Reutilizamos el CSS del formulario
+import { useNavigate } from 'react-router-dom';
+import { FaCalendarAlt, FaPlus, FaTrashAlt, FaSpinner, FaSave, FaTimesCircle, FaCheckCircle, FaClock } from 'react-icons/fa';
+import './DocenteForm.css'; 
 import { obtenerDisponibilidad, actualizarDisponibilidad } from '../../services/schedules.service.js';
 
-const DIAS_SEMANA = [
-    { value: 1, label: 'Lunes' },
-    { value: 2, label: 'Martes' },
-    { value: 3, label: 'Miércoles' },
-    { value: 4, label: 'Jueves' },
-    { value: 5, label: 'Viernes' },
-    { value: 6, label: 'Sábado' },
-    { value: 7, label: 'Domingo' }, // Usamos 1-7 por simplicidad
-];
-
 const DocenteHorariosPage = () => {
-    const navigate = useNavigate();
-    
-    // Estado para la lista de horarios (bloques)
     const [horarios, setHorarios] = useState([]); 
+    
+    // --- ESTADOS TEMPORALES (Constructor) ---
+    const [diasTemp, setDiasTemp] = useState([]);
+    const [horaInicioTemp, setHoraInicioTemp] = useState('');
+    const [horaFinTemp, setHoraFinTemp] = useState('');
 
-    const [loading, setLoading] = useState(false); // Para el envío
-    const [pageLoading, setPageLoading] = useState(true); // Para cargar datos iniciales
+    const [loading, setLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
 
-    // Formatear hora de BD (16:00:00) a input (16:00)
-    const formatTimeParaInput = (timeString) => {
-         if (!timeString) return '';
-         return timeString.substring(0, 5); // Corta a HH:MM
-    }
+    const diasSemana = [
+        { label: 'L', value: '1' }, // 1 = Lunes en tu DB
+        { label: 'M', value: '2' },
+        { label: 'X', value: '3' },
+        { label: 'J', value: '4' },
+        { label: 'V', value: '5' },
+        { label: 'S', value: '6' },
+        { label: 'D', value: '7' },
+    ];
 
-    // Cargar la disponibilidad actual del docente
+    const formatTime = (time) => time ? time.substring(0, 5) : '';
+    const mapDiaNumeroALetra = (num) => {
+        const map = { '1': 'Lunes', '2': 'Martes', '3': 'Miércoles', '4': 'Jueves', '5': 'Viernes', '6': 'Sábado', '7': 'Domingo' };
+        return map[num] || num;
+    };
+
     useEffect(() => {
-        const cargarDisponibilidad = async () => {
+        const cargar = async () => {
             try {
                 const data = await obtenerDisponibilidad(); 
-                // Mapear los datos de la BD al formato del estado local
                 setHorarios(data.map(h => ({
-                    ...h,
-                    // Convertir el número del día a texto si fuera necesario (aunque en este caso es texto en DB)
-                    // Nota: Si la DB usa números (1-7), el value en el select ya lo maneja
-                    hora_inicio: formatTimeParaInput(h.hora_inicio),
-                    hora_fin: formatTimeParaInput(h.hora_fin),
-                    dia_semana: h.dia_semana.toString() // Asegurar que sea string para el <select>
+                    dia_semana: h.dia_semana.toString(),
+                    hora_inicio: formatTime(h.hora_inicio),
+                    hora_fin: formatTime(h.hora_fin)
                 })));
-
-                // Si la lista está vacía, añadimos una fila vacía para empezar
-                if (data.length === 0) {
-                     setHorarios([{ dia_semana: '', hora_inicio: '', hora_fin: '' }]);
-                }
-
             } catch (err) {
-                setError("Error al cargar tu disponibilidad actual.");
+                setError("No se pudo cargar la agenda.");
             } finally {
                 setPageLoading(false);
             }
         };
-        cargarDisponibilidad();
+        cargar();
     }, []);
 
-
-    // --- Handlers de Horarios Dinámicos ---
-    const handleHorarioChange = (index, event) => {
-        const nuevosHorarios = [...horarios];
-        nuevosHorarios[index][event.target.name] = event.target.value;
-        setHorarios(nuevosHorarios);
+    // --- LOGICA DE CONSTRUCTOR (Igual a CrearLote) ---
+    const toggleDia = (val) => {
+        if (diasTemp.includes(val)) setDiasTemp(diasTemp.filter(d => d !== val));
+        else setDiasTemp([...diasTemp, val]);
     };
 
-    const agregarHorario = () => {
-        setHorarios([...horarios, { dia_semana: '', hora_inicio: '', hora_fin: '' }]);
+    const agregarFranja = () => {
+        if (diasTemp.length === 0 || !horaInicioTemp || !horaFinTemp) return;
+        const nuevos = diasTemp.map(dia => ({ dia_semana: dia, hora_inicio: horaInicioTemp, hora_fin: horaFinTemp }));
+        setHorarios([...horarios, ...nuevos]);
+        setDiasTemp([]); setHoraInicioTemp(''); setHoraFinTemp('');
     };
 
-    const eliminarHorario = (index) => {
-        const nuevosHorarios = horarios.filter((_, i) => i !== index);
-        // Si borramos el último, añadimos uno vacío si la lista queda en cero
-        if (nuevosHorarios.length === 0) {
-            setHorarios([{ dia_semana: '', hora_inicio: '', hora_fin: '' }]);
-        } else {
-            setHorarios(nuevosHorarios);
-        }
-    };
-    // -----------------------------------------------------
-
+    const eliminarHorario = (index) => setHorarios(horarios.filter((_, i) => i !== index));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
-        setSuccess(null);
-        setLoading(true);
-
-        // Limpieza y validación final de datos antes de enviar
-        const horariosValidos = horarios.filter(h => h.dia_semana && h.hora_inicio && h.hora_fin);
-
-        if (horariosValidos.length === 0) {
-            // Si el docente quiere borrar todo, enviamos un array vacío
-            const data = await actualizarDisponibilidad({ bloques: [] }); 
-            setSuccess(data.mensaje || 'Disponibilidad eliminada exitosamente.');
-            setHorarios([{ dia_semana: '', hora_inicio: '', hora_fin: '' }]); // Resetear el form local
-            setLoading(false);
-            return;
-        }
-
-        const disponibilidadData = {
-            bloques: horariosValidos.map(h => ({
-                dia_semana: Number(h.dia_semana), // Asegurar que sea el número del día (1, 2, 3...)
-                hora_inicio: h.hora_inicio + ':00', // Añadir segundos
-                hora_fin: h.hora_fin + ':00',
-            }))
-        };
+        setError(null); setSuccess(null); setLoading(true);
 
         try {
-            const data = await actualizarDisponibilidad(disponibilidadData); 
-            setSuccess(data.mensaje || 'Disponibilidad actualizada.');
+            const payload = {
+                bloques: horarios.map(h => ({
+                    dia_semana: Number(h.dia_semana),
+                    hora_inicio: h.hora_inicio + ':00',
+                    hora_fin: h.hora_fin + ':00',
+                }))
+            };
+            const res = await actualizarDisponibilidad(payload); 
+            setSuccess(res.mensaje || 'Agenda base actualizada.');
         } catch (err) {
-            setError(err.mensaje || "Error al guardar tu disponibilidad.");
+            setError(err.mensaje || "Error al guardar.");
         } finally {
             setLoading(false);
         }
     };
 
-    if (pageLoading) return <div className="page-loading"><FaSpinner className="spinner" /> Cargando disponibilidad...</div>;
+    if (pageLoading) return <div className="page-loading"><FaSpinner className="spinner" /> Sincronizando agenda...</div>;
 
     return (
         <div className="docente-form-page">
             <div className="docente-form-container">
                 <div className="docente-form-header">
-                    <FaCalendarAlt className="icon" />
-                    <h1>Definir Disponibilidad Semanal</h1>
+                    <FaCalendarAlt className="icon-header" />
+                    <h1>Disponibilidad General</h1>
                 </div>
-                <p>Aquí defines las franjas horarias recurrentes en las que estás disponible para dictar clases. Tu horario se actualizará inmediatamente en tu perfil público.</p>
+                <p className="form-description">
+                    Define tus franjas libres para <strong>Mentorías Privadas</strong>. Esto no afecta los horarios de tus cursos grupales.
+                </p>
+
+                {error && <div className="message error"><FaTimesCircle /> {error}</div>}
+                {success && <div className="message success"><FaCheckCircle /> {success}</div>}
 
                 <form className="docente-form" onSubmit={handleSubmit}>
                     
-                    {/* Sección de Horarios */}
-                    <div className="form-group">
-                        <label>Bloques de Disponibilidad</label>
-                        <div className="horarios-list">
-                            {horarios.map((horario, index) => (
-                                <div key={index} className="horario-item">
-                                    <select name="dia_semana" value={horario.dia_semana} onChange={e => handleHorarioChange(index, e)} required>
-                                        <option value="" disabled>Día</option>
-                                        {/* Usamos el índice del array (1-7) como valor para la DB */}
-                                        {DIAS_SEMANA.map(d => (
-                                            <option key={d.value} value={d.value}>{d.label}</option>
-                                        ))}
-                                    </select>
-                                    <input type="time" name="hora_inicio" value={horario.hora_inicio} onChange={e => handleHorarioChange(index, e)} required />
-                                    <span className="time-separator">-</span>
-                                    <input type="time" name="hora_fin" value={horario.hora_fin} onChange={e => handleHorarioChange(index, e)} required />
-                                    
-                                    <button type="button" onClick={() => eliminarHorario(index)} className="btn-delete-horario">
-                                        <FaTrashAlt />
-                                    </button>
-                                </div>
-                            ))}
+                    <div className="form-group section-horarios">
+                        <label><FaClock /> Constructor de Horarios</label>
+                        
+                        <div className="schedule-builder">
+                            <div className="days-selector">
+                                {diasSemana.map((d) => (
+                                    <button type="button" key={d.value}
+                                        className={`day-btn ${diasTemp.includes(d.value) ? 'active' : ''}`}
+                                        onClick={() => toggleDia(d.value)}>{d.label}</button>
+                                ))}
+                            </div>
+                            <div className="time-inputs">
+                                <input type="time" value={horaInicioTemp} onChange={e => setHoraInicioTemp(e.target.value)} />
+                                <span className="separator">-</span>
+                                <input type="time" value={horaFinTemp} onChange={e => setHoraFinTemp(e.target.value)} />
+                                <button type="button" className="btn-add-schedule" onClick={agregarFranja} disabled={!diasTemp.length || !horaInicioTemp}>
+                                    <FaPlus /> Agregar
+                                </button>
+                            </div>
                         </div>
-                        <button type="button" onClick={agregarHorario} className="btn btn-secondary btn-add-horario">
-                            <FaPlus /> Agregar Franja
-                        </button>
+
+                        <div className="schedule-list-display">
+                            {horarios.length === 0 ? <p className="empty-schedule">No has definido disponibilidad base.</p> : 
+                                horarios.map((h, i) => (
+                                    <div key={i} className="schedule-chip">
+                                        <span className="chip-day">{mapDiaNumeroALetra(h.dia_semana)}</span>
+                                        <span className="chip-time">{h.hora_inicio} - {h.hora_fin}</span>
+                                        <button type="button" onClick={() => eliminarHorario(i)} className="chip-delete"><FaTrashAlt /></button>
+                                    </div>
+                                ))
+                            }
+                        </div>
                     </div>
-
-                    {error && (<div className="message error"><FaTimesCircle /> {error}</div>)}
-                    {success && (<div className="message success"><FaCheckCircle /> {success}</div>)}
-
 
                     <div className="form-actions">
                         <button type="submit" className="btn btn-primary" disabled={loading}>
-                            {loading ? <><FaSpinner className="spinner" /> Guardando...</> : <><FaSave /> Guardar Disponibilidad</>}
+                            {loading ? <><FaSpinner className="spinner" /> Guardando...</> : <><FaSave /> Guardar Configuración</>}
                         </button>
                     </div>
-
                 </form>
             </div>
         </div>

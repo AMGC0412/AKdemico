@@ -9,11 +9,14 @@ export const obtenerPerfilPublicoDocente = async (req, res) => {
   const { id } = req.params;
 
   try {
-    // 1. Buscamos la información pública del docente
+    // 1. Buscamos la información pública del docente - AJUSTADO A NUEVA BD
     const [docente] = await query(
-      `SELECT id, nombre, biografia, foto_url, ciudad, estado_verificacion 
-       FROM usuarios 
-       WHERE id = ? AND rol = 'docente'`,
+      `SELECT 
+        u.id, u.nombre, u.biografia, u.foto_url, u.ciudad, u.estado_verificacion 
+       FROM usuarios u
+       INNER JOIN usuario_roles ur ON u.id = ur.usuario_id
+       INNER JOIN roles r ON ur.rol_id = r.id
+       WHERE u.id = ? AND r.nombre = 'docente'`,
       [id]
     );
 

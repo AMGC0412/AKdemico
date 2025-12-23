@@ -3,7 +3,7 @@ import 'dotenv/config'; // Carga las variables de .env
 
 // Configuración de la conexión a la base de datos
 const dbConfig = {
-  host: process.env.DB_HOST || 'localhost',
+  host: process.env.DB_HOST || 'mysql',
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,

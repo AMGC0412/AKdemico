@@ -1,33 +1,29 @@
+/* Archivo: taxonomia.routes.js */
 import { Router } from 'express';
-// [MODIFICADO] Importamos las nuevas funciones
 import { 
   crearTaxonomia, 
-  obtenerTaxonomias,
-  actualizarTaxonomia, // <-- [NUEVO]
-  eliminarTaxonomia   // <-- [NUEVO]
+  obtenerTaxonomias, // <-- [NUEVO] Renombrada para claridad
+  actualizarTaxonomia, 
+  eliminarTaxonomia   
 } from './taxonomia.controller.js';
 import { protegerRuta } from '../../middleware/auth.middleware.js';
 import { esAdmin } from '../../middleware/role.middleware.js';
 
 const router = Router();
 
-// --- RUTA DE ADMIN ---
+// --- RUTA PÚBLICA (para filtros de búsqueda) ---
+// GET /api/v1/taxonomia
+// [CORREGIDO] Quitamos 'protegerRuta'. Los filtros deben ser públicos.
+router.get('/', obtenerTaxonomias);
+
+// --- RUTAS DE ADMIN ---
 // POST /api/v1/taxonomia
 router.post('/', protegerRuta, esAdmin, crearTaxonomia);
 
-// --- RUTA PÚBLICA (para filtros) ---
-// GET /api/v1/taxonomia
-router.get('/', protegerRuta, obtenerTaxonomias);
-
-// --- [NUEVAS RUTAS DE ADMIN AÑADIDAS] ---
-
 // PUT /api/v1/taxonomia/:id
-// Solo el Admin puede actualizar
 router.put('/:id', protegerRuta, esAdmin, actualizarTaxonomia);
 
 // DELETE /api/v1/taxonomia/:id
-// Solo el Admin puede eliminar
 router.delete('/:id', protegerRuta, esAdmin, eliminarTaxonomia);
-// ------------------------------------------
 
 export default router;

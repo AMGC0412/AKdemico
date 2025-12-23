@@ -1,123 +1,149 @@
 import React, { useState, useEffect, useMemo } from 'react';
+// [MODIFICADO] importamos los servicios (no cambia)
 import { buscarLotes } from '../../services/lote.service.js';
 import { obtenerTodasTaxonomias } from '../../services/taxonomia.service.js';
+// [MODIFICADO] importamos CourseCard (no cambia)
 import CourseCard from '../../components/shared/CourseCard.jsx';
-import './CourseSearchPage.css'; // Importamos el CSS Art Pop
+import './CourseSearchPage.css'; 
 import { 
     FaFilter, FaSearch, FaTimesCircle, FaBookOpen,
-    FaSpinner, FaRegSadTear, FaExclamationCircle // Iconos para estados
+    FaSpinner, FaLayerGroup 
 } from 'react-icons/fa';
 
+const MASCOT_PATH = '/images/pet/pet_04.png'; 
+
 const CourseSearchPage = () => {
-    // --- Estados ---
-    const [cursosOriginales, setCursosOriginales] = useState([]); // Cursos de la API
+    // [MEJORADO] Renombramos 'cursosOriginales' a 'planes'
+    const [planes, setPlanes] = useState([]); 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    // Estados de Filtro
     const [filtroModalidad, setFiltroModalidad] = useState('');
     const [filtroPrecioMax, setFiltroPrecioMax] = useState(500);
-    const [filtroMateriaId, setFiltroMateriaId] = useState('');
+    // [ELIMINADO] filtroMateriaId
     const [filtroNivelId, setFiltroNivelId] = useState('');
+    const [filtroCategoriaId, setFiltroCategoriaId] = useState(''); 
     const [searchTerm, setSearchTerm] = useState('');
-    const [materias, setMaterias] = useState([]);
+    
+    // Opciones para los <select>
+    // [ELIMINADO] 'materias'
     const [niveles, setNiveles] = useState([]);
+    const [categorias, setCategorias] = useState([]); 
 
-  // 1. Cargar Taxonomías
+  // 1. Cargar Taxonomías (Opciones de Filtro)
   useEffect(() => {
     const cargarOpcionesFiltro = async () => {
       try {
         const data = await obtenerTodasTaxonomias();
-        setMaterias(data.materias || []);
+        // [MODIFICADO] Ya no cargamos 'materias'
         setNiveles(data.niveles || []);
+        setCategorias(data.categorias || []); 
       } catch (err) {
         console.error("Error cargando opciones de filtro:", err);
+        setError("No se pudieron cargar los filtros. " + err.message);
       }
     };
     cargarOpcionesFiltro();
   }, []); 
 
-  // 2. Cargar Cursos (depende de filtros API)
+  // 2. [MEJORADO] Cargar Planes (Ahora depende de los filtros de la API)
   useEffect(() => {
+    // Creamos el objeto de parámetros para la API
     const filtrosAPI = {};
     if (filtroModalidad) filtrosAPI.modalidad = filtroModalidad;
-    if (filtroPrecioMax < 500) filtrosAPI.precio_max = filtroPrecioMax;
-    // (Asumiendo que el backend puede filtrar por estos IDs)
-    if (filtroMateriaId) filtrosAPI.materiaId = filtroMateriaId;
+    if (filtroPrecioMax < 500) filtrosAPI.precio_max = filtroPrecioMax; 
+    // [MODIFICADO] 'materiaId' se reemplaza por 'categoriaId'
+    if (filtroCategoriaId) filtrosAPI.categoriaId = filtroCategoriaId;
     if (filtroNivelId) filtrosAPI.nivelId = filtroNivelId;
 
-    const cargarCursos = async () => {
+    const cargarPlanes = async () => {
       setLoading(true);
-      setError(null);
+      setError(null); 
       try {
-        // Usamos la búsqueda general (que debería aceptar filtros)
+        // [MEJORADO] Pasamos los filtros de la API a buscarLotes
         const data = await buscarLotes(filtrosAPI); 
-        setCursosOriginales(data); 
+        // [MEJORADO] Guardamos los planes agrupados que devuelve la API
+        setPlanes(data); 
       } catch (err) {
-        setError('Error al cargar los cursos. No se pudo establecer conexión.');
+        setError('Error al cargar los cursos. ' + err.message);
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    cargarCursos();
-  }, [filtroModalidad, filtroPrecioMax, filtroMateriaId, filtroNivelId]); 
+    
+    // [NUEVO] Usamos un temporizador (debounce) para no llamar a la API
+    // en cada click del slider de precio, solo cuando el usuario para.
+    const timerId = setTimeout(() => {
+        cargarPlanes();
+    }, 500); // Espera 500ms después del último cambio
 
-  // 3. Filtrar por Búsqueda (Frontend)
-  const cursosFiltrados = useMemo(() => {
+    return () => clearTimeout(timerId); // Limpia el temporizador si hay un nuevo cambio
+
+  // [MEJORADO] Actualizadas las dependencias
+  }, [filtroModalidad, filtroPrecioMax, filtroCategoriaId, filtroNivelId]); 
+
+  // 3. [MEJORADO] Filtrado por Búsqueda (Frontend - INSTANTÁNEO)
+  // useMemo ahora solo se preocupa por el texto de búsqueda.
+  const planesFiltrados = useMemo(() => {
     if (!searchTerm) {
-      return cursosOriginales; 
+      return planes; 
     }
     const lowerSearchTerm = searchTerm.toLowerCase();
-    return cursosOriginales.filter(curso => 
-      curso.plan_titulo?.toLowerCase().includes(lowerSearchTerm) ||
-      curso.docente_nombre?.toLowerCase().includes(lowerSearchTerm)
+    
+    return planes.filter(plan => 
+      plan.plan_titulo?.toLowerCase().includes(lowerSearchTerm) ||
+      plan.docente_nombre?.toLowerCase().includes(lowerSearchTerm)
     );
-  }, [searchTerm, cursosOriginales]); 
+  }, [searchTerm, planes]); 
 
 
-  // --- Handlers para cambios ---
+  // --- Handlers ---
   const handleModalidadChange = (e) => setFiltroModalidad(e.target.value);
   const handlePrecioChange = (e) => setFiltroPrecioMax(Number(e.target.value));
-  const handleMateriaChange = (e) => setFiltroMateriaId(e.target.value);
+  // [ELIMINADO] handleMateriaChange
   const handleNivelChange = (e) => setFiltroNivelId(e.target.value);
+  const handleCategoriaChange = (e) => setFiltroCategoriaId(e.target.value); 
   const handleSearchChange = (e) => setSearchTerm(e.target.value);
-
+  
   const limpiarFiltros = () => { 
     setFiltroModalidad('');
-    setFiltroPrecioMax(500);
-    setFiltroMateriaId('');
+    setFiltroPrecioMax(500); 
+    // [ELIMINADO] setFiltroMateriaId
     setFiltroNivelId('');
+    setFiltroCategoriaId(''); 
     setSearchTerm('');
   };
   
-  // --- [NUEVO] Helper de Renderizado para Resultados ---
+  // --- RenderResultados (Con animación de delay) ---
   const renderResultados = () => {
     if (loading) {
       return (
         <div className="loading-state">
           <FaSpinner className="fa-spin" size="3em" />
-          <p>Cargando Catálogo...</p>
+          <p>Buscando Cursos...</p>
         </div>
       );
     }
-
     if (error) {
       return (
         <div className="error-card-pixeltech">
-          <FaExclamationCircle size="3em" />
-          <h3>Error de Conexión</h3>
+          <img src={MASCOT_PATH} alt="Error" className="mascot-state-image" />
+          <h3>¡Oh no! Hubo un Error</h3>
           <p>{error}</p>
+          <p>Parece que nuestros circuitos están cruzados. Intenta recargar la página.</p>
         </div>
       );
     }
-    
-    if (cursosFiltrados.length === 0) { 
+    if (planesFiltrados.length === 0) { 
       return (
           <div className="empty-state-pixeltech">
-            <FaRegSadTear size="3em" />
-            <h3>Sin Resultados</h3>
-            <p>No se encontraron cursos con los criterios seleccionados.</p>
+            <img src={MASCOT_PATH} alt="Sin resultados" className="mascot-state-image" />
+            <h3>¡Nada por aquí!</h3>
+            <p>El búho no encontró cursos con esos criterios. ¿Probamos con otros filtros?</p>
             <button onClick={limpiarFiltros} className="btn btn-primary" style={{marginTop: '1rem'}}>
-                Mostrar Todos
+                Limpiar Filtros
             </button>
           </div>
       );
@@ -125,54 +151,59 @@ const CourseSearchPage = () => {
 
     return (
         <div className="course-grid-akademic">
-            {cursosFiltrados.map(curso => (
-                <CourseCard key={curso.lote_id} curso={curso} />
-                // NOTA: CourseCard necesita un onQuickView si se va a usar
+            {planesFiltrados.map((plan, index) => (
+                <CourseCard 
+                    key={plan.plan_id} 
+                    plan={plan} 
+                    // [NUEVO] Aplica retraso incremental a cada tarjeta
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                />
             ))}
         </div>
     );
   }
 
 return (
-        // [MODIFICADO] Nuevas clases principales
         <div className="search-page-akademic">
           <div className="search-container">
-
-            {/* --- Filtros de Búsqueda (Art Pop) --- */}
-            <section className="search-filters-section">
+            <aside className="search-filters-sidebar">
                 <div className="search-section-header">
                     <FaFilter className="header-icon" />
-                    <h2>Filtros de Búsqueda</h2>
+                    <h2>Panel de Filtros</h2>
                 </div>
                 <div className="filters-grid">
-                     {/* Búsqueda por Texto */}
                      <div className="filter-item search-term">
-                        <label htmlFor="search">Buscar</label>
+                        <label htmlFor="search">Buscar Curso</label>
                         <div className="input-with-icon">
                             <FaSearch className="input-icon"/>
                             <input
-                                type="text" id="search" placeholder="Título, docente o tema..."
+                                type="text" id="search" placeholder="Título, docente..."
                                 value={searchTerm} onChange={handleSearchChange}
                             />
                         </div>
                      </div>
-                     {/* Rango de Precio */}
                      <div className="filter-item price-range">
-                        <label htmlFor="precio_max">Precio Máximo (S/ {filtroPrecioMax})</label>
+                        <label htmlFor="precio_max">
+                            Precio Máximo: {filtroPrecioMax === 500 ? 'S/ 500+ (Sin Límite)' : `S/ ${filtroPrecioMax}`}
+                        </label>
                         <input
                             type="range" id="precio_max" min="0" max="500" step="10"
                             value={filtroPrecioMax} onChange={handlePrecioChange}
+                            className="price-slider-akademic"
                         />
                      </div>
-                     {/* Categoría (Materia) */}
+                     {/* Select de Categoría */}
                      <div className="filter-item category-select">
-                        <label htmlFor="materia">Categoría</label>
-                        <select id="materia" value={filtroMateriaId} onChange={handleMateriaChange}>
+                        <label htmlFor="categoria">Categoría Principal</label>
+                        <select id="categoria" value={filtroCategoriaId} onChange={handleCategoriaChange}>
                             <option value="">Todas las categorías</option>
-                            {materias.map(m => <option key={m.id} value={m.id}>{m.nombre}</option>)}
+                            {categorias.map(c => <option key={c.id} value={c.id}>{c.nombre}</option>)}
                         </select>
                      </div>
-                      {/* Nivel */}
+                     
+                     {/* [ELIMINADO] El select de 'Materia (Subtema)' se ha ido */}
+
+                     {/* Select de Nivel */}
                      <div className="filter-item level-select">
                         <label htmlFor="nivel">Nivel</label>
                         <select id="nivel" value={filtroNivelId} onChange={handleNivelChange}>
@@ -180,7 +211,7 @@ return (
                             {niveles.map(n => <option key={n.id} value={n.id}>{n.nombre}</option>)}
                         </select>
                      </div>
-                     {/* Modalidad */}
+                     {/* Select de Modalidad */}
                      <div className="filter-item modality-select">
                         <label htmlFor="modalidad">Modalidad</label>
                         <select id="modalidad" value={filtroModalidad} onChange={handleModalidadChange}>
@@ -191,24 +222,19 @@ return (
                      </div>
                      {/* Botón Limpiar */}
                      <div className="filter-item clear-button">
-                        {/* Este botón usará los estilos de .btn-secondary de index.css */}
                         <button onClick={limpiarFiltros} className="btn btn-secondary">
-                           <FaTimesCircle style={{ marginRight: '5px' }} /> Limpiar
+                           <FaTimesCircle style={{ marginRight: '8px' }} /> Limpiar Filtros
                         </button>
                      </div>
                 </div>
-            </section>
-
-            {/* --- Resultados de la Búsqueda --- */}
-            <section className="search-results-section">
+            </aside>
+            <main className="search-results-section">
                  <div className="search-section-header">
                     <FaBookOpen className="header-icon" />
-                    <h2>Cursos Disponibles ({cursosFiltrados.length})</h2>
+                    <h2>Cursos Disponibles ({planesFiltrados.length})</h2>
                 </div>
-
                 {renderResultados()}
-                
-            </section>
+            </main>
           </div>
         </div>
     );

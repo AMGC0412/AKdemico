@@ -4,16 +4,11 @@ import { query } from '../../config/database.js';
  * Controlador para que un docente cree un nuevo Plan de Estudio (US-12)
  */
 export const crearPlanDeEstudio = async (req, res) => {
-  const docenteId = req.usuario.id; // Obtenido del token
+  const docenteId = req.usuario.id; 
+  const { titulo, descripcion, objetivos, categoria_id, nivel_id, imagen_url, estado } = req.body;
 
-  // Campos del plan (US-12)
-  const { titulo, descripcion, objetivos } = req.body;
-
-  // --- INICIO DE LA CORRECCIÓN ---
-  // Obtenemos los campos opcionales. Si no vienen, los convertimos en 'null'.
   const duracion_semanas = req.body.duracion_semanas || null;
   const frecuencia_semanal = req.body.frecuencia_semanal || null;
-  // --- FIN DE LA CORRECCIÓN ---
 
   if (!titulo || !descripcion || !objetivos) {
     return res.status(400).json({ mensaje: 'Título, descripción y objetivos son obligatorios.' });
@@ -22,22 +17,25 @@ export const crearPlanDeEstudio = async (req, res) => {
   try {
     const sql = `
       INSERT INTO planes_estudio 
-        (docente_id, titulo, descripcion, duracion_semanas, frecuencia_semanal, objetivos, estado)
-      VALUES (?, ?, ?, ?, ?, ?, 'borrador')
+        (docente_id, titulo, descripcion, duracion_semanas, frecuencia_semanal, objetivos, categoria_id, nivel_id, imagen_url, estado)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     
-    // Ahora, 'duracion_semanas' y 'frecuencia_semanal' serán 'null' en lugar de 'undefined'
     const resultado = await query(sql, [
       docenteId,
       titulo,
       descripcion,
       duracion_semanas,
       frecuencia_semanal,
-      objetivos
+      objetivos,
+      Number(categoria_id) || null,
+      Number(nivel_id) || null,
+      imagen_url || null,
+      estado || 'borrador'
     ]);
 
     res.status(201).json({ 
-      mensaje: 'Plan de estudio creado como borrador.',
+      mensaje: 'Plan de estudio creado exitosamente.',
       planId: resultado.insertId 
     });
 
@@ -48,40 +46,66 @@ export const crearPlanDeEstudio = async (req, res) => {
 };
 
 /**
- * Controlador para que un docente obtenga TODOS sus planes de estudio
- * Y los lotes (cursos) asociados a cada plan.
+ * Controlador para obtener TODOS los planes + Lotes + HORARIOS
+ * (Crítico para que funcione el Calendario)
  */
 export const obtenerMisPlanesConLotes = async (req, res) => {
     const docenteId = req.usuario.id;
 
     try {
-        // 1. Obtener todos los planes del docente
-        const planes = await query(
-            'SELECT * FROM planes_estudio WHERE docente_id = ? ORDER BY id DESC', 
-            [docenteId]
-        );
+        // 1. Obtener PLANES filtrando por el rol 'docente'
+        const sqlPlanes = `
+            SELECT p.* FROM planes_estudio p
+            INNER JOIN usuarios u ON p.docente_id = u.id
+            INNER JOIN usuario_roles ur ON u.id = ur.usuario_id
+            INNER JOIN roles r ON ur.rol_id = r.id
+            WHERE p.docente_id = ? AND r.nombre = 'docente'
+            ORDER BY p.id DESC
+        `;
+        const planes = await query(sqlPlanes, [docenteId]);
 
-        // 2. Obtener todos los lotes del docente
-        // (Asegúrate de seleccionar 'cupos_actuales' si ya lo implementaste)
-        const lotes = await query(
-            'SELECT * FROM cursos_lotes WHERE docente_id = ? ORDER BY fecha_inicio DESC', 
-            [docenteId]
-        );
+        // 2. Obtener LOTES filtrando por el rol 'docente'
+        const sqlLotes = `
+            SELECT 
+                l.id, l.plan_id, l.fecha_inicio, l.fecha_fin, l.cupos, l.precio, l.modalidad, l.estado, l.cupos_actuales 
+            FROM cursos_lotes l
+            INNER JOIN usuarios u ON l.docente_id = u.id
+            INNER JOIN usuario_roles ur ON u.id = ur.usuario_id
+            INNER JOIN roles r ON ur.rol_id = r.id
+            WHERE l.docente_id = ? AND r.nombre = 'docente'
+            ORDER BY l.fecha_inicio DESC
+        `;
+        const lotes = await query(sqlLotes, [docenteId]);
 
-        // 3. Agrupar lotes por plan_id (para anidarlos)
-        const lotesPorPlan = lotes.reduce((acc, lote) => {
+        // 3. Obtener HORARIOS (Mantenemos tu lógica de placeholders original)
+        let horarios = [];
+        if (lotes.length > 0) {
+            const loteIds = lotes.map(l => l.id);
+            const placeholders = loteIds.map(() => '?').join(',');
+            horarios = await query(
+                `SELECT * FROM lote_horarios WHERE lote_id IN (${placeholders})`,
+                loteIds
+            );
+        }
+
+        // 4. Anidar Horarios dentro de Lotes (Lógica original intacta)
+        const lotesConHorarios = lotes.map(lote => ({
+            ...lote,
+            horarios: horarios.filter(h => h.lote_id === lote.id)
+        }));
+
+        // 5. Agrupar lotes por plan_id (Lógica original intacta)
+        const lotesPorPlan = lotesConHorarios.reduce((acc, lote) => {
             const planId = lote.plan_id;
-            if (!acc[planId]) {
-                acc[planId] = [];
-            }
+            if (!acc[planId]) acc[planId] = [];
             acc[planId].push(lote);
             return acc;
         }, {});
 
-        // 4. Combinar planes con sus lotes
+        // 6. Combinar (Lógica original intacta)
         const planesConLotes = planes.map(plan => ({
             ...plan,
-            lotes: lotesPorPlan[plan.id] || [] // Asignar array de lotes (o vacío)
+            lotes: lotesPorPlan[plan.id] || []
         }));
 
         res.status(200).json(planesConLotes);
@@ -93,73 +117,78 @@ export const obtenerMisPlanesConLotes = async (req, res) => {
 };
 
 /**
- * -----------------------------------------------------------------
- * FUNCIÓN NUEVA: Obtener un Plan de Estudio específico por ID
- * -----------------------------------------------------------------
+ * Obtener un Plan de Estudio específico por ID
  */
 export const obtenerPlanPorId = async (req, res) => {
     const { planId } = req.params;
     const docenteId = req.usuario.id;
 
     try {
-        // Buscamos el plan Y nos aseguramos de que le pertenezca al docente
-        const [plan] = await query(
-            'SELECT * FROM planes_estudio WHERE id = ? AND docente_id = ?',
-            [planId, docenteId]
-        );
+        const sql = `
+            SELECT p.* FROM planes_estudio p
+            INNER JOIN usuarios u ON p.docente_id = u.id
+            INNER JOIN usuario_roles ur ON u.id = ur.usuario_id
+            INNER JOIN roles r ON ur.rol_id = r.id
+            WHERE p.id = ? AND p.docente_id = ? AND r.nombre = 'docente'
+        `;
+        const [plan] = await query(sql, [planId, docenteId]);
 
         if (!plan) {
-            return res.status(404).json({ mensaje: 'Plan de estudio no encontrado o no te pertenece.' });
+            return res.status(404).json({ mensaje: 'Plan de estudio no encontrado o no autorizado.' });
         }
         
-        res.status(200).json(plan); // Devuelve el objeto del plan
+        res.status(200).json(plan);
 
     } catch (error) {
-        console.error('Error al obtener plan por ID:', error);
         res.status(500).json({ mensaje: 'Error interno del servidor.' });
     }
 };
 
 /**
- * -----------------------------------------------------------------
- * FUNCIÓN NUEVA: Actualizar un Plan de Estudio
- * -----------------------------------------------------------------
+ * Actualizar un Plan de Estudio (ROBUSTO)
  */
 export const actualizarPlan = async (req, res) => {
     const { planId } = req.params;
     const docenteId = req.usuario.id;
-    const { titulo, descripcion, objetivos, duracion_semanas, frecuencia_semanal } = req.body;
+    
+    const { 
+        titulo, descripcion, objetivos, 
+        duracion_semanas, frecuencia_semanal, 
+        estado, categoria_id, nivel_id, imagen_url 
+    } = req.body;
 
     if (!titulo || !descripcion || !objetivos) {
         return res.status(400).json({ mensaje: 'Título, descripción y objetivos son obligatorios.' });
     }
 
     try {
-        // --- ¡AQUÍ ESTÁ LA CORRECCIÓN! ---
-        // Se quitaron los corchetes [ ] alrededor de 'resultado'
-        const resultado = await query(
-            `UPDATE planes_estudio SET
-                titulo = ?,
-                descripcion = ?,
-                objetivos = ?,
-                duracion_semanas = ?,
-                frecuencia_semanal = ?
-             WHERE id = ? AND docente_id = ?`,
-            [titulo, descripcion, objetivos, Number(duracion_semanas) || null, Number(frecuencia_semanal) || null, planId, docenteId]
-        );
-        // ---------------------------------
+        // En el UPDATE, el WHERE garantiza que solo el dueño (docente) pueda modificarlo
+        const sql = `
+            UPDATE planes_estudio SET
+                titulo = ?, descripcion = ?, objetivos = ?,
+                duracion_semanas = ?, frecuencia_semanal = ?,
+                estado = ?, categoria_id = ?, nivel_id = ?, imagen_url = ?
+             WHERE id = ? AND docente_id = ?
+        `;
 
-        // Ahora 'resultado' es el objeto OkPacket (ej. { affectedRows: 1 })
+        const resultado = await query(sql, [
+            titulo, descripcion, objetivos, 
+            Number(duracion_semanas) || null, 
+            Number(frecuencia_semanal) || null, 
+            estado || 'borrador', 
+            Number(categoria_id) || null, 
+            Number(nivel_id) || null, 
+            imagen_url || null,
+            planId, docenteId
+        ]);
+
         if (resultado.affectedRows === 0) {
-            return res.status(404).json({ mensaje: 'Plan no encontrado, no te pertenece, o no se realizaron cambios.' });
+            return res.status(404).json({ mensaje: 'Plan no encontrado o no autorizado.' });
         }
 
         res.status(200).json({ mensaje: 'Plan actualizado exitosamente.' });
 
     } catch (error) {
-        // El error 'TypeError: (intermediate value) is not iterable'
-        // debería desaparecer, pero dejamos el catch para otros errores.
-        console.error('Error al actualizar plan:', error);
         res.status(500).json({ mensaje: 'Error interno del servidor.' });
     }
 };

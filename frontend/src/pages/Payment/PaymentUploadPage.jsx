@@ -1,218 +1,267 @@
+/* Archivo: PaymentUploadPage.jsx */
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link, Navigate } from 'react-router-dom';
 import { subirComprobante, obtenerEstadoPagoPorInscripcion } from '../../services/pagos.service.js';
+import { cancelarInscripcion } from '../../services/inscripcion.service.js';
 import { useAuth } from '../../context/AuthContext';
-import './PaymentUploadPage.css';
-import { FaFileUpload, FaCheckCircle, FaTimesCircle, FaSpinner, FaEdit, FaExclamationTriangle, FaHourglassHalf, FaPaperclip } from 'react-icons/fa';
+import './PaymentUploadPage.css'; // Estilos Ultimate
+import { 
+    FaFileUpload, FaCheckCircle, FaTimesCircle, FaSpinner, FaEdit, 
+    FaExclamationTriangle, FaHourglassHalf, FaPaperclip, FaArrowLeft, 
+    FaMoneyBillWave, FaTrashAlt, FaShieldAlt
+} from 'react-icons/fa';
 
-// --- Constantes ---
+// Configuración
 const MAX_FILE_SIZE_MB = 2;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'application/pdf'];
-// -------------------
 
 const PaymentUploadPage = () => {
     const { inscripcionId } = useParams();
     const { usuario } = useAuth();
     const navigate = useNavigate();
 
-    // Estados UI
+    // UI States
     const [archivoLocal, setArchivoLocal] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
-    const [loading, setLoading] = useState(false); // Para subir/actualizar
-    const [pageLoading, setPageLoading] = useState(true); // Para cargar estado inicial
+    const [loading, setLoading] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
+    const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [exito, setExito] = useState(null); // Mensaje temporal de éxito
+    const [exito, setExito] = useState(null);
     const [isDragging, setIsDragging] = useState(false);
 
-    // Estado del Pago desde Backend
+    // Data State
     const [pagoActual, setPagoActual] = useState({
-        existePago: false,
-        estado: null,
-        urlComprobante: null,
-        observacionAdmin: null
+        existePago: false, estado: null, urlComprobante: null, observacionAdmin: null
     });
-
-    // Estado para controlar explícitamente si se muestra el formulario
     const [modoEdicion, setModoEdicion] = useState(false);
 
-    // Cargar estado inicial
+    // 1. Init Data
     useEffect(() => {
         const cargarEstado = async () => {
-            setPageLoading(true);
+            setPageLoading(true); 
             setError(null);
-            setExito(null); // Limpiar mensajes al cargar
             try {
                 const data = await obtenerEstadoPagoPorInscripcion(inscripcionId);
                 setPagoActual(data);
-                // Mostrar formulario solo si NO existe pago O si está RECHAZADO
                 setModoEdicion(!data.existePago || data.estado === 'rechazado');
             } catch (err) {
-                setError("Error al cargar estado del pago.");
-                console.error("Error useEffect:", err);
+                setError("Error de conexión con la terminal de pagos.");
                 setPagoActual({ existePago: false });
-                setModoEdicion(true); // Permitir subir si hay error cargando
+                setModoEdicion(true);
             } finally {
                 setPageLoading(false);
             }
         };
-        if (usuario?.rol === 'estudiante' && inscripcionId) {
-             cargarEstado();
+
+        // CORRECCIÓN: Ajustar la verificación del rol según tu nueva estructura de BD
+        const esEstudiante = usuario?.roles?.includes('estudiante') || usuario?.rol === 'estudiante';
+        
+        if (esEstudiante && inscripcionId) {
+            cargarEstado();
         } else {
-             setPageLoading(false);
-             if (!inscripcionId) setError("ID de inscripción no encontrado.");
+            setPageLoading(false);
         }
     }, [inscripcionId, usuario]);
 
-    // Procesar archivo seleccionado/arrastrado
+    // 2. File Handling
     const procesarArchivo = useCallback((file) => {
-        // ... (Validaciones de tamaño y tipo igual que antes) ...
-        setError(null); setExito(null); if (!file) { setArchivoLocal(null); setPreviewUrl(null); return; }
-        if (file.size > MAX_FILE_SIZE_BYTES) { setError(`Máx ${MAX_FILE_SIZE_MB}MB.`); setArchivoLocal(null); setPreviewUrl(null); return; }
-        if (!ALLOWED_MIME_TYPES.includes(file.type)) { setError('Solo JPG, PNG, PDF.'); setArchivoLocal(null); setPreviewUrl(null); return; }
+        setError(null); setExito(null); 
+        if (!file) { setArchivoLocal(null); setPreviewUrl(null); return; }
+        
+        if (file.size > MAX_FILE_SIZE_BYTES) { 
+            setError(`ERROR: TAMAÑO EXCEDE ${MAX_FILE_SIZE_MB}MB.`); return; 
+        }
+        if (!ALLOWED_MIME_TYPES.includes(file.type)) { 
+            setError('ERROR: FORMATO INVÁLIDO. SOLO JPG, PNG, PDF.'); return; 
+        }
+        
         setArchivoLocal(file);
         if (file.type.startsWith('image/')) {
-            const reader = new FileReader(); reader.onloadend = () => { setPreviewUrl(reader.result); }; reader.readAsDataURL(file);
+            const reader = new FileReader(); 
+            reader.onloadend = () => setPreviewUrl(reader.result); 
+            reader.readAsDataURL(file);
         } else { setPreviewUrl(null); }
     }, []);
 
-    // Handlers Drag & Drop
-    const handleDragEnter = (e) => { e.preventDefault(); e.stopPropagation(); if (!loading && modoEdicion) setIsDragging(true); };
-    const handleDragLeave = (e) => { e.preventDefault(); e.stopPropagation(); setIsDragging(false); };
-    const handleDragOver = (e) => { e.preventDefault(); e.stopPropagation(); };
+    // 3. Drag & Drop Events
+    const handleDrag = (e, active) => { e.preventDefault(); e.stopPropagation(); setIsDragging(active); };
     const handleDrop = (e) => {
         e.preventDefault(); e.stopPropagation(); setIsDragging(false);
         if (loading || !modoEdicion) return;
-        const file = e.dataTransfer.files[0];
-        setArchivoLocal(null); setPreviewUrl(null); setError(null);
-        procesarArchivo(file);
+        procesarArchivo(e.dataTransfer.files[0]);
     };
 
-    // Handler input file
-    const handleFileChange = (event) => { procesarArchivo(event.target.files[0]); };
-
-    // Handler envío de formulario
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!archivoLocal) { setError('Selecciona o arrastra un archivo.'); return; }
+    // 4. Actions
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!archivoLocal) { setError('REQUERIDO: SELECCIONAR ARCHIVO.'); return; }
         setLoading(true); setError(null); setExito(null);
 
         const formData = new FormData();
         formData.append('comprobante', archivoLocal);
 
         try {
-            const respuesta = await subirComprobante(inscripcionId, formData);
-            setExito(respuesta.mensaje || 'Acción completada.');
+            const res = await subirComprobante(inscripcionId, formData);
+            setExito(res.mensaje || 'VOUCHER TRANSMITIDO CON ÉXITO.');
             setArchivoLocal(null); setPreviewUrl(null);
-
-            // Actualizar estado local y salir del modo edición
-            setPagoActual(prev => ({
-                ...prev,
-                existePago: true,
-                estado: 'pendiente', // Siempre queda pendiente
-                observacionAdmin: null,
-                // Idealmente, el backend devolvería la nueva urlComprobante aquí
-            }));
-            setModoEdicion(false); // Ocultar formulario
-
+            setPagoActual(prev => ({ ...prev, existePago: true, estado: 'pendiente', observacionAdmin: null }));
+            setModoEdicion(false);
         } catch (err) {
-            setError(err.mensaje || 'Error al subir el comprobante.');
-            console.error("Error handleSubmit:", err);
-        } finally {
-            setLoading(false);
+            setError(err.mensaje || 'FALLO EN TRANSMISIÓN DE DATOS.');
+        } finally { setLoading(false); }
+    };
+
+    const handleCancelar = async () => {
+        if (!window.confirm("ATENCIÓN: Se eliminará el voucher y se liberará el cupo. ¿Confirmar anulación?")) return;
+        setCancelling(true); setError(null);
+        try {
+            await cancelarInscripcion(inscripcionId);
+            alert("INSCRIPCIÓN ANULADA CORRECTAMENTE.");
+            navigate('/estudiante/cursos');
+        } catch (err) {
+            setError(err.mensaje || "ERROR CRÍTICO AL CANCELAR.");
+            setCancelling(false);
         }
     };
 
-    // Handler para activar modo edición (botón "Cambiar Archivo")
-    const activarModoEdicion = () => {
-        setModoEdicion(true);
-        setArchivoLocal(null); setPreviewUrl(null); setError(null); setExito(null);
-    };
-
-    // --- Renderizado ---
-    if (!usuario || usuario.rol !== 'estudiante') { return <Navigate to="/login" replace />; }
-    if (pageLoading) return <div className="page-loading">Cargando estado del pago...</div>;
+    if (!usuario || !usuario.roles?.includes('estudiante')) return <Navigate to="/auth/login" replace />;
 
     return (
-        <div className="payment-upload-page styled">
-            <div className={`upload-container styled ${isDragging ? 'dragging' : ''}`}>
-                <h2>Comprobante de Pago</h2>
-                <p>Inscripción #{inscripcionId}</p>
+        <div className="payment-page-layout">
+            <div className="pay-terminal-panel">
+                
+                {/* Header Técnico */}
+                <div className="pay-header">
+                    <div className="pay-header-icon-box">
+                        <FaShieldAlt />
+                    </div>
+                    <div className="pay-title-group">
+                        <h2>Validación de Pago</h2>
+                        <span className="pay-id-label">ID TRANSACCIÓN:</span>
+                        <span className="pay-id-badge">#{inscripcionId}</span>
+                    </div>
+                </div>
 
-                {/* --- Mostrar Estado Actual o Mensaje Temporal de Éxito --- */}
-                {exito && <div className="message success"><FaCheckCircle /> {exito}</div>}
-
-                {!modoEdicion && pagoActual.existePago && !exito && (
-                    <div className="estado-actual">
-                        {pagoActual.estado === 'validado' && (
-                            <div className="message success"><FaCheckCircle /> Pago Validado. Inscripción confirmada.</div>
-                        )}
-                        {pagoActual.estado === 'pendiente' && (
-                            <>
-                                <div className="message info"><FaHourglassHalf /> Comprobante en revisión.</div>
-                                {pagoActual.urlComprobante && (
-                                     <a href={`http://localhost:4000/files/${pagoActual.urlComprobante}`} target="_blank" rel="noopener noreferrer" className="link-ver-comprobante">
-                                        <FaPaperclip/> Ver comprobante actual
-                                     </a>
-                                )}
-                                <button onClick={activarModoEdicion} className="btn btn-secondary btn-cambiar">
-                                    <FaEdit /> Cambiar Archivo
-                                </button>
-                            </>
-                        )}
-                         {/* El estado 'rechazado' fuerza modoEdicion=true, no se muestra aquí */}
+                {/* Loader */}
+                {pageLoading && (
+                    <div className="pay-loader">
+                        <FaSpinner className="fa-spin" />
+                        <p>ESTABLECIENDO ENLACE SEGURO...</p>
                     </div>
                 )}
 
-                {/* --- Mostrar Formulario de Subida (si aplica) --- */}
-                {modoEdicion && !exito && ( // Mostrar formulario si estamos en modo edición Y no hubo éxito reciente
-                    <>
-                        {pagoActual.estado === 'rechazado' && (
-                            <div className="message error">
-                                <FaExclamationTriangle /> Pago Rechazado. Motivo: {pagoActual.observacionAdmin || 'Sin motivo.'} Por favor, sube un nuevo comprobante.
+                {/* Contenido */}
+                {!pageLoading && (
+                    <div className="pay-content">
+                        
+                        {/* Alertas */}
+                        {exito && <div className="pay-alert success"><FaCheckCircle /> {exito}</div>}
+                        {error && <div className="pay-alert error"><FaTimesCircle /> {error}</div>}
+
+                        {/* --- VISTA: ESTADO ACTUAL (Holograma) --- */}
+                        {!modoEdicion && pagoActual.existePago && (
+                            <div className={`pay-status-hologram status-${pagoActual.estado}`}>
+                                {pagoActual.estado === 'validado' ? (
+                                    <>
+                                        <FaCheckCircle className="pay-status-icon" />
+                                        <h3>ACCESO AUTORIZADO</h3>
+                                        <p className="status-text">Transacción completada. Inscripción activa.</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaHourglassHalf className="pay-status-icon fa-spin-slow" />
+                                        <h3>ESTADO: PENDIENTE PAGO</h3>
+                                        <p className="status-text">El sistema está validando la integridad del comprobante.</p>
+                                        
+                                        <div className="pay-hologram-actions">
+                                            {pagoActual.urlComprobante && (
+                                                <a href={`http://localhost:4000/files/${pagoActual.urlComprobante}`} target="_blank" rel="noreferrer" className="pay-btn-secondary">
+                                                    <FaPaperclip /> VER ARCHIVO
+                                                </a>
+                                            )}
+                                            <button onClick={() => { setModoEdicion(true); setExito(null); }} className="pay-btn-secondary">
+                                                <FaEdit /> MODIFICAR
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         )}
-                        {/* Mensaje de error de validación local */}
-                        {error && <div className="message error"><FaTimesCircle /> {error}</div>}
 
-                        <form onSubmit={handleSubmit} className="upload-form">
-                            <div
-                                className={`form-group file-drop-zone ${isDragging ? 'dragging' : ''} ${archivoLocal ? 'has-file' : ''}`}
-                                onDragEnter={handleDragEnter} onDragLeave={handleDragLeave}
-                                onDragOver={handleDragOver} onDrop={handleDrop}
-                                onClick={() => document.getElementById('comprobante-input')?.click()}
-                            >
-                                <FaFileUpload className="drop-icon" />
-                                <span className="file-label styled">
-                                    {archivoLocal ? archivoLocal.name : (isDragging ? '¡Suelta aquí!' : 'Arrastra o haz clic')}
-                                </span>
-                                <input type="file" id="comprobante-input" accept={ALLOWED_MIME_TYPES.join(',')} onChange={handleFileChange} disabled={loading} style={{ display: 'none' }} />
-                                {!archivoLocal && <span className="file-instructions">(JPG, PNG, PDF - Máx {MAX_FILE_SIZE_MB}MB)</span>}
-                                {archivoLocal && !previewUrl && <p className="pdf-info">PDF: {archivoLocal.name}</p>}
-                            </div>
+                        {/* --- VISTA: FORMULARIO DE CARGA (Dropzone) --- */}
+                        {modoEdicion && (
+                            <form onSubmit={handleSubmit} className="cyber-form">
+                                {pagoActual.estado === 'rechazado' && (
+                                    <div className="pay-alert error">
+                                        <FaExclamationTriangle /> RECHAZADO: {pagoActual.observacionAdmin || 'Archivo ilegible'}
+                                    </div>
+                                )}
 
-                            {previewUrl && (
-                                <div className="image-preview styled">
-                                    <img src={previewUrl} alt="Vista previa" />
+                                <div
+                                    className={`pay-dropzone ${isDragging ? 'dragging' : ''} ${archivoLocal ? 'has-file' : ''}`}
+                                    onDragEnter={(e) => handleDrag(e, true)}
+                                    onDragLeave={(e) => handleDrag(e, false)}
+                                    onDragOver={(e) => handleDrag(e, true)}
+                                    onDrop={handleDrop}
+                                    onClick={() => document.getElementById('file-upload').click()}
+                                >
+                                    <input type="file" id="file-upload" accept={ALLOWED_MIME_TYPES.join(',')} onChange={(e) => procesarArchivo(e.target.files[0])} disabled={loading} hidden />
+                                    
+                                    <FaFileUpload className="pay-upload-icon" />
+                                    
+                                    {archivoLocal ? (
+                                        <div className="pay-file-preview">
+                                            <span className="pay-filename">{archivoLocal.name}</span>
+                                            <span className="pay-filesize">{(archivoLocal.size / 1024 / 1024).toFixed(2)} MB</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <span className="pay-label-main">INICIAR SECUENCIA DE CARGA</span>
+                                            <span className="pay-label-sub">Arrastre archivo o click para interfaz</span>
+                                            <span className="pay-label-meta">JPG :: PNG :: PDF</span>
+                                        </>
+                                    )}
                                 </div>
-                            )}
 
-                            <button type="submit" className={`btn btn-primary btn-full ${loading || !archivoLocal ? 'disabled-like' : ''}`} disabled={loading || !archivoLocal}>
-                                {loading ? <><FaSpinner className="spinner" /> Subiendo...</> : (pagoActual.existePago && pagoActual.estado !== 'rechazado' ? 'Actualizar Comprobante' : 'Enviar Comprobante')}
-                            </button>
-                            {/* Botón para cancelar la edición si ya existía un pago pendiente */}
-                            {pagoActual.existePago && pagoActual.estado === 'pendiente' && (
-                                <button type="button" onClick={() => setModoEdicion(false)} className="btn btn-link btn-cancelar-cambio">
-                                    Cancelar cambio
+                                {previewUrl && (
+                                    <div className="pay-img-preview">
+                                        <img src={previewUrl} alt="Vista Previa" />
+                                    </div>
+                                )}
+
+                                <div className="pay-actions-grid">
+                                    <button type="submit" className="pay-btn pay-btn-primary" disabled={loading || !archivoLocal}>
+                                        {loading ? <><FaSpinner className="fa-spin"/> TRANSMITIENDO...</> : <><FaMoneyBillWave/> SUBIR COMPROBANTE</>}
+                                    </button>
+                                    
+                                    {pagoActual.existePago && pagoActual.estado === 'pendiente' && (
+                                        <button type="button" onClick={() => setModoEdicion(false)} className="pay-btn-text">
+                                            Cancelar Edición
+                                        </button>
+                                    )}
+                                </div>
+                            </form>
+                        )}
+
+                        {/* --- BOTÓN DESTRUCTIVO (Siempre visible si no validado) --- */}
+                        {pagoActual.estado !== 'validado' && (
+                            <div className="pay-actions-grid">
+                                <button onClick={handleCancelar} className="pay-btn pay-btn-danger" disabled={loading || cancelling}>
+                                    {cancelling ? <><FaSpinner className="fa-spin"/> ANULANDO...</> : <><FaTrashAlt /> CANCELAR INSCRIPCIÓN</>}
                                 </button>
-                            )}
-                        </form>
-                    </>
+                            </div>
+                        )}
+
+                    </div>
                 )}
 
-                 <div className="back-link styled">
-                     <Link to="/mis-inscripciones">Ir a Mis Inscripciones</Link>
-                 </div>
+                <div className="pay-footer">
+                    <Link to="/estudiante/cursos" className="pay-back-link">
+                        <FaArrowLeft /> RETORNAR AL PANEL
+                    </Link>
+                </div>
             </div>
         </div>
     );

@@ -1,326 +1,857 @@
-/* --- Estilos Generales --- */
+/* ==========================================================================
+   NOMBRE DEL ARCHIVO: CourseDetailPage.css
+   DISEÑO: ACADEMIC COMMAND CENTER (CORREGIDO & ALINEADO)
+   INSPIRACIÓN: MisInscripcionesPage.css (Integración Total)
+   PREFIX: cdp- (Course Detail Page) para evitar conflictos
+   ========================================================================== */
+
+/* 1. VARIABLES ROOT (Sincronizadas con Panel de Control) */
 :root {
-    --color-primary: #6d41dc;
-    --color-secondary: #00bcd4;
-    --color-danger: #e94158;
-    --color-success: #00c853;
-    --color-warn: #ffab00;
-    --color-text: #222;
-    --color-text-light: #666;
-    --color-bg-white: #ffffff;
-    --color-bg-light: #f4f6f8;
-    --border-radius-main: 12px;
+    /* --- TIPOGRAFÍA --- */
+    --cdp-font-display: '04b30', 'Consolas', monospace; /* Títulos pixelados */
+    --cdp-font-body: 'Poppins', -apple-system, sans-serif; /* Lectura */
+
+    /* --- PALETA NEÓN PREMIUM --- */
+    --cdp-brand-cyan: #4DFFFF;      /* Acentos principales */
+    --cdp-brand-blue: #1A52B8;      /* Azul Corporativo */
+    --cdp-brand-purple: #4B004B;    /* Fondos */
+    
+    --cdp-accent-blue: #6C9EFF;     /* Botones, Enlaces */
+    --cdp-accent-magenta: #FF3EFF;  /* Vibrante */
+    --cdp-accent-red: #E63946;      /* Cancelar / Error */
+    --cdp-accent-green: #05FF00;    /* Éxito */
+    --cdp-accent-yellow: #FEEA00;   /* Pendiente */
+
+    /* --- FONDOS Y CAPAS --- */
+    --cdp-bg-deep: #0A0A12;         /* Fondo Base */
+    --cdp-bg-panel: rgba(20, 20, 30, 0.90); /* Paneles oscuros mate */
+    --cdp-bg-sidebar: #0F0F16;      /* Sidebar casi sólido */
+    --cdp-bg-hover: rgba(255, 255, 255, 0.05);
+
+    /* --- TEXTOS --- */
+    --cdp-text-primary: #FFFFFF;
+    --cdp-text-secondary: #CCCCFF;
+    --cdp-text-tertiary: #8888AA;
+
+    /* --- DIMENSIONES Y EFECTOS --- */
+    --cdp-max-width: 1280px;        /* ANCHO MÁXIMO ESTRICTO PARA ALINEACIÓN */
+    --cdp-card-radius: 16px;        /* Bordes redondeados */
+    --cdp-border-color: rgba(255, 255, 255, 0.15);
+    
+    /* Sombras Neon */
+    --cdp-glow-cyan: 0 0 20px rgba(77, 255, 255, 0.25);
+    --cdp-shadow-panel: 0 15px 40px rgba(0, 0, 0, 0.6);
+
+    /* --- Z-INDEX --- */
+    --z-back: 0;
+    --z-grid: 1;
+    --z-content: 10;
 }
 
-.course-detail-page-final {
-    padding: 2rem 0;
-    max-width: 1200px;
-    margin: 0 auto;
+/* 2. RESETS Y UTILIDADES */
+
+.cdp-main-wrapper * {
+    box-sizing: border-box;
 }
 
-/* --- 1. CABECERA PRINCIPAL (PLAN) --- */
-.plan-header-content {
-    background: var(--color-bg-light);
+.cdp-main-wrapper a {
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+}
+
+/* Scrollbar Personalizado */
+.cdp-main-wrapper ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.cdp-main-wrapper ::-webkit-scrollbar-track {
+    background: var(--cdp-bg-deep);
+}
+.cdp-main-wrapper ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+    border: 1px solid #000;
+}
+.cdp-main-wrapper ::-webkit-scrollbar-thumb:hover {
+    background: var(--cdp-accent-blue);
+}
+
+/* Animaciones */
+@keyframes cdpFadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes cdpSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* 3. ESTRUCTURA DE PÁGINA Y FONDOS (Igual a MisInscripciones) */
+
+.cdp-main-wrapper {
+    min-height: 100vh;
     padding: 2rem;
-    border-radius: var(--border-radius-main);
-    margin-bottom: 2rem;
-    border: 1px solid #e0e0e0;
+    color: var(--cdp-text-primary);
+    font-family: var(--cdp-font-body);
+    position: relative;
+    overflow-x: hidden;
+    background-color: var(--cdp-bg-deep);
+
+    /* Fondo Gradiente Complejo */
+    background: 
+        radial-gradient(ellipse at 15% 15%, rgba(26, 82, 184, 0.12) 0%, transparent 45%),
+        radial-gradient(ellipse at 85% 85%, rgba(75, 0, 75, 0.12) 0%, transparent 45%),
+        linear-gradient(135deg, #0A0A12 0%, #0F0F18 100%);
 }
-.plan-header-top {
+
+/* Grid Overlay Técnico */
+.cdp-tech-grid-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.4;
+    z-index: var(--z-grid);
+    pointer-events: none;
+}
+
+/* Imagen de Fondo (Marca de Agua) */
+.cdp-main-wrapper::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: var(--cdp-bg-image-url);
+    background-size: cover;
+    background-position: center top;
+    opacity: 0.08;
+    filter: grayscale(100%) blur(4px);
+    z-index: var(--z-back);
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, black, transparent);
+}
+
+/* Scanlines */
+.cdp-main-wrapper::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: var(--z-grid);
+    opacity: 0.2;
+}
+
+/* 4. LAYOUT Y CONTENEDORES (CORRECCIÓN DE ALINEACIÓN) */
+
+/* Contenedor Maestro para alineación vertical perfecta */
+.cdp-header-section, 
+.cdp-feedback-container, 
+.cdp-content-grid {
+    position: relative;
+    z-index: var(--z-content);
+    width: 100%;
+    max-width: var(--cdp-max-width); /* 1280px Estricto */
+    margin: 0 auto; /* Centrado */
+}
+
+/* La Grilla Principal */
+.cdp-content-grid {
+    display: grid;
+    /* Sidebar fija de 380px, el resto flexible. Gap consistente */
+    grid-template-columns: 1fr 380px; 
+    gap: 2.5rem;
+    align-items: start;
+    margin-top: 2rem;
+}
+
+.cdp-col-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    /* Asegura que no se desborde */
+    min-width: 0; 
+}
+
+.cdp-col-right {
+    height: 100%;
+    position: relative;
+    /* Ancho fijo definido por el grid parent */
+}
+
+/* Clase Base Panel (Glassmorphism) */
+.cdp-panel-base {
+    background: var(--cdp-bg-panel);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--cdp-border-color);
+    border-radius: var(--cdp-card-radius);
+    padding: 2.5rem;
+    box-shadow: var(--cdp-shadow-panel);
+    animation: cdpFadeIn 0.6s ease-out;
+}
+
+/* 5. HEADER (CABECERA DEL CURSO) */
+
+.cdp-header-section {
+    position: relative;
+    /* Borde superior neón característico */
+    border-top: 3px solid var(--cdp-brand-cyan);
+    overflow: hidden;
+}
+
+/* Decoración estilo HUD */
+.cdp-header-decoration-line {
+    position: absolute;
+    top: 0;
+    right: 4rem;
+    width: 120px;
+    height: 3px;
+    background: var(--cdp-brand-cyan);
+    box-shadow: var(--cdp-glow-cyan);
+}
+
+.cdp-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+}
+
+.cdp-title-main {
+    font-family: var(--cdp-font-display);
+    font-size: 3rem;
+    line-height: 1.1;
+    margin: 0;
+    /* Texto degradado premium */
+    background: linear-gradient(90deg, #FFFFFF 0%, var(--cdp-brand-cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    text-shadow: 0 0 25px rgba(77, 255, 255, 0.3);
+    flex: 1; /* Ocupa el espacio disponible */
+}
+
+.cdp-header-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.8rem;
+    min-width: 250px;
+    flex-shrink: 0;
+}
+
+.cdp-meta-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--cdp-accent-blue);
+    color: var(--cdp-text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.cdp-meta-tag svg { color: var(--cdp-accent-blue); }
+.cdp-meta-tag a { 
+    color: var(--cdp-brand-cyan); 
+    font-weight: 700;
+    transition: 0.2s;
+}
+.cdp-meta-tag a:hover {
+    text-shadow: 0 0 8px var(--cdp-brand-cyan);
+    color: #fff;
+}
+
+.cdp-star-rating {
+    font-family: var(--cdp-font-display);
+    font-size: 1.5rem;
+    color: var(--cdp-accent-yellow);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-shadow: 0 0 10px rgba(254, 234, 0, 0.4);
+}
+
+.cdp-description-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--cdp-text-secondary);
+    max-width: 900px;
+    margin: 0;
+    font-weight: 300;
+}
+
+/* 6. COMPONENTES INTERNOS */
+
+/* Títulos de Sección */
+.cdp-section-title {
+    font-family: var(--cdp-font-display);
+    font-size: 1.4rem;
+    color: var(--cdp-brand-cyan);
+    margin: 0 0 1.5rem 0;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(77, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.cdp-section-icon { 
+    font-size: 1.2em; 
+    filter: drop-shadow(0 0 5px var(--cdp-brand-cyan));
+}
+
+/* 7. CARRUSEL DE HORARIOS */
+
+.cdp-carousel-container {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    scrollbar-color: var(--cdp-brand-cyan) var(--cdp-bg-deep);
+    scrollbar-width: thin;
+}
+
+.cdp-carousel-card {
+    min-width: 280px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--cdp-border-color);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.cdp-carousel-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--cdp-brand-cyan);
+    background: rgba(77, 255, 255, 0.05);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.cdp-carousel-header {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid var(--color-primary);
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--cdp-border-color);
+    border-radius: 12px 12px 0 0;
 }
-.plan-title-final {
-    font-size: 2.2rem;
-    margin: 0;
-    color: var(--color-text);
-}
-.plan-description-final {
-    font-size: 1.1rem;
-    color: var(--color-text-light);
-    margin: 0;
-}
-.plan-header-meta {
-    display: flex;
-    gap: 1.5rem;
-    flex-shrink: 0;
-}
-.meta-item-tag {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    font-size: 0.95rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    background: #fff;
-    border: 1px solid #ccc;
-    color: var(--color-primary);
-}
-.meta-item-tag a {
-    color: var(--color-primary);
-    text-decoration: none;
-}
-.star-rating-display {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+
+.cdp-tag {
+    font-size: 0.8rem;
     font-weight: 700;
-}
-.star-icon-rating {
-    color: #ffc107;
-}
-
-/* --- 2. LAYOUT PRINCIPAL (Contenido y Sidebar de Acción) --- */
-.detail-main-content-layout {
-    display: grid;
-    grid-template-columns: 2fr 360px; 
-    gap: 2rem;
-    align-items: start; /* Asegura que el sidebar no se estire */
+    text-transform: uppercase;
+    color: var(--cdp-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-/* A. COLUMNA PRINCIPAL (Contenido del Plan) */
-.content-column-plan {
+.cdp-carousel-price {
+    font-family: var(--cdp-font-display);
+    font-size: 1.1rem;
+    color: var(--cdp-text-primary);
+}
+
+.cdp-carousel-body {
+    padding: 1.2rem;
     display: flex;
     flex-direction: column;
-    gap: 2rem;
+    gap: 0.8rem;
 }
 
-.current-lote-details-section {
-    padding: 1.5rem;
-    border-radius: var(--border-radius-main);
-    background: var(--color-bg-white);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-}
-.lote-schedule-box {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1rem 0;
-    border-bottom: 1px dashed #e0e0e0;
-    margin-bottom: 1rem;
-}
-.schedule-meta-chip {
-    background: var(--color-bg-light);
-    padding: 0.6rem 1rem;
-    border-radius: 20px;
-    font-size: 0.95rem;
-    font-weight: 600;
+.cdp-info-row {
+    font-size: 0.9rem;
+    color: var(--cdp-text-tertiary);
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text);
+    gap: 0.6rem;
 }
-.schedule-meta-chip strong {
-    color: var(--color-primary);
-}
-.horario-title {
-    font-size: 1.2rem;
-    color: var(--color-text);
-    margin-bottom: 0.5rem;
-}
-.current-horarios-list {
-    list-style-type: none;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-.horario-item-current {
-    background: var(--color-secondary);
-    color: white;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    box-shadow: 0 4px 8px rgba(0, 188, 212, 0.3);
-}
+.cdp-info-row svg { color: var(--cdp-text-tertiary); }
 
-/* Objetivos */
-.plan-objectives-section h2, .teacher-info-section h2 {
-    font-size: 1.6rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: var(--color-text);
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 0.5rem;
-}
-.section-icon {
-    color: var(--color-primary);
-}
-.learning-objectives-grid {
-    list-style-type: none;
+.cdp-inline-tags {
+    list-style: none;
     padding: 0;
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.cdp-inline-tags li {
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--cdp-font-display);
+    color: var(--cdp-text-secondary);
+}
+
+.cdp-plazas-high { color: var(--cdp-brand-cyan); }
+.cdp-plazas-mid { color: var(--cdp-accent-yellow); }
+.cdp-plazas-low { color: var(--cdp-accent-red); }
+
+/* 8. OBJETIVOS Y DOCENTE */
+
+.cdp-objectives-list {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    background: var(--color-bg-light);
-    padding: 1.5rem;
-    border-radius: var(--border-radius-main);
+    gap: 1.5rem;
+    padding: 0;
+    list-style: none;
+    margin: 0;
 }
-.learning-objectives-grid li {
-    padding-left: 1.5rem;
+
+.cdp-objectives-list li {
+    padding-left: 2rem;
     position: relative;
-    color: var(--color-text);
+    color: var(--cdp-text-secondary);
+    line-height: 1.6;
     font-size: 1rem;
 }
-.learning-objectives-grid li::before {
-    content: '•';
-    color: var(--color-primary);
-    font-weight: 800;
+.cdp-objectives-list li::before {
+    content: "";
     position: absolute;
     left: 0;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    background: var(--cdp-brand-cyan);
+    box-shadow: 0 0 8px var(--cdp-brand-cyan);
+    transform: rotate(45deg);
 }
 
 /* Tarjeta Docente */
-.teacher-card-large {
+.cdp-teacher-card {
     display: flex;
-    align-items: flex-start;
-    gap: 1.5rem;
-    background: var(--color-bg-light);
-    padding: 1.5rem;
-    border-radius: var(--border-radius-main);
-    border: 1px solid #e0e0e0;
-}
-.teacher-avatar-large {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    color: white;
-    display: flex;
+    gap: 2rem;
     align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    font-size: 1rem;
 }
-.teacher-details h3 { margin: 0 0 0.5rem 0; font-size: 1.5rem; }
-.teacher-details p { color: var(--color-text-light); margin-bottom: 1rem; }
 
+.cdp-teacher-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--cdp-accent-blue);
+    overflow: hidden;
+    flex-shrink: 0;
+    box-shadow: 0 0 20px rgba(108, 158, 255, 0.3);
+}
+.cdp-teacher-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-/* B. SIDEBAR DE ACCIÓN (LOTE) */
-.sidebar-action-column {
+.cdp-teacher-info h3 {
+    font-family: var(--cdp-font-display);
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--cdp-text-primary);
+}
+
+.cdp-teacher-info p {
+    color: var(--cdp-text-tertiary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* 9. SIDEBAR HUD (PANEL DE ACCIÓN) - CORREGIDO */
+
+.cdp-sidebar-card {
+    position: sticky;
+    top: 2rem;
+    background: var(--cdp-bg-sidebar);
+    border: 1px solid var(--cdp-border-color);
+    border-radius: var(--cdp-card-radius);
+    padding: 2rem;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    /* Ajuste para que ocupe todo el ancho de su columna */
+    width: 100%; 
 }
 
-.purchase-action-box-final {
-    background: var(--color-bg-white);
-    padding: 1.5rem;
-    border-radius: var(--border-radius-main);
-    box-shadow: 0 8px 20px rgba(109, 65, 220, 0.15);
-    border: 2px solid var(--color-primary); /* Borde destacado */
+/* Esquinas Decorativas */
+.cdp-sidebar-corner {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border: 2px solid var(--cdp-brand-cyan);
+    transition: all 0.3s ease;
+}
+.cdp-corner-tl { top: -1px; left: -1px; border-bottom: none; border-right: none; border-radius: 4px 0 0 0; }
+.cdp-corner-br { bottom: -1px; right: -1px; border-top: none; border-left: none; border-radius: 0 0 4px 0; }
+
+.cdp-sidebar-card:hover .cdp-sidebar-corner {
+    width: 30px; height: 30px;
+    box-shadow: 0 0 10px var(--cdp-brand-cyan);
+}
+
+/* Precio */
+.cdp-price-header {
     text-align: center;
-    flex-shrink: 0;
+    border-bottom: 1px dashed rgba(255,255,255,0.15);
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
 }
-.price-info-action-final {
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-}
-.price-tag-large {
-    font-size: 3rem;
-    font-weight: 800;
-    color: var(--color-primary);
+
+.cdp-price-icon {
+    font-size: 2.2rem;
+    color: var(--cdp-brand-cyan);
+    margin-bottom: 0.5rem;
     display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
-.sidebar-lote-details {
-    padding-bottom: 1rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid #e0e0e0;
+
+.cdp-price-display {
+    display: block;
+    font-family: var(--cdp-font-display);
+    font-size: 3.5rem;
+    color: var(--cdp-text-primary);
+    line-height: 1;
+    letter-spacing: -2px;
+    text-shadow: 0 0 20px rgba(77, 255, 255, 0.4);
 }
-.sidebar-horario-label {
+
+/* Detalles del Sidebar */
+.cdp-sidebar-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin-bottom: 1.5rem;
+}
+
+.cdp-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.cdp-label {
+    font-size: 0.75rem;
     font-weight: 700;
-    color: var(--color-text);
-    margin-bottom: 0.25rem;
+    color: var(--cdp-text-tertiary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 0;
 }
-.sidebar-fechas {
+
+.cdp-value {
+    font-family: var(--cdp-font-body);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--cdp-text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+/* Badges de Disponibilidad */
+.cdp-availability {
+    font-family: var(--cdp-font-display);
+    font-size: 0.85rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid transparent;
+}
+.cdp-availability.cdp-plazas-high { 
+    color: var(--cdp-brand-cyan); 
+    background: rgba(77, 255, 255, 0.1); 
+    border-color: rgba(77, 255, 255, 0.3); 
+}
+.cdp-availability.cdp-plazas-mid { 
+    color: var(--cdp-accent-yellow); 
+    background: rgba(254, 234, 0, 0.1); 
+    border-color: rgba(254, 234, 0, 0.3); 
+}
+.cdp-availability.cdp-plazas-low { 
+    color: var(--cdp-accent-red); 
+    background: rgba(230, 57, 70, 0.1); 
+    border-color: rgba(230, 57, 70, 0.3); 
+}
+
+/* Fechas y Listas */
+.cdp-detail-block {
+    margin-bottom: 1.5rem;
+}
+.cdp-date-range { font-size: 1.05rem; }
+.cdp-arrow-icon { font-size: 0.8em; color: var(--cdp-text-tertiary); }
+
+.cdp-sidebar-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0 0;
+}
+
+.cdp-list-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid var(--cdp-brand-cyan);
+    padding: 0.8rem 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 4px 4px 0;
+}
+.cdp-list-item span { font-weight: 700; color: var(--cdp-text-primary); }
+
+/* 10. BOTONES Y ACCIONES (CORRECCIÓN IMPORTANTE) */
+
+.cdp-action-footer {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    width: 100%;
+}
+
+/* Contenedores de botones apilados */
+.cdp-guest-box, 
+.cdp-enrolled-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; /* Espacio vertical uniforme entre botones */
+    width: 100%;
+}
+
+.cdp-guest-text {
+    text-align: center;
+    color: var(--cdp-text-secondary);
+    margin: 0;
+}
+
+/* Botón Base */
+.cdp-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%; /* Ocupa todo el ancho */
+    padding: 1rem 1.5rem; /* Botón robusto */
+    
+    font-family: var(--cdp-font-display);
     font-size: 1rem;
-    color: var(--color-text-light);
-    margin-bottom: 1rem;
-}
-.availability-info {
     font-weight: 700;
-    padding: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    line-height: 1.2;
+    
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    text-align: center;
+}
+
+/* Variante Primaria (Inscribirse / Subir) */
+.cdp-btn-primary {
+    background: linear-gradient(135deg, var(--cdp-accent-blue), #2b5cb8);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.cdp-btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(108, 158, 255, 0.5);
+    filter: brightness(1.1);
+}
+
+/* Variante Secundaria (Ver Perfil) */
+.cdp-btn-secondary {
+    background: transparent;
+    border: 1px solid var(--cdp-brand-cyan);
+    color: var(--cdp-brand-cyan);
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    width: auto; /* Excepción: botón inline */
+    display: inline-flex;
+}
+.cdp-btn-secondary:hover {
+    background: rgba(77, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(77, 255, 255, 0.2);
+}
+
+/* Variante Peligro (Cancelar) */
+.cdp-btn-danger {
+    background: rgba(230, 57, 70, 0.05);
+    border: 1px solid var(--cdp-accent-red);
+    color: #ffadb7;
+}
+.cdp-btn-danger:hover:not(:disabled) {
+    background: rgba(230, 57, 70, 0.2);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(230, 57, 70, 0.4);
+}
+
+.cdp-btn-disabled {
+    background: #222;
+    color: #555;
+    border: 1px solid #333;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Margen utilitario para separar botones en la pila */
+.cdp-mb-1 { 
+    margin-bottom: 0.5rem; 
+}
+
+/* 11. ESTADOS VISUALES */
+
+.cdp-status-box {
+    width: 100%;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+    font-family: var(--cdp-font-display);
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid transparent;
+}
+
+.cdp-status-pendiente_pago {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: #555;
+    border-style: dashed;
+    color: var(--cdp-text-secondary);
+}
+.cdp-status-pendiente_pago svg {
+    font-size: 1.5rem;
+    animation: cdpSpin 3s linear infinite;
+    color: var(--cdp-accent-yellow);
+}
+
+.cdp-status-inscrito {
+    background: rgba(5, 255, 0, 0.05);
+    border-color: var(--cdp-accent-green);
+    border-style: solid;
+    color: var(--cdp-accent-green);
+    box-shadow: 0 0 15px rgba(5, 255, 0, 0.1);
+}
+
+.cdp-status-closed {
+    background: rgba(230, 57, 70, 0.1);
+    border: 1px solid var(--cdp-accent-red);
+    color: var(--cdp-accent-red);
+    padding: 1rem;
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    font-weight: 700;
+}
+
+.cdp-payment-confirmed {
+    color: var(--cdp-accent-green);
+    font-family: var(--cdp-font-display);
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    text-shadow: 0 0 8px var(--cdp-accent-green);
+}
+
+/* 12. FEEDBACK Y CARGA */
+
+.cdp-feedback-container {
     margin-bottom: 1.5rem;
 }
-.plazas-alta { background: #e8f5e9; color: var(--color-success); }
-.plazas-media { background: #fffde7; color: var(--color-warn); }
-.plazas-baja { background: #ffebee; color: var(--color-danger); }
 
-
-/* Opciones de Horario (Carrusel) */
-.other-options-section h2 {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
+.cdp-msg {
+    padding: 1rem;
+    border-radius: 6px;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text);
+    gap: 0.8rem;
+    font-size: 0.95rem;
+    animation: cdpFadeIn 0.3s ease;
 }
-.options-carousel {
+.cdp-msg-error {
+    background: rgba(230, 57, 70, 0.1);
+    border: 1px solid var(--cdp-accent-red);
+    color: #ffadb7;
+}
+.cdp-msg-success {
+    background: rgba(5, 255, 0, 0.1);
+    border: 1px solid var(--cdp-accent-green);
+    color: #ccffcc;
+}
+
+.cdp-loading-state, .cdp-error-state {
+    min-height: 80vh;
     display: flex;
-    overflow-x: auto; 
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 1rem;
-    padding: 0.5rem 0;
+    font-family: var(--cdp-font-display);
+    font-size: 1.5rem;
+    color: var(--cdp-text-primary);
+    background: var(--cdp-bg-deep);
 }
-.option-card-carousel {
-    flex-shrink: 0;
-    width: 250px;
-    background: var(--color-bg-white);
-    border: 1px solid var(--color-primary);
-    border-radius: 10px;
-    padding: 1rem;
-    text-decoration: none;
-    color: var(--color-text);
-    transition: all 0.2s ease;
-}
-.option-card-carousel:hover {
-    box-shadow: 0 4px 12px rgba(109, 65, 220, 0.2);
-    transform: translateY(-2px);
-}
-.carousel-tag { font-weight: 600; color: var(--color-secondary); }
-.carousel-price { font-weight: 700; color: var(--color-primary); }
-.card-body-carousel { display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.95rem; color: var(--color-text-light); }
-.card-horario-info { display: flex; align-items: center; gap: 0.5rem; }
+.cdp-spin { animation: cdpSpin 1s linear infinite; font-size: 2rem; color: var(--cdp-brand-cyan); }
+.cdp-error-state { color: var(--cdp-accent-red); }
 
-/* Inscrito y Acciones (Sub-lógica) */
-.inscrito-actions {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e0e0e0;
-}
-.status-inscrito { font-weight: 600; color: var(--color-success); margin-bottom: 1rem; }
-.pago-confirmado { font-weight: 600; color: var(--color-primary); padding: 0.5rem 0; }
-.btn-full { width: 100%; }
-.btn-margen-inf { margin-bottom: 0.5rem; }
+/* 13. ADAPTABILIDAD */
 
-/* Helpers */
-.feedback-area {
-    margin-bottom: 1.5rem;
+@media (max-width: 1200px) {
+    .cdp-content-grid {
+        grid-template-columns: 1fr 340px; 
+        gap: 2rem;
+    }
 }
-.message {
-    padding: 1rem;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-size: 1.1rem;
-    font-weight: 500;
+
+@media (max-width: 1024px) {
+    .cdp-content-grid {
+        grid-template-columns: 1fr; /* Colapsa a 1 columna */
+    }
+    .cdp-col-right {
+        height: auto;
+    }
+    .cdp-sidebar-card {
+        position: relative;
+        top: 0;
+        max-width: 600px;
+        margin: 0 auto;
+    }
 }
-.message.error { background-color: #ffebee; border: 1px solid var(--color-danger); color: var(--color-danger); }
-.message.success { background-color: #e8f5e9; border: 1px solid var(--color-success); color: #0c6210; }
+
+@media (max-width: 768px) {
+    .cdp-main-wrapper { padding: 1rem; }
+    .cdp-header-section { padding: 1.5rem; }
+    .cdp-title-main { font-size: 2rem; }
+    .cdp-header-top { flex-direction: column; gap: 1rem; }
+    .cdp-header-meta { align-items: flex-start; width: 100%; }
+    
+    .cdp-objectives-list { grid-template-columns: 1fr; }
+    
+    .cdp-teacher-card { flex-direction: column; text-align: center; }
+    .cdp-teacher-info { display: flex; flex-direction: column; align-items: center; }
+}

@@ -1,10 +1,9 @@
-// [CORREGIDO] Añadimos 'useMemo' a la importación
 import React, { useState, useEffect, useMemo } from 'react'; 
-// [CORREGIDO] Importamos la función renombrada
 import { getAllVerificaciones, approveVerificacion, rejectVerificacion } from '../../services/admin.service';
 import { 
   FaSpinner, FaExclamationTriangle, FaCheck, FaTimes, FaFilePdf, 
-  FaIdCard, FaGraduationCap, FaEnvelope, FaClock, FaCheckCircle, FaTimesCircle
+  FaIdCard, FaGraduationCap, FaEnvelope, FaClock, FaCheckCircle, 
+  FaTimesCircle, FaUsers, FaClipboardList, FaArrowRight, FaShieldAlt
 } from 'react-icons/fa';
 import './AdminVerificationPage.css';
 
@@ -20,11 +19,10 @@ const VerificationModal = ({ verificacion, onClose, onConfirm }) => {
   const [error, setError] = useState('');
 
   const docente = verificacion.docente_nombre;
-  const action = isRejecting ? 'Rechazar' : 'Aprobar';
+  const actionText = isRejecting ? 'RECHAZAR' : 'APROBAR';
 
   const handleSubmit = async () => {
     setError('');
-    // Validación para rechazo
     if (isRejecting && !observaciones.trim()) {
       setError('Debes proveer un motivo para el rechazo.');
       return;
@@ -33,10 +31,9 @@ const VerificationModal = ({ verificacion, onClose, onConfirm }) => {
     setIsSubmitting(true);
     
     try {
-      // onConfirm es la función (approveVerificacion o rejectVerificacion)
       await onConfirm(isRejecting, observaciones);
       setIsSubmitting(false);
-      onClose(); // Cierra el modal al éxito
+      onClose(); 
     } catch (err) {
       setIsSubmitting(false);
       setError(err.message || 'Error al procesar la solicitud.');
@@ -47,54 +44,56 @@ const VerificationModal = ({ verificacion, onClose, onConfirm }) => {
     <div className="admin-modal-overlay" onClick={onClose}>
       <div className="admin-modal-content" onClick={(e) => e.stopPropagation()}>
         <header className="admin-modal-header">
-          <h3>Confirmar Acción</h3>
+          <h3>AUDITORÍA DE IDENTIDAD</h3>
           <button onClick={onClose} className="modal-close-btn"><FaTimes /></button>
         </header>
         
         <div className="admin-modal-body">
-          {!isRejecting ? (
-            <p>¿Estás seguro de que quieres <strong>Aprobar</strong> la verificación de <strong>{docente}</strong>?</p>
-          ) : (
-            <p>Vas a <strong>Rechazar</strong> la verificación de <strong>{docente}</strong>.</p>
-          )}
-
+          <p className="modal-target-info">
+            Aplicar decisión a: <strong style={{color: 'var(--color-data)'}}>{docente}</strong>
+          </p>
+          
           <div className="modal-actions-toggle">
             <button 
               className={`btn-modal-toggle ${!isRejecting ? 'active' : ''}`} 
-              onClick={() => setIsRejecting(false)}>
-              <FaCheck /> Aprobar
+              onClick={() => setIsRejecting(false)}
+              disabled={isSubmitting}
+            >
+              <FaCheck /> APROBAR
             </button>
             <button 
               className={`btn-modal-toggle ${isRejecting ? 'active' : ''}`} 
-              onClick={() => setIsRejecting(true)}>
-              <FaTimes /> Rechazar
+              onClick={() => setIsRejecting(true)}
+              disabled={isSubmitting}
+            >
+              <FaTimes /> RECHAZAR
             </button>
           </div>
 
-          {isRejecting && (
-            <div className="form-group-modal">
-              <label htmlFor="observaciones">Motivo del Rechazo (ObligatorIO)</label>
+          {/* Área de Observaciones */}
+          <div className="form-group-modal verification-notes">
+              <label htmlFor="observaciones" className="label-strong">{isRejecting ? 'MOTIVO DE RECHAZO (OBLIGATORIO)' : 'OBSERVACIONES (OPCIONAL)'}</label>
               <textarea
                 id="observaciones"
                 rows="3"
                 value={observaciones}
                 onChange={(e) => setObservaciones(e.target.value)}
-                placeholder="Ej: El DNI no es legible, el título no es válido..."
+                placeholder={isRejecting ? "Ej: El DNI no es legible o el título es de una institución no reconocida." : "Notas internas sobre la verificación."}
+                disabled={isSubmitting}
               />
-            </div>
-          )}
+          </div>
         </div>
         
         <footer className="admin-modal-footer">
           {error && <p className="error-message-modal">{error}</p>}
           <button className="btn btn-secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancelar
+            CANCELAR
           </button>
           <button 
             className={`btn ${isRejecting ? 'btn-danger' : 'btn-primary'}`} 
             onClick={handleSubmit} 
             disabled={isSubmitting}>
-            {isSubmitting ? 'Procesando...' : `Confirmar ${action}`}
+            {isSubmitting ? <FaSpinner className="spin"/> : `CONFIRMAR ${actionText}`}
           </button>
         </footer>
       </div>
@@ -105,7 +104,6 @@ const VerificationModal = ({ verificacion, onClose, onConfirm }) => {
 
 /**
  * Página principal para la cola de Verificaciones de Docentes
- * [MODIFICADA] con Pestañas (Tabs)
  */
 const AdminVerificationPage = () => {
   const [allVerificaciones, setAllVerificaciones] = useState([]);
@@ -114,12 +112,10 @@ const AdminVerificationPage = () => {
   const [filtroEstado, setFiltroEstado] = useState('en_revision');
   const [selectedVerification, setSelectedVerification] = useState(null);
 
-  // Función para cargar los datos
   const fetchVerificaciones = async () => {
     try {
       setIsLoading(true);
       setError(null);
-      // [CORREGIDO] Llama a la nueva función del servicio
       const data = await getAllVerificaciones();
       setAllVerificaciones(data || []);
     } catch (err) {
@@ -130,9 +126,7 @@ const AdminVerificationPage = () => {
     }
   };
 
-  useEffect(() => {
-    fetchVerificaciones();
-  }, []);
+  useEffect(() => { fetchVerificaciones(); }, []);
 
   // Función de callback para el modal
   const handleConfirmAction = async (isRejecting, observaciones) => {
@@ -143,7 +137,6 @@ const AdminVerificationPage = () => {
       } else {
         await approveVerificacion(id, observaciones);
       }
-      // Si tiene éxito, refrescamos la lista
       fetchVerificaciones(); 
     } catch (err) {
       console.error("Error al confirmar acción:", err);
@@ -151,30 +144,23 @@ const AdminVerificationPage = () => {
     }
   };
 
-// [CORREGIDO] Esta línea ahora funcionará porque 'useMemo' está importado
   const verificacionesFiltradas = useMemo(() => {
     return allVerificaciones.filter(v => v.estado === filtroEstado);
   }, [allVerificaciones, filtroEstado]);
 
-  // --- [NUEVO] Función para limpiar las URLs ---
-  /**
-   * Limpia la ruta del archivo de la BD.
-   * Asume que la BD guarda "uploads/archivo.pdf"
-   * y queremos solo "archivo.pdf".
-   */
-  const getCleanFilePath = (path) => {
-    if (!path) return '';
-    // Quita 'uploads/' o 'uploads\' (para Windows) del inicio
-    return path.replace(/^uploads[\\/]/, '');
-  };
-  // ------------------------------------------
+  // Limpia la ruta del archivo de la BD.
+  const getCleanFilePath = (path) => path ? path.replace(/^uploads[\\/]/, '') : '';
+  
+  // Conteo de tabs
+  const countState = (state) => allVerificaciones.filter(v => v.estado === state).length;
+
 
   // 1. Estado de Carga
   if (isLoading) {
     return (
-      <div className="admin-page-loader">
-        <FaSpinner className="fa-spin" size="3em" />
-        <p>Cargando verificaciones...</p>
+      <div className="admin-page-state loading">
+        <FaSpinner className="spin-icon" />
+        <p>AUDITANDO REGISTROS DE DOCENTES...</p>
       </div>
     );
   }
@@ -182,20 +168,19 @@ const AdminVerificationPage = () => {
   // 2. Estado de Error
   if (error) {
     return (
-      <div className="admin-page-error">
-        <FaExclamationTriangle size="3em" />
-        <h3>Error al Cargar</h3>
+      <div className="admin-page-state error">
+        <FaExclamationTriangle className="error-icon" />
+        <h3>ERROR DE SINCORNIZACIÓN</h3>
         <p>{error}</p>
       </div>
     );
   }
 
-  // 3. Estado de Éxito
 return (
     <div className="admin-verification-page">
       <header className="admin-page-header">
-        <h2>Cola de Verificación de Docentes</h2>
-        <p>Revisa y aprueba o rechaza las postulaciones.</p>
+        <h2>TERMINAL DE AUDITORÍA (DOCENTES)</h2>
+        <p>Revisa, valida y sella los registros de identidad y credenciales de los postulantes.</p>
       </header>
 
       {/* --- Pestañas de Filtro --- */}
@@ -204,86 +189,80 @@ return (
           className={`admin-tab-item ${filtroEstado === 'en_revision' ? 'active' : ''}`}
           onClick={() => setFiltroEstado('en_revision')}
         >
-          Pendientes ({allVerificaciones.filter(v => v.estado === 'en_revision').length})
+          <FaClipboardList/> PENDIENTES ({countState('en_revision')})
         </button>
         <button
           className={`admin-tab-item ${filtroEstado === 'aprobado' ? 'active' : ''}`}
           onClick={() => setFiltroEstado('aprobado')}
         >
-          Aprobados ({allVerificaciones.filter(v => v.estado === 'aprobado').length})
+          <FaCheckCircle/> APROBADOS ({countState('aprobado')})
         </button>
         <button
           className={`admin-tab-item ${filtroEstado === 'rechazado' ? 'active' : ''}`}
           onClick={() => setFiltroEstado('rechazado')}
         >
-          Rechazados ({allVerificaciones.filter(v => v.estado === 'rechazado').length})
+          <FaTimesCircle/> RECHAZADOS ({countState('rechazado')})
         </button>
       </div>
 
       {/* --- Lista o Estado Vacío --- */}
       {verificacionesFiltradas.length === 0 ? (
         <div className="admin-empty-state">
-          {filtroEstado === 'en_revision' && <FaCheckCircle size="4em" />}
-          <h3>No hay docentes en esta categoría.</h3>
+          {filtroEstado === 'en_revision' ? <FaCheckCircle size="4em" /> : <FaUsers size="4em"/>}
+          <h3>BANDEJA DE {filtroEstado.toUpperCase().replace('_', ' ')} LIMPIA</h3>
           <p>
             {filtroEstado === 'en_revision' 
-              ? '¡Todo al día! No hay verificaciones pendientes.' 
-              : `No hay docentes ${filtroEstado}s.`}
+              ? 'Todas las postulaciones han sido procesadas. Excelente trabajo.' 
+              : `No hay registros ${filtroEstado}s actualmente.`}
           </p>
         </div>
       ) : (
         <div className="verification-list-container">
           {verificacionesFiltradas.map((v) => (
             <div key={v.id} className={`verification-card estado-${v.estado}`}>
-              <header className="verification-card-header">
-                <h4>{v.docente_nombre}</h4>
-                <span><FaEnvelope /> {v.docente_correo}</span>
-              </header>
               
-              <div className="verification-card-body">
-                <p>
-                  <FaClock /> 
-                  Postuló el: {new Date(v.fecha_postulacion).toLocaleDateString()}
-                </p>
-                <div className="document-links">
-                  
-                  {/* --- [CORREGIDO] Aplicamos la función de limpieza --- */}
-                  
-                  {v.url_cv && <a href={`${API_BASE_URL}/files/${getCleanFilePath(v.url_cv)}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-small"><FaFilePdf /> Ver CV</a>}
-                  
-                  {v.url_dni && <a href={`${API_BASE_URL}/files/${getCleanFilePath(v.url_dni)}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-small"><FaIdCard /> Ver DNI</a>}
-                  
-                  {v.url_titulo && <a href={`${API_BASE_URL}/files/${getCleanFilePath(v.url_titulo)}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-small"><FaGraduationCap /> Ver Título</a>}
-                  {/* ----------------------------------------------- */}
+              <div className="card-header-data">
+                <h4>{v.docente_nombre}</h4>
+                <div className={`status-pill status-${v.estado}`}>
+                    {v.estado.replace('_', ' ').toUpperCase()}
                 </div>
-                
-                {/* --- Mostrar motivo de rechazo --- */}
-                {v.estado === 'rechazado' && v.observaciones_admin && (
-                  <div className="rejection-reason">
-                    <strong>Motivo del Rechazo:</strong>
-                    <p>{v.observaciones_admin}</p>
-                  </div>
-                )}
-                {v.estado === 'aprobado' && v.observaciones_admin && (
-                  <div className="approval-notes">
-                    <strong>Observaciones:</strong>
-                    <p>{v.observaciones_admin}</p>
-                  </div>
-                )}
               </div>
+
+              <div className="card-docente-info">
+                <span><FaEnvelope /> {v.docente_correo}</span>
+                <span><FaClock /> Postuló: {new Date(v.fecha_postulacion).toLocaleDateString()}</span>
+              </div>
+              
+              <div className="document-links-grid">
+                <p className="grid-title"><FaShieldAlt/> DOCUMENTOS ESCANEADOS</p>
+                
+                {v.url_cv && <a href={`${API_BASE_URL}/files/${getCleanFilePath(v.url_cv)}`} target="_blank" rel="noopener noreferrer" className="btn-doc-link"><FaFilePdf /> CV (Hoja de Vida)</a>}
+                
+                {v.url_dni && <a href={`${API_BASE_URL}/files/${getCleanFilePath(v.url_dni)}`} target="_blank" rel="noopener noreferrer" className="btn-doc-link"><FaIdCard /> DNI / ID</a>}
+                
+                {v.url_titulo && <a href={`${API_BASE_URL}/files/${getCleanFilePath(v.url_titulo)}`} target="_blank" rel="noopener noreferrer" className="btn-doc-link"><FaGraduationCap /> TÍTULO / GRADO</a>}
+              </div>
+              
+              {/* --- Mostrar notas finales --- */}
+              {(v.estado === 'rechazado' || v.estado === 'aprobado') && v.observaciones_admin && (
+                <div className={`admin-notes ${v.estado === 'rechazado' ? 'rejection-reason' : 'approval-notes'}`}>
+                  <strong>{v.estado === 'rechazado' ? 'MOTIVO FINAL' : 'NOTAS DE AUDITORÍA'}</strong>
+                  <p>{v.observaciones_admin}</p>
+                </div>
+              )}
               
               {/* Acciones solo para pendientes */}
               {v.estado === 'en_revision' && (
                 <footer className="verification-card-actions">
                   <button 
-                    className="btn btn-danger btn-small"
+                    className="btn-action btn-danger"
                     onClick={() => setSelectedVerification(v)}>
-                    <FaTimes /> Revisar (Rechazar)
+                    <FaTimes /> RECHAZAR
                   </button>
                   <button 
-                    className="btn btn-primary btn-small"
+                    className="btn-action btn-primary"
                     onClick={() => setSelectedVerification(v)}>
-                    <FaCheck /> Revisar (Aprobar)
+                    <FaCheck /> APROBAR
                   </button>
                 </footer>
               )}

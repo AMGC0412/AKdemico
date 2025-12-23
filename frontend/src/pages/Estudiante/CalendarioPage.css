@@ -1,0 +1,451 @@
+/* =================================================================
+   ARCHIVO: CalendarioPage.css
+   DISEÑO: ACADEMIC OPS CENTER (ULTRA HIGH-FIDELITY)
+   ESTADO: CORREGIDO (ALINEACIÓN SIDEBAR & BOTONES)
+   PREFIX: cal-
+   ================================================================= */
+
+:root {
+    /* --- PALETA DE ENERGÍA (Estudiante: Cyan/Blue/Purple) --- */
+    --cal-brand-cyan: #4DFFFF;
+    --cal-brand-blue: #4B87FF;
+    --cal-brand-purple: #BD00FF;
+    --cal-brand-pink: #FF3EFF;
+    --cal-brand-green: #05FF00;
+    --cal-brand-yellow: #FEEA00;
+    
+    /* --- FONDOS Y SUPERFICIES --- */
+    --cal-bg-deep: #050508;
+    --cal-bg-panel: rgba(20, 20, 30, 0.96); /* Panel Mate Oscuro */
+    --cal-bg-header: rgba(15, 15, 25, 0.92);
+    --cal-bg-hover: rgba(255, 255, 255, 0.03);
+    
+    /* --- EFECTOS --- */
+    --cal-border: rgba(77, 255, 255, 0.15);
+    --cal-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+    --cal-radius: 12px;
+    
+    /* --- FUENTES --- */
+    --cal-font-title: '04b30', 'Consolas', monospace;
+    --cal-font-body: 'Poppins', sans-serif;
+}
+
+/* RESET LOCAL */
+.calendario-page-container * {
+    box-sizing: border-box;
+}
+
+/* =========================================
+   0. ANIMACIONES
+   ========================================= */
+
+@keyframes calFadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes calSlideInLeft {
+    from { opacity: 0; transform: translateX(-40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes calSlideInRight {
+    from { opacity: 0; transform: translateX(40px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+/* =========================================
+   1. ESTRUCTURA MAESTRA Y FONDO
+   ========================================= */
+
+.calendario-page-container {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: var(--cal-bg-deep);
+    position: relative;
+    overflow-x: hidden;
+    color: #FFF;
+    font-family: var(--cal-font-body);
+    
+    /* Fondo Atmosférico */
+    background: 
+        radial-gradient(circle at 60% 10%, rgba(75, 0, 130, 0.15), transparent 50%),
+        linear-gradient(135deg, #050508 0%, #0A0A12 100%);
+}
+
+/* Grid Overlay Técnico */
+.calendario-page-container::before {
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), 
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px; 
+    opacity: 0.3; 
+    pointer-events: none; z-index: 0;
+}
+
+/* Scanlines CRT */
+.calendario-page-container::after {
+    content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 1px, transparent 1px, transparent 3px);
+    pointer-events: none; z-index: 0; opacity: 0.4;
+}
+
+/* CONTENEDOR CENTRAL */
+.calendar-content-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 1400px; /* Ancho controlado */
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* =========================================
+   2. HEADER ANIMADO (ESTILO HUD)
+   ========================================= */
+
+.calendar-header-panel {
+    background: var(--cal-bg-header);
+    border: 1px solid var(--cal-border);
+    border-top: 3px solid var(--cal-brand-cyan);
+    border-radius: var(--cal-radius);
+    padding: 2.5rem;
+    box-shadow: var(--cal-shadow);
+    backdrop-filter: blur(15px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+    
+    /* Animación de Entrada */
+    animation: calSlideInLeft 0.7s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+}
+
+/* Efecto Luz Lateral */
+.calendar-header-panel::after {
+    content: ''; position: absolute; top: 0; right: 0; width: 5px; height: 100%;
+    background: linear-gradient(to bottom, var(--cal-brand-cyan), transparent); opacity: 0.5;
+}
+
+.header-text h1 {
+    font-family: var(--cal-font-title);
+    font-size: 2.5rem;
+    margin: 0;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, var(--cal-brand-cyan) 0%, #FFFFFF 50%, var(--cal-brand-blue) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 15px rgba(77, 255, 255, 0.3));
+}
+
+.header-text p {
+    color: #B0B0CC;
+    margin: 0.8rem 0 0 0;
+    font-size: 1rem;
+    max-width: 700px;
+    line-height: 1.5;
+}
+
+.cal-header-badge {
+    border: 1px solid var(--cal-brand-blue);
+    background: rgba(75, 135, 255, 0.1);
+    color: var(--cal-brand-cyan);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-family: var(--cal-font-title);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: inset 0 0 10px rgba(75, 135, 255, 0.2);
+}
+
+/* =========================================
+   3. LAYOUT DEL CALENDARIO (GRID)
+   ========================================= */
+
+.calendar-grid-layout {
+    display: grid;
+    /* Calendario Flexible | Sidebar Fija de 320px */
+    grid-template-columns: 1fr 320px; 
+    gap: 2rem;
+    align-items: start; /* Importante para sticky sidebar */
+}
+
+/* Panel Izquierdo (FullCalendar) - ANIMADO */
+.calendar-view-panel {
+    background: var(--cal-bg-panel);
+    border: 1px solid var(--cal-border);
+    border-radius: var(--cal-radius);
+    padding: 1.5rem;
+    box-shadow: var(--cal-shadow);
+    min-height: 700px;
+    
+    /* Animación Escalonada */
+    opacity: 0;
+    animation: calFadeInUp 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.2s forwards;
+}
+
+/* =========================================
+   4. FULLCALENDAR CUSTOMIZATION
+   ========================================= */
+
+.fc {
+    font-family: var(--cal-font-body);
+    color: #E0E0E0;
+    --fc-border-color: rgba(255, 255, 255, 0.08);
+    --fc-page-bg-color: transparent;
+    --fc-list-event-hover-bg-color: rgba(77, 255, 255, 0.05);
+}
+
+/* --- Toolbar --- */
+.fc .fc-toolbar {
+    flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem !important;
+}
+.fc .fc-toolbar-title {
+    font-family: var(--cal-font-title);
+    font-size: 1.8rem !important;
+    color: var(--cal-brand-cyan);
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+}
+
+/* Botones de Navegación */
+.fc .fc-button-primary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--cal-border);
+    color: var(--cal-brand-cyan);
+    font-family: var(--cal-font-title);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    padding: 0.6rem 1.2rem;
+}
+.fc .fc-button-primary:hover {
+    background: rgba(77, 255, 255, 0.1);
+    border-color: var(--cal-brand-cyan);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(77, 255, 255, 0.2);
+}
+.fc .fc-button-primary.fc-button-active {
+    background: var(--cal-brand-cyan);
+    border-color: var(--cal-brand-cyan);
+    color: #000;
+}
+
+/* --- VISTA LISTA (Vertical Agenda) --- */
+.fc-list { border: none !important; }
+.fc-list-day-cushion { background: var(--cal-bg-hover) !important; }
+.fc-list-day-text {
+    font-family: var(--cal-font-title);
+    color: var(--cal-brand-blue);
+    font-size: 1.1rem;
+    text-decoration: none !important;
+    text-transform: uppercase;
+}
+.fc-list-event td { border-color: transparent !important; padding: 12px 10px !important; transition: 0.2s; }
+.fc-list-event:hover td { background: rgba(77, 255, 255, 0.08) !important; transform: translateX(5px); }
+.fc-list-event-time {
+    color: var(--cal-brand-cyan);
+    font-family: var(--cal-font-title);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+.fc-list-event-title { color: #FFF; font-weight: 500; font-size: 1rem; }
+.fc-list-event-dot { border-width: 5px !important; box-shadow: 0 0 10px currentColor; }
+
+/* --- VISTA GRID (Mes) --- */
+.fc-daygrid-day-number {
+    font-family: var(--cal-font-title);
+    color: rgba(255,255,255,0.6);
+    padding: 8px;
+}
+.fc-col-header-cell-cushion {
+    color: var(--cal-brand-blue);
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 10px 0;
+}
+.fc-day-today {
+    background: rgba(77, 255, 255, 0.02) !important;
+    border: 1px solid rgba(77, 255, 255, 0.2) !important;
+}
+
+/* Estilo de Evento en Grid (Compacto) */
+.grid-event-tech {
+    border: none; border-radius: 2px;
+    padding: 3px 5px; margin: 1px 0;
+    font-size: 0.75rem; display: flex; align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    transition: transform 0.1s;
+}
+.grid-event-tech:hover { transform: scale(1.02); z-index: 5; }
+.grid-event-time { font-family: var(--cal-font-title); margin-right: 4px; opacity: 0.9; }
+.grid-event-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 600; }
+
+/* =========================================
+   5. SIDEBAR Y BOTONES (ALINEACIÓN PERFECTA)
+   ========================================= */
+
+.calendar-sidebar {
+    background: var(--cal-bg-panel);
+    border: 1px solid var(--cal-border);
+    border-radius: var(--cal-radius);
+    padding: 2rem;
+    
+    /* [CLAVE] Configuración Flex para estructura vertical sólida */
+    display: flex;
+    flex-direction: column;
+    
+    /* [CLAVE] Sticky y Altura calculada para anclar footer */
+    position: sticky;
+    top: 2rem;
+    height: calc(100vh - 4rem); 
+    min-height: 600px;
+    box-shadow: var(--cal-shadow);
+    
+    /* Animación de Entrada */
+    opacity: 0;
+    animation: calSlideInRight 0.7s cubic-bezier(0.23, 1, 0.32, 1) 0.4s forwards;
+}
+
+.sidebar-section { 
+    margin-bottom: 2rem; 
+    flex-shrink: 0; /* No encoger secciones */
+}
+
+.sidebar-title {
+    font-family: var(--cal-font-title);
+    font-size: 1.2rem;
+    color: var(--cal-brand-cyan);
+    margin: 0 0 1.5rem 0;
+    border-bottom: 1px dashed var(--cal-border);
+    padding-bottom: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.leyenda-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9rem;
+    color: #D0D0E0;
+    padding: 0.8rem;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid transparent;
+    transition: 0.2s;
+}
+.leyenda-item:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: var(--cal-border);
+    transform: translateX(5px);
+}
+
+.leyenda-icon {
+    font-size: 1.2rem;
+    display: flex;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* --- SECCIÓN DE BOTONES ALINEADOS (FOOTER) --- */
+.sidebar-footer {
+    /* [CLAVE] margin-top: auto empuja esto al fondo del contenedor flex */
+    margin-top: auto; 
+    padding-top: 2rem;
+    border-top: 1px solid var(--cal-border);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+/* ESTILO DE BOTÓN TÁCTICO (Transparente con Borde) */
+.cal-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 1.1rem;
+    border-radius: 8px;
+    
+    font-family: var(--cal-font-title);
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    
+    /* Fondo casi transparente */
+    background: rgba(255, 255, 255, 0.02);
+    color: #FFF; 
+    border: 1px solid transparent; 
+    
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Botón Primario (Azul - Outline) */
+.cal-btn-primary {
+    border-color: var(--cal-brand-blue);
+    box-shadow: inset 0 0 10px rgba(75, 135, 255, 0.1);
+}
+.cal-btn-primary:hover {
+    background: rgba(75, 135, 255, 0.1); /* Relleno sutil al hover */
+    box-shadow: 
+        0 0 20px rgba(75, 135, 255, 0.4), 
+        inset 0 0 15px rgba(75, 135, 255, 0.2);
+    transform: translateY(-2px);
+    text-shadow: 0 0 8px var(--cal-brand-blue);
+}
+
+/* Botón Secundario (Cyan - Outline) */
+.cal-btn-secondary {
+    border-color: var(--cal-brand-cyan);
+    box-shadow: inset 0 0 10px rgba(77, 255, 255, 0.1);
+}
+.cal-btn-secondary:hover {
+    background: rgba(77, 255, 255, 0.1);
+    box-shadow: 
+        0 0 20px rgba(77, 255, 255, 0.4),
+        inset 0 0 15px rgba(77, 255, 255, 0.2);
+    transform: translateY(-2px);
+    text-shadow: 0 0 8px var(--cal-brand-cyan);
+}
+
+/* Loading */
+.cal-loader {
+    display: flex; flex-direction: column; align-items: center; gap: 1rem; padding: 5rem; color: var(--cal-brand-cyan);
+}
+.cal-loader svg { font-size: 3rem; animation: calPulseGlow 2s infinite; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .calendar-grid-layout { grid-template-columns: 1fr; }
+    .calendar-sidebar { height: auto; margin-bottom: 2rem; order: -1; }
+    .sidebar-footer { margin-top: 2rem; }
+}
+@media (max-width: 768px) {
+    .calendario-page-container { padding: 1rem; }
+    .header-text h1 { font-size: 2rem; }
+    .fc-toolbar { flex-direction: column; }
+    .calendar-header-panel { flex-direction: column; gap: 1rem; text-align: center; }
+}

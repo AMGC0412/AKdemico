@@ -1,47 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useParams } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-// Importar las nuevas funciones
 import { obtenerPlanPorId, actualizarPlan } from '../../services/planes.service.js';
-import './DocenteForm.css'; // Reutilizamos el mismo CSS
-import { FaEdit, FaSpinner, FaTimesCircle } from 'react-icons/fa';
+import { obtenerListaCategorias, obtenerListaNiveles } from '../../services/catalogos.service.js';
+import './DocenteForm.css'; 
+import { FaEdit, FaSpinner, FaTimesCircle, FaEye, FaEyeSlash, FaImage, FaLayerGroup, FaSignal } from 'react-icons/fa';
 
 const EditarPlanPage = () => {
-    const { planId } = useParams(); // Obtener el ID del plan de la URL
+    const { planId } = useParams();
     const navigate = useNavigate();
     
-    // Estados del formulario
+    // --- ESTADOS DE DATOS (Catálogos) ---
+    const [listaCategorias, setListaCategorias] = useState([]);
+    const [listaNiveles, setListaNiveles] = useState([]);
+
+    // --- ESTADOS DEL FORMULARIO ---
     const [titulo, setTitulo] = useState('');
     const [descripcion, setDescripcion] = useState('');
     const [objetivos, setObjetivos] = useState('');
     const [duracionSemanas, setDuracionSemanas] = useState('');
     const [frecuenciaSemanal, setFrecuenciaSemanal] = useState('');
+    const [estadoPlan, setEstadoPlan] = useState('borrador');
+    
+    // Nuevos estados
+    const [categoriaId, setCategoriaId] = useState('');
+    const [nivelId, setNivelId] = useState('');
+    const [imagenUrl, setImagenUrl] = useState('');
 
-    const [loading, setLoading] = useState(false); // Para el envío
-    const [pageLoading, setPageLoading] = useState(true); // Para cargar datos iniciales
+    const [loading, setLoading] = useState(false);
+    const [pageLoading, setPageLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- Cargar datos del plan al montar ---
+    // --- CARGA INICIAL (Paralela) ---
     useEffect(() => {
-        const cargarDatosPlan = async () => {
+        const cargarTodo = async () => {
             try {
-                const data = await obtenerPlanPorId(planId);
-                // Rellenar el formulario con los datos cargados
-                setTitulo(data.titulo);
-                setDescripcion(data.descripcion);
-                setObjetivos(data.objetivos);
-                setDuracionSemanas(data.duracion_semanas || ''); // Manejar nulos
-                setFrecuenciaSemanal(data.frecuencia_semanal || ''); // Manejar nulos
+                // Ejecutamos las 3 peticiones al mismo tiempo para ser más rápidos
+                const [planData, categoriasData, nivelesData] = await Promise.all([
+                    obtenerPlanPorId(planId),
+                    obtenerListaCategorias(),
+                    obtenerListaNiveles()
+                ]);
+
+                // 1. Rellenar formulario
+                setTitulo(planData.titulo);
+                setDescripcion(planData.descripcion || '');
+                setObjetivos(planData.objetivos || '');
+                setDuracionSemanas(planData.duracion_semanas || '');
+                setFrecuenciaSemanal(planData.frecuencia_semanal || '');
+                setEstadoPlan(planData.estado);
+                setCategoriaId(planData.categoria_id || '');
+                setNivelId(planData.nivel_id || '');
+                setImagenUrl(planData.imagen_url || '');
+
+                // 2. Rellenar catálogos
+                setListaCategorias(categoriasData);
+                setListaNiveles(nivelesData);
+
             } catch (err) {
-                setError("Error al cargar los datos del plan. No se encontró o no te pertenece.");
+                console.error(err);
+                setError("Error al cargar los datos. Verifica tu conexión.");
             } finally {
                 setPageLoading(false);
             }
         };
-        cargarDatosPlan();
-    }, [planId]); // Se ejecuta si el planId cambia
+        cargarTodo();
+    }, [planId]);
 
-    // --- Enviar actualización ---
+    // --- MANEJO DE ENVÍO ---
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -51,95 +76,158 @@ const EditarPlanPage = () => {
             titulo,
             descripcion,
             objetivos,
-            duracion_semanas: Number(duracionSemanas) || null,
-            frecuencia_semanal: Number(frecuenciaSemanal) || null,
+            duracion_semanas: duracionSemanas,
+            frecuencia_semanal: frecuenciaSemanal,
+            estado: estadoPlan,
+            categoria_id: categoriaId,
+            nivel_id: nivelId,
+            imagen_url: imagenUrl
         };
 
         try {
-            await actualizarPlan(planId, planData); // Llamar a la función de ACTUALIZAR
-            navigate('/docente/cursos'); // Volver a la lista
+            await actualizarPlan(planId, planData);
+            navigate('/docente/cursos');
         } catch (err) {
             setError(err.mensaje || "Error al actualizar el plan.");
-            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
-    if (pageLoading) return <div className="page-loading">Cargando datos del plan...</div>;
+    if (pageLoading) return <div className="page-loading"><FaSpinner className="spinner" /> Cargando Editor de Plan...</div>;
 
     return (
         <div className="docente-form-page">
             <div className="docente-form-container">
                 <div className="docente-form-header">
-                    <FaEdit className="icon" />
-                    <h1>Editar Plan de Estudio</h1>
+                    <FaEdit className="icon-header" />
+                    <h1>Editar Plan Maestro</h1>
                 </div>
-                <p>Modifica los detalles de tu plantilla de curso. Los cambios no afectarán a los lotes ya publicados.</p>
+                <p className="form-description">
+                    Define la estructura académica y visual de tu curso. Esta información se usará para crear nuevos lotes.
+                </p>
+
+                {error && <div className="message error"><FaTimesCircle /> {error}</div>}
 
                 <form className="docente-form" onSubmit={handleSubmit}>
                     
+                    {/* --- 1. VISIBILIDAD (Estado) --- */}
+                    <div className="visibilidad-box">
+                        <label className="visibilidad-label">
+                            {estadoPlan === 'publicado' ? <FaEye /> : <FaEyeSlash />} Visibilidad
+                        </label>
+                        <select
+                            value={estadoPlan}
+                            onChange={(e) => setEstadoPlan(e.target.value)}
+                            className={`select-estado ${estadoPlan}`}
+                        >
+                            <option value="publicado">PUBLICADO (Visible)</option>
+                            <option value="borrador">BORRADOR (Oculto)</option>
+                        </select>
+                    </div>
+
+                    {/* --- 2. INFORMACIÓN BÁSICA --- */}
                     <div className="form-group">
-                        <label htmlFor="titulo">Título del Plan (Obligatorio)</label>
+                        <label htmlFor="titulo">Título del Curso</label>
                         <input
                             type="text" id="titulo"
-                            value={titulo}
-                            onChange={(e) => setTitulo(e.target.value)}
-                            required
+                            value={titulo} onChange={(e) => setTitulo(e.target.value)}
+                            required placeholder="Ej: Introducción al Marketing Digital"
                         />
                     </div>
 
+                    {/* --- 3. CLASIFICACIÓN (CATEGORÍA Y NIVEL) --- */}
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label><FaLayerGroup /> Categoría</label>
+                            <select 
+                                value={categoriaId} 
+                                onChange={(e) => setCategoriaId(e.target.value)}
+                                required
+                            >
+                                <option value="">-- Seleccionar --</option>
+                                {listaCategorias.map(cat => (
+                                    <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label><FaSignal /> Nivel de Dificultad</label>
+                            <select 
+                                value={nivelId} 
+                                onChange={(e) => setNivelId(e.target.value)}
+                                required
+                            >
+                                <option value="">-- Seleccionar --</option>
+                                {listaNiveles.map(niv => (
+                                    <option key={niv.id} value={niv.id}>{niv.nombre}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {/* --- 4. DETALLES ACADÉMICOS --- */}
                     <div className="form-group">
-                        <label htmlFor="descripcion">Descripción (Obligatorio)</label>
+                        <label htmlFor="descripcion">Descripción Detallada</label>
                         <textarea
                             id="descripcion"
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            required
+                            value={descripcion} onChange={(e) => setDescripcion(e.target.value)}
+                            required rows="4"
                         />
                     </div>
-
+                    
                     <div className="form-group">
-                        <label htmlFor="objetivos">Objetivos (Obligatorio)</label>
+                        <label htmlFor="objetivos">Objetivos de Aprendizaje</label>
                         <textarea
                             id="objetivos"
-                            value={objetivos}
-                            onChange={(e) => setObjetivos(e.target.value)}
-                            required
+                            value={objetivos} onChange={(e) => setObjetivos(e.target.value)}
+                            required rows="4" placeholder="¿Qué logrará el estudiante al finalizar?"
                         />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div className="form-row">
                         <div className="form-group">
-                            <label htmlFor="duracion">Duración (semanas)</label>
+                            <label>Duración (Semanas)</label>
                             <input
-                                type="number" id="duracion"
-                                value={duracionSemanas}
-                                onChange={(e) => setDuracionSemanas(e.target.value)}
+                                type="number"
+                                value={duracionSemanas} onChange={(e) => setDuracionSemanas(e.target.value)}
                                 min="1"
                             />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="frecuencia">Frecuencia (veces/semana)</label>
+                            <label>Frecuencia (Clases/Semana)</label>
                             <input
-                                type="number" id="frecuencia"
-                                value={frecuenciaSemanal}
-                                onChange={(e) => setFrecuenciaSemanal(e.target.value)}
+                                type="number"
+                                value={frecuenciaSemanal} onChange={(e) => setFrecuenciaSemanal(e.target.value)}
                                 min="1"
                             />
                         </div>
                     </div>
 
-                    {error && (
-                        <div className="message error">
-                            <FaTimesCircle /> {error}
-                        </div>
-                    )}
+                    {/* --- 5. IMAGEN REFERENCIAL --- */}
+                    <div className="form-group section-imagen">
+                        <label><FaImage /> Imagen de Portada (URL)</label>
+                        <input 
+                            type="text" 
+                            placeholder="https://ejemplo.com/imagen.jpg"
+                            value={imagenUrl}
+                            onChange={(e) => setImagenUrl(e.target.value)}
+                        />
+                        {imagenUrl && (
+                            <div className="imagen-preview-container">
+                                <img 
+                                    src={imagenUrl} 
+                                    alt="Vista previa" 
+                                    onError={(e) => e.target.style.display = 'none'} 
+                                />
+                                <span>Vista Previa</span>
+                            </div>
+                        )}
+                    </div>
 
+                    {/* --- ACCIONES --- */}
                     <div className="form-actions">
-                        <Link to="/docente/cursos" className="btn btn-cancel">
-                            Cancelar
-                        </Link>
+                        <Link to="/docente/cursos" className="btn btn-ghost">Cancelar</Link>
                         <button type="submit" className="btn btn-primary" disabled={loading}>
                             {loading ? <><FaSpinner className="spinner" /> Guardando...</> : 'Guardar Cambios'}
                         </button>

@@ -2,10 +2,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { getAllUsers, updateUserRole } from '../../services/admin.service';
 import { 
-  FaSpinner, FaExclamationTriangle, FaUsers, FaEdit, FaTimes, FaSearch 
+  FaSpinner, FaExclamationTriangle, FaEdit, FaTimes, FaSearch, FaMapMarkerAlt,
+  FaIdCard
 } from 'react-icons/fa';
-// Reutilizamos el CSS del Modal y de la página de Verificación
-import './AdminVerificationPage.css'; 
+// Importamos el CSS unificado del sistema
 import './AdminUserManagementPage.css';
 
 /**
@@ -14,7 +14,7 @@ import './AdminUserManagementPage.css';
 const RoleEditModal = ({ usuario, onClose, onConfirm, error, setError }) => {
   const [nuevoRol, setNuevoRol] = useState(usuario.rol);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { usuario: admin } = useAuth(); // Obtenemos al admin logueado
+  const { usuario: admin } = useAuth();
 
   const handleSubmit = async () => {
     setError(null);
@@ -26,57 +26,56 @@ const RoleEditModal = ({ usuario, onClose, onConfirm, error, setError }) => {
       onClose(); // Cierra el modal al éxito
     } catch (err) {
       setIsSubmitting(false);
-      setError(err.message || 'Error al procesar la solicitud.');
+      // El error ya viene de la función handleRoleUpdate
+      // Solo aseguramos que se muestre en el modal
     }
   };
 
-  // Verificamos si el admin está intentando editarse a sí mismo
-  // --- [CORREGIDO] ---
-  // El objeto 'admin' (de useAuth) no tiene una propiedad 'usuario' anidada.
-  // 'admin' ES el objeto de usuario.
   const isEditingSelf = admin.id === usuario.id;
-  // ---------------------
 
   return (
     <div className="admin-modal-overlay" onClick={onClose}>
       <div className="admin-modal-content" onClick={(e) => e.stopPropagation()}>
         <header className="admin-modal-header">
-          <h3>Cambiar Rol de Usuario</h3>
+          <h3>CAMBIAR ROL DE IDENTIDAD</h3>
           <button onClick={onClose} className="modal-close-btn"><FaTimes /></button>
         </header>
         
         <div className="admin-modal-body">
-          <p>Estás editando el rol de <strong>{usuario.nombre}</strong> ({usuario.correo}).</p>
+          <p className="modal-target-info">
+            Aplicando cambios a: <strong style={{color: 'var(--color-data)'}}>{usuario.nombre}</strong>
+          </p>
           
           <div className="form-group-modal">
-            <label htmlFor="rol">Nuevo Rol</label>
+            <label htmlFor="rol">NUEVA ASIGNACIÓN DE ROL</label>
             <select
               id="rol"
               value={nuevoRol}
               onChange={(e) => setNuevoRol(e.target.value)}
-              disabled={isEditingSelf} // Deshabilitamos si se edita a sí mismo
+              disabled={isSubmitting || isEditingSelf}
             >
-              <option value="estudiante">Estudiante</option>
-              <option value="docente">Docente</option>
-              <option value="administrador">Administrador</option>
+              <option value="estudiante">ESTUDIANTE</option>
+              <option value="docente">DOCENTE</option>
+              <option value="administrador">ADMINISTRADOR</option>
             </select>
           </div>
           {isEditingSelf && (
-            <p className="warning-message">No puedes cambiar tu propio rol de administrador.</p>
+            <p className="warning-message">ALERTA: Un administrador no puede auto-modificarse el rol.</p>
           )}
+          {error && <p className="error-message-modal">{error}</p>}
+
         </div>
         
         <footer className="admin-modal-footer">
-          {error && <p className="error-message-modal">{error}</p>}
-          <button className="btn btn-secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancelar
+          <button className="btn btn-ghost" onClick={onClose} disabled={isSubmitting}>
+            CANCELAR
           </button>
           <button 
             className="btn btn-primary"
             onClick={handleSubmit} 
-            disabled={isSubmitting || isEditingSelf} // Deshabilitamos si se edita a sí mismo
+            disabled={isSubmitting || isEditingSelf}
           >
-            {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+            {isSubmitting ? <FaSpinner className="spin"/> : 'GUARDAR CAMBIOS'}
           </button>
         </footer>
       </div>
@@ -111,36 +110,34 @@ const AdminUserManagementPage = () => {
       if (filtroSearch) filters.search = filtroSearch;
       if (filtroRol) filters.rol = filtroRol;
 
+      // Aquí se hace la llamada al servicio real
       const data = await getAllUsers(filters);
       setUsuarios(data || []);
     } catch (err) {
       console.error("Error al cargar usuarios:", err);
-      setError("No se pudieron cargar los usuarios.");
+      setError("Error al cargar los registros de identidad. Verifique el servidor.");
     } finally {
       setIsLoading(false);
     }
-  }, [filtroRol, filtroSearch]); // Depende de los filtros
+  }, [filtroRol, filtroSearch]);
 
   // Cargar datos al montar y cuando los filtros cambian
   useEffect(() => {
-    // Usamos un 'debounce' simple para no llamar a la API en cada tecla
     const timer = setTimeout(() => {
       fetchUsers();
-    }, 500); // Espera 500ms después de que el usuario deja de escribir
+    }, 500); 
 
-    return () => clearTimeout(timer); // Limpia el timer
-  }, [fetchUsers]); // fetchUsers ya incluye las dependencias de filtro
+    return () => clearTimeout(timer); 
+  }, [fetchUsers]); 
 
   // Handler para el modal
   const handleRoleUpdate = async (userId, nuevoRol) => {
     setModalError(null);
     try {
       await updateUserRole(userId, nuevoRol);
-      fetchUsers(); // Refrescar la lista de usuarios
+      fetchUsers(); 
     } catch (err) {
-      // Mostrar error DENTRO del modal
       setModalError(err.message);
-      // Re-lanzar error para que el modal sepa que falló
       throw err;
     }
   };
@@ -153,41 +150,42 @@ const AdminUserManagementPage = () => {
   return (
     <div className="admin-user-management-page">
       <header className="admin-page-header">
-        <h2>Gestión de Usuarios</h2>
-        <p>Busca, filtra y actualiza los roles de todos los usuarios en la plataforma.</p>
+        <h2>TERMINAL DE GESTIÓN DE IDENTIDADES (TGI)</h2>
+        <p>Busca, filtra y actualiza los roles y el estado de verificación de todos los usuarios.</p>
       </header>
 
       {/* --- Barra de Filtros --- */}
-      <div className="admin-filter-bar">
+      <div className="admin-filter-bar admin-section-container">
         <div className="filter-group search-group">
-          <FaSearch />
+          <FaSearch className="search-icon"/>
           <input
             type="text"
-            placeholder="Buscar por nombre o correo..."
+            placeholder="Buscar por ID, nombre o correo..."
             value={filtroSearch}
             onChange={(e) => setFiltroSearch(e.target.value)}
           />
         </div>
         <div className="filter-group">
-          <label htmlFor="rol-filter">Filtrar por Rol:</label>
+          <label htmlFor="rol-filter">ROL:</label>
           <select 
             id="rol-filter"
+            className="filter-select"
             value={filtroRol}
             onChange={(e) => setFiltroRol(e.target.value)}
           >
-            <option value="">Todos los Roles</option>
-            <option value="estudiante">Estudiante</option>
-            <option value="docente">Docente</option>
-            <option value="administrador">Administrador</option>
+            <option value="">TODOS</option>
+            <option value="estudiante">ESTUDIANTE</option>
+            <option value="docente">DOCENTE</option>
+            <option value="administrador">ADMINISTRADOR</option>
           </select>
         </div>
       </div>
 
-      {/* --- Contenedor de la Tabla --- */}
-      <div className="admin-section-container">
+      {/* --- Contenedor de la Tabla/Lista --- */}
+      <div className="admin-section-container main-list-container">
         {isLoading && (
           <div className="admin-page-loader">
-            <FaSpinner className="fa-spin" size="2em" />
+            <FaSpinner className="spin-icon" />
           </div>
         )}
         {!isLoading && error && (
@@ -196,47 +194,76 @@ const AdminUserManagementPage = () => {
           </div>
         )}
         {!isLoading && !error && usuarios.length === 0 && (
-          <div className="admin-empty-state" style={{border: 'none', padding: '2rem'}}>
-            <h3>No se encontraron usuarios</h3>
-            <p>Intenta ajustar tus filtros de búsqueda.</p>
+          <div className="admin-empty-state">
+            <h3>NO HAY REGISTROS DE IDENTIDAD</h3>
+            <p>Ajusta los filtros o espera nuevos usuarios.</p>
           </div>
         )}
         {!isLoading && !error && usuarios.length > 0 && (
-          <div className="admin-table-container">
+          <div className="admin-table-wrapper">
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>Nombre</th>
-                  <th>Correo</th>
-                  <th>Rol</th>
-                  <th>Estado Verificación</th>
-                  <th>Acciones</th>
+                  <th>ID / CORREO</th>
+                  <th>NOMBRE / CIUDAD</th>
+                  <th>ROL ASIGNADO</th>
+                  <th>ESTADO VERIFICACIÓN</th>
+                  <th>ACCIONES</th>
                 </tr>
               </thead>
               <tbody>
                 {usuarios.map((user) => (
-                  <tr key={user.id}>
-                    <td>{user.nombre}</td>
-                    <td>{user.correo}</td>
-                    <td>
+                  <tr key={user.id} className="user-row">
+                    {/* Columna ID/Correo */}
+                    <td className="col-id-email">
+                      <div className="user-id-data">
+                          <span className="user-id-number"><FaIdCard/> ID:{user.id.toString().padStart(4, '0')}</span>
+                          <span className="user-email-address">{user.correo}</span>
+                      </div>
+                    </td>
+                    
+                    {/* Columna Nombre/Ciudad */}
+                    <td className="col-identity">
+                      <div className="user-identity">
+                          <strong>{user.nombre}</strong>
+                          <span className="user-city">
+                              <FaMapMarkerAlt /> {user.ciudad || 'N/A'}
+                          </span>
+                      </div>
+                    </td>
+                    
+                    {/* Columna Rol */}
+                    <td className="col-role">
                       <span className={`role-tag role-${user.rol}`}>{user.rol}</span>
                     </td>
-                    <td>
+                    
+                    {/* Columna Estado */}
+                    <td className="col-status">
                       <span className={`status-tag status-${user.estado_verificacion}`}>
                         {user.estado_verificacion.replace('_', ' ')}
                       </span>
                     </td>
-                    <td>
+                    
+                    {/* Columna Acciones */}
+                    <td className="col-actions">
                       <button 
-                        className="btn btn-secondary btn-small"
+                        className="btn-action btn-edit-role"
+                        title="Modificar Rol"
                         onClick={() => handleOpenModal(user)}
                       >
-                        <FaEdit /> Cambiar Rol
+                        <FaEdit />
                       </button>
                     </td>
                   </tr>
                 ))}
               </tbody>
+              <tfoot>
+                  <tr>
+                      <td colSpan="5">
+                          REGISTROS TOTALES: <span className="total-count">{usuarios.length}</span>
+                      </td>
+                  </tr>
+              </tfoot>
             </table>
           </div>
         )}

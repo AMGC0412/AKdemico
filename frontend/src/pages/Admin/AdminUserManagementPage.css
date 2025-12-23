@@ -1,131 +1,352 @@
-/* ---
-  Estilos para AdminUserManagementPage (AdminUserManagementPage.css)
-  Temática: "Pixel-Tech Académico"
---- */
+/* =================================================================
+   ARCHIVO: AdminUserManagementPage.css
+   DISEÑO: TERMINAL DE GESTIÓN DE IDENTIDADES (TGI) - ELITE MASTER V4
+   OBJETIVO: Máxima Nitidez, Separación y Armonía (Magenta/Cyan/Púrpura)
+   ================================================================= */
 
-/* --- Barra de Filtros --- */
+/* --- PALETA MAESTRA --- */
+:root {
+  --color-primary: #CC00CC; /* Magenta (Autoridad) */
+  --color-primary-glow: 0 0 35px 2px rgba(204, 0, 204, 0.7);
+  
+  --color-secondary: #8A2BE2; /* Púrpura (Docente) */
+  --color-data: #00F3FF; /* Cyan (Estudiante/Datos) */
+
+  --color-warning: #FFD600; /* Amarillo (Pendiente) */
+  --color-danger: #FF2E55; /* Rojo (Rechazo) */
+  --color-success: #00E676; /* Verde (Verificado) */
+  
+  --color-bg-deep: #05050A; 
+  --color-bg-dark: #1A1A2E; 
+  --color-bg-table-row: #10101C; 
+  --color-text-dark: #FFFFFF;
+  --color-text-body: #E0E0E0;
+  --color-text-light: #A0A0A0;
+  
+  --card-border: 1px solid rgba(255, 255, 255, 0.15);
+  --card-radius: 16px; 
+  
+  --font-tech: 'Consolas', 'Courier New', monospace;
+  --font-ui: 'Poppins', sans-serif;
+}
+
+/* --- ANIMACIONES --- */
+@keyframes fadeInDown { 0% { opacity: 0; transform: translateY(-30px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes pulseGlowTable { 0% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.4); } 50% { box-shadow: 0 0 15px rgba(138, 43, 226, 0.8); } 100% { box-shadow: 0 0 0 0 rgba(138, 43, 226, 0.4); } }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes scanlineActive { 
+    0% { background-position: 0 0; }
+    100% { background-position: 100% 100%; } 
+}
+
+
+/* --- ESTRUCTURA GENERAL --- */
+.admin-user-management-page {
+    background-color: var(--color-bg-deep);
+    min-height: 100vh;
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 3rem;
+    color: var(--color-text-body);
+    font-family: var(--font-ui);
+    position: relative;
+    
+    /* Fondo Cuadrícula Sutil */
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.admin-page-header {
+    background: var(--color-bg-dark);
+    border-left: 8px solid var(--color-primary);
+    padding: 2.5rem 3rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    border-radius: var(--card-radius);
+    padding-left: 2rem;
+    animation: fadeInDown 0.8s ease-out;
+}
+.admin-page-header h2 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    margin: 0;
+    font-family: var(--font-tech);
+    letter-spacing: -2px;
+    text-shadow: var(--color-primary-glow);
+    text-transform: uppercase;
+}
+.admin-page-header p {
+    font-size: 1.3rem;
+    color: var(--color-text-light);
+    margin-top: 1rem;
+}
+
+.admin-section-container {
+  background: var(--color-bg-dark);
+  border: var(--card-border);
+  border-radius: var(--card-radius);
+  padding: 2.5rem;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  margin-bottom: 3rem;
+}
+
+/* --- 1. BARRA DE FILTROS --- */
 .admin-filter-bar {
   display: flex;
-  flex-wrap: wrap; /* Permite que los filtros se reorganicen en pantallas pequeñas */
-  gap: 1.5rem;
-  padding: 1.5rem;
-  margin-bottom: 2.5rem;
-
-  /* Estilo "Glassmorphism" */
-  background: var(--card-background, rgba(255, 255, 255, 0.1));
-  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
-  border-radius: var(--card-radius, 16px);
-}
-
-.filter-group {
-  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.8rem;
+  gap: 2rem;
+  padding: 1.8rem 2.5rem;
+  background: rgba(255, 255, 255, 0.05); 
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
 }
 
-.filter-group.search-group {
-  flex-grow: 1; /* El campo de búsqueda ocupa el espacio disponible */
-}
+.filter-group { display: flex; align-items: center; gap: 1rem; }
+.filter-group.search-group { flex-grow: 1; position: relative; }
 
-.filter-group label {
-  font-weight: 600;
-  color: var(--color-text-light, #A0A0A0);
-}
+.filter-group label { font-weight: 700; color: var(--color-text-light); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; }
+.search-icon { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--color-data); z-index: 5; font-size: 1.3rem; }
 
-/* Estilo "glass" para inputs y select (reutilizado de Taxonomía) */
-.filter-group input,
-.filter-group select {
-  background: var(--card-background, rgba(255, 255, 255, 0.1));
-  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
+/* Inputs y Selects */
+.admin-filter-bar input,
+.filter-select {
+  background: rgba(0,0,0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 8px;
-  padding: 0.8rem;
-  color: var(--color-text-body, #E0E0E0);
-  font-family: 'Poppins', sans-serif;
+  padding: 1rem 1.2rem;
+  color: var(--color-text-body);
+  font-family: var(--font-ui);
   font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
-.filter-group select option {
-  background: var(--color-bg-dark, #0F0F1A);
-  color: var(--color-text-body, #E0E0E0);
+.admin-filter-bar input { padding-left: 3.5rem; }
+.admin-filter-bar input:focus,
+.filter-select:focus {
+    border-color: var(--color-data);
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.6);
+    outline: none;
+    background: rgba(0,0,0, 0.8);
+}
+.filter-select option { background: var(--color-bg-dark); }
+
+/* --- 2. TABLA TGI (Terminal Grid Interface) --- */
+.admin-table-wrapper {
+    overflow-x: auto;
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    /* Fondo con rayas */
+    background-image: repeating-linear-gradient(
+        180deg, 
+        rgba(255, 255, 255, 0.005) 0, 
+        rgba(255, 255, 255, 0.005) 1px, 
+        transparent 1px, 
+        transparent 40px
+    );
 }
 
-.filter-group input {
-  flex-grow: 1;
-  padding-left: 2.5rem; /* Espacio para el ícono */
-  background-color: rgba(0,0,0, 0.2); /* Fondo más oscuro para input */
+.admin-table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0 15px; /* Aumento la separación de filas */
 }
 
-.filter-group.search-group {
+.admin-table thead th {
+  padding: 1.5rem 1.5rem 1.5rem 1.8rem; /* Más padding */
+  text-align: left;
+  font-size: 1rem;
+  color: var(--color-primary); 
+  text-transform: uppercase;
+  font-weight: 800;
+  border-bottom: 4px solid var(--color-primary); /* Borde más grueso */
+  letter-spacing: 2px;
+  font-family: var(--font-tech);
+  text-shadow: 0 0 15px rgba(204, 0, 204, 0.4);
+}
+
+/* Estilo de Fila (Registro) */
+.admin-table tbody tr {
+  background: var(--color-bg-table-row); 
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 12px;
+  border-left: 6px solid var(--color-secondary); 
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
   position: relative;
-}
-.filter-group.search-group svg {
-  position: absolute;
-  left: 1rem;
-  color: var(--color-text-light, #A0A0A0);
+  overflow: hidden;
 }
 
+/* Efecto de Onda al Pasar el Ratón */
+.admin-table tbody tr:hover {
+  background: #252535;
+  box-shadow: 0 0 35px rgba(138, 43, 226, 0.7);
+  transform: translateY(-8px); /* Movimiento destacado */
+  border-left-color: var(--color-primary); 
+}
+.admin-table tbody tr:hover .col-id-email {
+    background: rgba(0, 243, 255, 0.1);
+}
 
-/* --- Estilos de la Tabla --- */
-/* (Reutilizamos .admin-table de AdminVerificationPage.css) */
+/* Celdas */
+.admin-table td {
+  padding: 1.5rem 1rem;
+  font-size: 1rem;
+  color: var(--color-text-body);
+  border: none;
+  vertical-align: middle;
+}
+.admin-table td:first-child { padding-left: 1.8rem; border-radius: 12px 0 0 12px; }
+.admin-table td:last-child { padding-right: 1.5rem; border-radius: 0 12px 12px 0; }
 
-/* --- Etiquetas de Rol (Tags) --- */
-.role-tag {
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  font-weight: 600;
+
+/* Columna de ID y Correo (Tipo Terminal) */
+.col-id-email { 
+    background: rgba(255, 255, 255, 0.03);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+.user-id-data { font-family: var(--font-tech); }
+.user-id-number {
+    font-weight: 700; font-size: 1.15rem; margin-bottom: 3px;
+    display: flex; align-items: center; gap: 8px;
+    color: var(--color-primary); 
+}
+.user-id-number svg { color: var(--color-data); font-size: 1.3rem; }
+.user-email-address {
+    font-size: 0.88rem; color: var(--color-data); 
+    text-shadow: 0 0 5px rgba(0, 243, 255, 0.4);
+}
+
+/* Columna de Identidad */
+.user-identity strong { color: var(--color-text-dark); display: block; font-size: 1.2rem; font-weight: 600; }
+.user-city { color: var(--color-text-light); font-size: 0.9rem; margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+.user-city svg { color: var(--color-secondary); }
+
+/* Footer de la Tabla */
+.admin-table tfoot td {
+  padding: 2rem 1.5rem;
+  text-align: left;
+  font-weight: 800;
+  color: var(--color-primary);
+  border-top: 4px solid var(--color-primary);
+  font-family: var(--font-tech);
+  letter-spacing: 2px;
+  background: rgba(204, 0, 204, 0.12);
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 0 30px rgba(204, 0, 204, 0.2);
+}
+.total-count {
+    font-size: 1.5rem;
+    color: var(--color-data);
+    text-shadow: 0 0 10px var(--color-data);
+    margin-left: 10px;
+}
+
+/* --- Tags de Rol y Estado --- */
+.role-tag, .status-tag {
+  padding: 0.7rem 1.4rem; 
+  border-radius: 50px; 
+  font-weight: 700;
   font-size: 0.9rem;
-  text-transform: capitalize;
-  background-color: var(--card-background);
-  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: var(--font-tech);
+  white-space: nowrap;
 }
 
-.role-tag.role-administrador {
-  background-color: var(--color-primary, #6d41dc);
-  color: white;
-  box-shadow: 0 0 10px rgba(109, 65, 220, 0.7);
-}
-.role-tag.role-docente {
-  background-color: var(--color-secondary, #00bcd4);
-  color: var(--color-bg-dark, #0F0F1A);
-}
-.role-tag.role-estudiante {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: var(--color-text-body, #E0E0E0);
-}
+/* Roles */
+.role-tag.role-administrador { background-color: var(--color-primary); color: var(--color-bg-deep); box-shadow: 0 0 15px rgba(204, 0, 204, 0.9); }
+.role-tag.role-docente { background-color: var(--color-secondary); color: white; box-shadow: 0 0 10px rgba(138, 43, 226, 0.7); }
+.role-tag.role-estudiante { background-color: var(--color-data); color: var(--color-bg-deep); box-shadow: 0 0 10px rgba(0, 243, 255, 0.7); }
 
-/* --- Etiquetas de Estado (Tags) --- */
-.status-tag {
-  padding: 0.3rem 0.7rem;
-  border-radius: 6px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-transform: capitalize;
-}
+/* Estados */
+.status-tag.status-verificado { color: var(--color-success); background-color: rgba(0, 230, 118, 0.2); border: 1px solid var(--color-success); }
+.status-tag.status-rechazado { color: var(--color-danger); background-color: rgba(255, 46, 85, 0.2); border: 1px solid var(--color-danger); }
+.status-tag.status-pendiente { color: var(--color-warning); background-color: rgba(255, 214, 0, 0.2); border: 1px solid var(--color-warning); }
+.status-tag.status-no_aplica { color: var(--color-text-light); background-color: rgba(160, 160, 160, 0.2); border: 1px solid var(--color-text-light); }
 
-.status-tag.status-verificado {
-  color: var(--color-success, #4CAF50);
-  background-color: rgba(76, 175, 80, 0.15);
-}
-.status-tag.status-rechazado {
-  color: var(--color-danger, #D9534F);
-  background-color: rgba(217, 83, 79, 0.15);
-}
-.status-tag.status-en_revision {
-  color: var(--color-warning, #FF9800);
-  background-color: rgba(255, 152, 0, 0.15);
-}
-.status-tag.status-no_aplica {
-  color: var(--color-text-light, #A0A0A0);
-  background-color: rgba(160, 160, 160, 0.15);
-}
-
-/* --- Mensaje de advertencia en Modal --- */
-.warning-message {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--color-warning, #FF9800);
-  background-color: rgba(255, 152, 0, 0.15);
+/* --- Botones de Acción (Revisión Final) --- */
+.btn-action {
+  background: none;
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
   padding: 0.8rem;
-  border-radius: 8px;
-  text-align: center;
-  margin-top: 1rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-size: 1.25rem;
+  width: 55px; height: 55px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 10px rgba(204, 0, 204, 0.3);
+}
+.btn-action.btn-edit-role:hover {
+  background: var(--color-primary);
+  color: var(--color-bg-deep);
+  box-shadow: 0 0 30px var(--color-primary);
+  transform: scale(1.35) rotate(15deg);
+}
+
+/* --- MODAL (Ajustes de coherencia) --- */
+.admin-modal-overlay {
+    position: fixed; inset: 0; z-index: 10000;
+    background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(10px);
+    display: flex; justify-content: center; align-items: center;
+}
+.admin-modal-content {
+  background: #181825;
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 60px rgba(204, 0, 204, 0.8);
+  border-radius: 16px;
+  width: 90%; max-width: 550px;
+}
+.admin-modal-header { background: rgba(204, 0, 204, 0.15); padding: 1.5rem; border-bottom: 1px solid var(--color-primary); display: flex; justify-content: space-between; align-items: center; }
+.admin-modal-header h3 { color: var(--color-primary); margin: 0; font-family: var(--font-tech); letter-spacing: 1px; }
+.modal-close-btn { background: none; border: none; color: #FFF; font-size: 1.8rem; cursor: pointer; transition: 0.3s; }
+.modal-close-btn:hover { color: var(--color-danger); transform: rotate(90deg); }
+
+.admin-modal-body { padding: 2.5rem; }
+.modal-target-info { font-size: 1.1rem; color: var(--color-text-light); margin-bottom: 2rem; font-family: var(--font-tech); }
+
+.form-group-modal label { display: block; font-weight: 700; color: #FFF; margin-bottom: 0.8rem; font-size: 1rem; }
+.form-group-modal select {
+    width: 100%; padding: 1rem; border-radius: 8px; background: rgba(0,0,0,0.5);
+    color: #FFF; border: 1px solid var(--color-primary); font-size: 1.05rem;
+    font-family: var(--font-tech);
+}
+.form-group-modal select:disabled { background: rgba(0,0,0,0.7); color: var(--color-text-light); }
+
+.admin-modal-footer {
+    padding: 1.5rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex; justify-content: flex-end; gap: 1rem;
+}
+.error-message-modal { color: var(--color-danger); font-size: 1rem; margin-right: auto; align-self: center; }
+
+.btn-primary { background: var(--color-primary); color: var(--color-bg-deep); font-family: var(--font-tech); padding: 1rem 2rem; border-radius: 8px; font-weight: 700; border: none; transition: 0.3s; }
+.btn-ghost { background: transparent; color: var(--color-text-light); border: 1px solid var(--color-text-light); font-family: var(--font-tech); padding: 1rem 2rem; border-radius: 8px; transition: 0.3s; }
+.btn-primary:hover { background: #FF3EFF; box-shadow: 0 0 20px #FF3EFF; }
+.btn-ghost:hover { border-color: var(--color-data); color: var(--color-data); }
+
+.warning-message {
+  font-size: 1rem; font-weight: 600; color: var(--color-warning); background-color: rgba(255, 214, 0, 0.2);
+  padding: 1rem; border-radius: 8px; text-align: center; margin-top: 1.5rem; border: 1px solid var(--color-warning);
+}
+
+/* --- ESTADOS DE CARGA/ERROR --- */
+.admin-page-loader { text-align: center; padding: 6rem; }
+.spin-icon { color: var(--color-primary); animation: spin 1s linear infinite; font-size: 4rem; text-shadow: var(--color-primary-glow); }
+.admin-page-error { color: var(--color-danger); }
+.admin-empty-state { text-align: center; padding: 4rem; border: 1px dashed var(--color-text-light); border-radius: 12px; }
+.admin-empty-state h3 { color: var(--color-text-light); }
+
+
+/* --- RESPONSIVE FIXES --- */
+@media (max-width: 900px) {
+    .admin-table-wrapper { min-width: 100%; }
+    .admin-table { min-width: 950px; } 
+    .admin-page-header h2 { font-size: 2.5rem; }
 }

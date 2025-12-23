@@ -1,123 +1,460 @@
-/* Enhanced and Styled CourseCard */
-.course-card.styled {
-  background-color: var(--color-white-frost); /* Fondo semi-transparente */
-  backdrop-filter: blur(8px);
-  border-radius: 12px; /* Bordes más redondeados */
-  overflow: hidden; /* Para que la imagen encaje */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+/* ---
+  Estilos para CourseCard.css (REDISEÑO: "Cyberpunk / Terminal")
+--- */
+
+:root {
+  /* ... tus variables ... */
+  --color-brand-blue: #1A52B8;
+  --color-accent-cyan: #4DFFFF;
+  --color-accent-blue: #6C9EFF;
+  --color-accent-magenta: #FF3EFF;
+  --color-accent-red: #E63946;
+  --color-bg-dark: #181818;
+  --color-bg-light: #2A2A2A;
+  --card-radius: 12px;
+  --font-display-pixel: '04b30', sans-serif;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E0E0E0;
+  --color-text-tertiary: #A0A0A0;
+  
+  /* 🚨 [MEJORA DE COLORES FINALES] 🚨 */
+  --color-status-pronto: #FF3EFF;   /* Rosado Neón (Pronto) */
+  --color-status-en-curso: #FEEA00; /* Amarillo Dorado (En Curso) */
+  --color-status-finalizado: #4DFFFF; /* Cian (Finalizado/Concluido) */
+  --color-status-error: #E63946;     /* Rojo (Error) */
+}
+
+.course-card {
+  position: relative; 
+  border-radius: var(--card-radius);
+  background: rgba(42, 42, 42, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.3); /* Borde sutil */
+  height: auto; 
+  overflow: hidden;
+  transition: all 0.3s ease; 
 }
-
-.course-card.styled:hover {
-  transform: translateY(-5px); /* Levantar al pasar el mouse */
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+.course-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 8px 25px rgba(0, 200, 255, 0.2), 
+              0 0 15px rgba(0, 200, 255, 0.15);
 }
-
-/* --- Imagen de la Tarjeta --- */
-.course-card-image {
-  height: 180px; /* Altura fija para la imagen */
-  background-color: #eee; /* Placeholder */
-  position: relative; /* Para el precio superpuesto */
-  background-size: cover;
-  background-position: center;
-  /* Estilo para la imagen real: */
-  /* background-image: url('/path/to/default-image.jpg'); */
-  display: flex; /* Placeholder */
-  align-items: center; /* Placeholder */
-  justify-content: center; /* Placeholder */
-  color: #aaa; /* Placeholder */
-}
-/* .course-card-image img { width: 100%; height: 100%; object-fit: cover; } */
-
-.price-overlay {
+.course-card::before {
+  content: "";
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: rgba(138, 99, 210, 0.9); /* Morado semi-transparente */
-  color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  font-weight: bold;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%; height: 100%;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 255, 255, 0.02),
+    rgba(0, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 1; 
+  opacity: 0.4;
+  border-radius: var(--card-radius);
+  transition: opacity 0.3s ease;
+}
+.course-card:hover::before {
+  opacity: 0.8; 
 }
 
-/* --- Contenido de la Tarjeta --- */
-.course-card-content.styled {
-  padding: 1rem 1.2rem; /* Más padding */
+
+/* --- Imagen y Precio --- */
+.course-image-container {
+  position: relative;
+  z-index: 2; 
+  height: 220px;
+  width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.course-image-link {
+  display: block;
+  height: 100%;
+}
+.course-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.course-card:hover .course-image {
+  transform: scale(1.08); 
+}
+.course-price {
+  position: absolute;
+  top: 1rem; right: 1rem;
+  background: var(--color-accent-magenta);
+  color: var(--color-text-primary);
+  padding: 0.5rem 1rem; border-radius: 8px;
+  font-family: var(--font-display-pixel);
+  font-size: 1.1rem; letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 0 10px var(--color-accent-magenta);
+  z-index: 2; border: 1px solid rgba(255,255,255,0.5);
+  transition: all 0.3s ease;
+}
+.course-price.sold-out {
+  background: var(--color-accent-red);
+  box-shadow: 0 0 10px var(--color-accent-red);
+}
+.course-card:hover .course-price {
+  animation: glitch-lite 0.5s infinite alternate;
+}
+@keyframes glitch-lite {
+  0% { 
+    transform: translate(0, 0); 
+    text-shadow: 0 0 5px var(--color-accent-magenta);
+  }
+  50% { 
+    transform: translate(-1px, 1px); 
+    text-shadow: 1px 0 5px var(--color-accent-magenta), -1px 0 5px var(--color-accent-cyan);
+  }
+  100% { 
+    transform: translate(1px, -1px);
+    text-shadow: -1px 0 5px var(--color-accent-magenta), 1px 0 5px var(--color-accent-cyan);
+  }
+}
+
+
+/* --- Contenido de Información --- */
+.course-info {
+  position: relative;
+  z-index: 2; 
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Para que ocupe el espacio restante */
+  flex-grow: 1; 
+  height: 100%;
+}
+.course-info::before,
+.course-info::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  pointer-events: none; 
+}
+.course-info::before {
+  top: 0.8rem;
+  left: 0.8rem;
+  border-top: 2px solid var(--color-accent-cyan);
+  border-left: 2px solid var(--color-accent-cyan);
+}
+.course-info::after {
+  bottom: 0.8rem;
+  right: 0.8rem;
+  border-bottom: 2px solid var(--color-accent-cyan);
+  border-right: 2px solid var(--color-accent-cyan);
+}
+.course-card:hover .course-info::before,
+.course-card:hover .course-info::after {
+  opacity: 1;
+  width: 28px; 
+  height: 28px;
 }
 
-.course-card-category { /* Estilo opcional para categoría */
-  font-size: 0.8rem;
-  color: var(--color-primary);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+
+.course-category-tag {
+  color: var(--color-accent-cyan);
+  font-size: 0.9rem; font-weight: 600;
+  display: flex; align-items: center;
+  gap: 0.5rem; margin-bottom: 0.8rem;
   text-transform: uppercase;
 }
-
-.course-card-title.styled {
-  font-family: var(--font-heading);
-  font-size: 1.15rem; /* Ligeramente más grande */
-  font-weight: 600;
-  color: var(--color-text-dark);
-  margin: 0 0 0.6rem 0;
-  line-height: 1.3;
-  /* Limitar a 2 líneas (opcional) */
-  /* display: -webkit-box;
+.course-title {
+  font-family: var(--font-display-pixel) !important; 
+  font-size: 1.5rem; letter-spacing: 1px;
+  color: var(--color-text-primary);
+  line-height: 1.4; margin: 0 0 1rem 0;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  text-overflow: ellipsis; min-height: calc(1.5rem * 1.4 * 2);
+  transition: text-shadow 0.2s ease;
+}
+.course-card:hover .course-title {
+  text-shadow: 0 0 5px var(--color-accent-cyan);
+}
+.course-title a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+.course-card:hover .course-title a {
+  color: var(--color-accent-cyan);
+}
+.course-teacher {
+  display: flex; align-items: center;
+  gap: 0.6rem; font-size: 0.95rem;
+  color: var(--color-text-tertiary);
+  margin-bottom: 1.5rem; 
+}
+.icon-docente {
+  color: var(--color-accent-blue);
+}
+.course-description {
+  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+  padding-bottom: 1.5rem; 
+  display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
-  overflow: hidden; */
-}
-.course-card-title.styled a {
-    color: inherit; /* Hereda color */
-    text-decoration: none;
-}
-.course-card-title.styled a:hover {
-    color: var(--color-primary); /* Cambia a morado al pasar el mouse */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: calc(0.95rem * 1.6 * 2); 
 }
 
-.course-card-teacher-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--color-text-medium);
-  margin-bottom: 0.8rem;
+/* --- Barra de Nivel "Videojuego" --- */
+.course-level-bar {
+  margin-bottom: 1.5rem;
+  margin-top: auto; 
+  padding-top: 1rem;
 }
-.teacher-icon {
-    color: var(--color-accent-blue); /* Icono azul */
+.level-bar-label {
+  display: flex; align-items: center;
+  gap: 0.5rem; font-size: 0.9rem;
+  font-weight: 600; color: var(--color-text-secondary);
+  margin-bottom: 0.5rem; text-transform: capitalize;
+}
+.level-bar-label .meta-icon {
+  color: var(--color-accent-cyan);
+}
+.level-bar-container {
+  display: flex; gap: 3px;
+  height: 10px; background: var(--color-bg-dark);
+  border-radius: 4px; padding: 3px;
+  border: 1px solid #444;
+}
+.level-segment {
+  flex: 1; border-radius: 2px;
+  background: #333; 
+  transition: all 0.3s ease;
+}
+.level-segment.active {
+  background: var(--color-accent-cyan);
+  box-shadow: 0 0 8px var(--color-accent-cyan), 0 0 4px var(--color-accent-cyan) inset;
 }
 
-/* --- Meta Info (Modalidad, etc.) --- */
-.course-card-meta {
+/* --- CTA de Horarios (Botón) (Sin cambios) --- */
+.course-horarios-cta {
+  background: none; border: none;
+  padding: 0; margin: 0;
+  font-family: inherit;
   display: flex;
-  justify-content: space-between; /* Espacia los elementos */
+  justify-content: space-between;
   align-items: center;
-  margin-top: auto; /* Empuja al final de la tarjeta */
-  padding-top: 0.8rem;
-  border-top: 1px solid #eee; /* Separador sutil */
-  font-size: 0.85rem;
-  color: var(--color-text-medium);
+  border-top: 1px solid #444;
+  padding-top: 1rem;
+  margin-top: 1rem; 
+  flex-shrink: 0; 
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-
-.meta-item.styled {
-  display: flex;
-  align-items: center;
+.course-horarios-cta:disabled { cursor: not-allowed; opacity: 0.5; }
+.course-horarios-cta:not(:disabled):hover .horarios-cta-link {
+  color: var(--color-text-primary);
+  text-shadow: 0 0 8px var(--color-accent-cyan);
+  gap: 0.6rem;
+}
+.horarios-cta-text {
+  display: flex; align-items: center;
+  gap: 0.6rem; font-size: 1rem;
+  font-weight: 600; color: var(--color-text-primary);
+}
+.horarios-cta-text .meta-icon { color: var(--color-accent-cyan); }
+.horarios-cta-link {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--color-accent-cyan);
+  text-decoration: none;
+  display: flex; align-items: center;
   gap: 0.4rem;
-}
-.meta-icon {
-  color: var(--color-primary); /* Iconos morados */
+  transition: all 0.3s ease;
 }
 
-/* Estrellas pequeñas (opcional) */
-.star-rating-display-small { color: #ffc107; font-size: 0.9rem; }
-.star-rating-display-small .stars { letter-spacing: 0.5px; }
+/* --- Panel Expandible y Sub-lista de Horarios (Sin cambios) --- */
+.course-horarios-expanded {
+  position: relative; 
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.4); 
+  backdrop-filter: blur(2px);
+  margin: 0 -1.5rem -1.5rem -1.5rem; 
+  padding: 1.5rem; 
+  border-top: 1px solid var(--color-accent-cyan);
+  animation: slideDown 0.3s ease-out;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5) inset;
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.horarios-loader { /* (Sin cambios) */ }
+.horarios-error { /* (Sin cambios) */ }
+.horario-sublist-container {
+  list-style: none;
+  padding: 0; margin: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+.horario-sublist-container::-webkit-scrollbar { width: 8px; }
+.horario-sublist-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+}
+.horario-sublist-container::-webkit-scrollbar-thumb {
+  background-color: var(--color-accent-cyan);
+  border-radius: 10px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px var(--color-accent-cyan);
+}
+
+/* --- Tabla de Horarios --- */
+.horario-table {
+  width: 100%;
+  border-collapse: collapse; 
+  table-layout: fixed; 
+}
+.horario-table th {
+  font-family: var(--font-display-pixel); 
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  color: var(--color-accent-cyan); 
+  text-transform: uppercase;
+  text-align: left;
+  padding: 0 0.8rem 1rem 0.8rem; /* Padding ajustado para cabecera */
+  border-bottom: 2px solid var(--color-accent-cyan);
+  box-shadow: 0 2px 8px rgba(0,255,255,0.2); 
+}
+/* 🚨 [MEJORADO] Anchos y Alineación 🚨 */
+.horario-table th:nth-child(1) { width: 45%; text-align: left; } /* Horario (más espacio) */
+.horario-table th:nth-child(2) { width: 15%; text-align: center;} /* Inicia */
+.horario-table th:nth-child(3) { width: 20%; text-align: center; } /* Precio */
+.horario-table th:nth-child(4) { width: 20%; text-align: center; } /* Estado */
 
 
-/* Botón opcional dentro de la tarjeta */
-/* .btn-card-details { padding: 8px 15px; font-size: 0.9rem; margin-top: 1rem; } */
+/* Fila de la Tabla Clicable */
+.horario-row {
+  cursor: pointer;
+  background: var(--color-bg-dark); 
+  border-bottom: 1px solid #444; 
+  box-shadow: inset 3px 0 0 0 transparent;
+  transition: all 0.2s ease;
+}
+.horario-row:hover {
+  background: var(--color-bg-light); 
+  border-color: var(--color-accent-cyan);
+  box-shadow: inset 3px 0 0 0 var(--color-accent-magenta); /* Sombra magenta de hover */
+}
+
+/* 🚨 [CORREGIDO] Celdas y Texto 🚨 */
+.horario-table td {
+  padding: 1.25rem 0.8rem; 
+  vertical-align: middle;
+  text-align: left;
+  color: var(--color-text-secondary); 
+  white-space: normal; /* Permite que el texto salte de línea */
+}
+
+/* Celda 1: Horario */
+.cell-horario {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+/* 🚨 [CORRECCIÓN CLAVE]: Se fuerza la fuente pixel con !important aquí también 🚨 */
+.cell-pixel-main { 
+  font-family: var(--font-display-pixel) !important;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  letter-spacing: 0.5px;
+  text-transform: capitalize;
+}
+
+.cell-neon { 
+  font-weight: 700;
+  color: var(--color-accent-cyan);
+}
+
+/* Celda 2: Inicia */
+.cell-subtle { 
+  font-size: 0.9rem;
+  color: var(--color-text-tertiary);
+  text-align: center; /* [MEJORADO] Alineación */
+  white-space: nowrap; /* Mantenemos la fecha en una línea */
+}
+
+/* Celda 3: Precio */
+.cell-price {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+/* Celda 4: Píldoras de Estado */
+.cell-status {
+  text-align: center;
+  white-space: nowrap; 
+}
+.cell-status > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 99px; 
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+  /* El color de fondo se define por la variable de estado */
+}
+.cell-status > span svg { 
+  font-size: 0.9em; 
+  filter: drop-shadow(0 0 3px currentColor);
+  flex-shrink: 0; 
+}
+
+/* 🚨 [MEJORADO] Colores de estado usan la nueva paleta (fondo vivo/texto oscuro) */
+.cell-status.status-pronto > span {
+  background: var(--color-status-pronto); /* Magenta Neón */
+  color: var(--color-bg-dark); /* Texto oscuro para contraste */
+  box-shadow: 0 0 8px var(--color-status-pronto);
+}
+.cell-status.status-en-curso > span {
+  background: var(--color-status-en-curso); /* Amarillo Neón */
+  color: var(--color-text-primary); /* Texto blanco para contraste */
+  box-shadow: 0 0 8px var(--color-status-en-curso);
+}
+.cell-status.status-finalizado > span {
+  background: var(--color-status-finalizado); /* Cian Neón */
+  color: var(--color-bg-dark); /* Texto oscuro para contraste */
+  box-shadow: 0 0 8px var(--color-status-finalizado);
+}
+.cell-status.status-error > span {
+  background: var(--color-status-error);
+  color: var(--color-text-primary);
+  box-shadow: 0 0 8px var(--color-status-error);
+}
+
+
+.horario-item-none {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+  font-family: var(--font-display-pixel);
+  letter-spacing: 1px;
+}

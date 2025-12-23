@@ -1,165 +1,373 @@
-/* Enhanced and Styled PaymentUploadPage */
-.payment-upload-page.styled {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start; /* Evita que se centre verticalmente */
-  padding: var(--spacing-xl) var(--spacing-md);
-  /* background: linear-gradient(to bottom right, #a0e7e5, #c4e1f7); /* Gradiente de fondo */
-  min-height: calc(100vh - 100px); /* Ajusta según tu header/footer */
+/* =================================================================
+   ARCHIVO: PaymentUploadPage.css
+   DISEÑO: SECURE DATA TERMINAL (ULTRA HIGH-FIDELITY)
+   ESTILO: Basado en CourseDetailPage & MisInscripcionesPage
+   PREFIX: pay-
+   ================================================================= */
+
+:root {
+    /* --- ENERGÍA Y NEÓN (Sincronizada) --- */
+    --pay-neon-cyan: #4DFFFF;       /* Acentos principales */
+    --pay-neon-blue: #4B87FF;       /* Botones e interfaz */
+    --pay-neon-crimson: #E63946;    /* Error / Cancelar */
+    --pay-neon-green: #05FF00;      /* Éxito / Validado */
+    --pay-neon-yellow: #FEEA00;     /* Pendiente */
+    --pay-neon-magenta: #FF3EFF;    /* Detalles */
+
+    /* --- SUPERFICIES --- */
+    --pay-bg-deep: #050508;         /* Fondo Negro Profundo */
+    --pay-bg-panel: rgba(20, 20, 30, 0.95); /* Panel Mate */
+    --pay-bg-slot: rgba(255, 255, 255, 0.03); /* Ranuras */
+    
+    /* --- EFECTOS --- */
+    --pay-border-dim: rgba(255, 255, 255, 0.15);
+    --pay-shadow-deep: 0 30px 60px rgba(0, 0, 0, 0.8);
+    --pay-glow-cyan: 0 0 20px rgba(77, 255, 255, 0.4);
+    
+    /* --- FUENTES --- */
+    --pay-font-tech: '04b30', 'Consolas', monospace; /* Títulos y Números */
+    --pay-font-ui: 'Poppins', sans-serif; /* Textos */
+    --pay-radius: 12px;
 }
 
-.upload-container.styled {
-  background-color: var(--color-white-frost);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border-light);
-  padding: var(--spacing-xl) var(--spacing-xxl);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 550px; /* Ancho ajustado */
-  text-align: center;
-  transition: transform 0.3s ease; /* Transición suave */
-}
-.upload-container.styled.dragging { /* Efecto visual al arrastrar */
-    transform: scale(1.02);
-    box-shadow: 0 12px 30px rgba(106, 130, 251, 0.4);
+/* =========================================
+   1. ENTORNO Y FONDO (GRID SYSTEM)
+   ========================================= */
+
+.payment-page-layout {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    position: relative;
+    overflow-x: hidden;
+    background-color: var(--pay-bg-deep);
+    
+    /* Fondo idéntico a MisInscripcionesPage */
+    background: 
+        radial-gradient(ellipse at 20% 20%, rgba(26, 82, 184, 0.15) 0%, transparent 40%),
+        radial-gradient(ellipse at 80% 80%, rgba(75, 0, 75, 0.15) 0%, transparent 40%),
+        linear-gradient(135deg, #0A0A12 0%, #0F0F18 100%);
 }
 
-.upload-container h2 {
-  margin: 0 0 var(--spacing-md) 0;
-  color: var(--color-primary);
-  font-size: 1.8rem;
-  font-family: var(--font-heading);
+/* Grid Overlay Técnico */
+.payment-page-layout::before {
+    content: "";
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.4;
+    z-index: 0;
+    pointer-events: none;
 }
 
-.upload-container p {
-  color: var(--color-text-medium);
-  margin-bottom: var(--spacing-lg);
-  font-size: 1rem;
-  line-height: 1.5;
+/* Scanlines CRT */
+.payment-page-layout::after {
+    content: "";
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(77, 255, 255, 0.02) 0px,
+        rgba(77, 255, 255, 0.02) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none; 
+    z-index: 1;
+    opacity: 0.3;
 }
 
-/* Estilos para Mensajes de Error/Éxito */
-.message {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--spacing-lg);
-    font-size: 0.95rem;
-    font-weight: 500;
+/* =========================================
+   2. LA TERMINAL (PANEL PRINCIPAL)
+   ========================================= */
+
+.pay-terminal-panel {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 550px;
+    background: var(--pay-bg-panel);
+    backdrop-filter: blur(15px);
+    border: 1px solid var(--pay-border-dim);
+    border-radius: var(--pay-radius);
+    box-shadow: var(--pay-shadow-deep);
+    
+    /* Borde Superior Neón (Como en CourseDetailPage) */
+    border-top: 3px solid var(--pay-neon-cyan);
+    
+    /* Animación de Entrada */
+    animation: terminalBoot 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    overflow: hidden;
+}
+
+/* Decoración estilo HUD en esquina */
+.pay-terminal-panel::after {
+    content: '';
+    position: absolute; top: 0; right: 2rem;
+    width: 80px; height: 3px;
+    background: var(--pay-neon-blue);
+    box-shadow: 0 0 15px var(--pay-neon-blue);
+}
+
+@keyframes terminalBoot {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   3. ENCABEZADO TÉCNICO
+   ========================================= */
+
+.pay-header {
+    padding: 2.5rem 2rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    text-align: left;
-}
-.message.error {
-    color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb;
-}
-.message.success {
-    color: #155724; background-color: #d4edda; border: 1px solid #c3e6cb;
+    gap: 1.5rem;
+    background: linear-gradient(to bottom, rgba(77, 255, 255, 0.02), transparent);
 }
 
-
-.upload-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-lg);
+.pay-header-icon-box {
+    width: 60px; height: 60px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid var(--pay-neon-cyan);
+    background: rgba(77, 255, 255, 0.05);
+    font-size: 2rem;
+    color: var(--pay-neon-cyan);
+    box-shadow: 0 0 15px rgba(77, 255, 255, 0.1) inset;
+    border-radius: 8px;
 }
 
-/* Zona de Arrastrar y Soltar */
-.file-drop-zone {
-  border: 2px dashed var(--color-accent-blue);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl) var(--spacing-lg);
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 150px; /* Altura mínima */
-  text-align: center;
-}
-.file-drop-zone:hover {
-    background-color: rgba(106, 130, 251, 0.05); /* Fondo azul muy claro al pasar */
-}
-.file-drop-zone.dragging { /* Estilo cuando se arrastra sobre ella */
-    background-color: rgba(106, 130, 251, 0.1);
-    border-color: var(--color-primary);
+.pay-title-group h2 {
+    font-family: var(--pay-font-tech);
+    font-size: 1.8rem;
+    color: var(--pay-text-primary);
+    margin: 0;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(77, 255, 255, 0.3);
+    line-height: 1.1;
 }
 
-.drop-icon {
-    font-size: 2.5rem;
-    color: var(--color-accent-blue);
-    margin-bottom: var(--spacing-md);
+.pay-id-label {
+    font-size: 0.75rem;
+    color: var(--pay-text-secondary);
+    margin-right: 0.5rem;
+    letter-spacing: 1px;
 }
 
-.file-label.styled {
-  font-weight: 600;
-  color: var(--color-primary); /* Morado */
-  cursor: pointer;
-  font-size: 1rem;
-}
-.file-label.styled:hover {
-    text-decoration: underline;
+.pay-id-badge {
+    font-family: var(--pay-font-tech);
+    font-size: 1rem;
+    color: var(--pay-neon-blue);
+    font-weight: 700;
 }
 
-.pdf-info { /* Mensaje para PDF seleccionado */
-    margin-top: var(--spacing-sm);
-    font-size: 0.9rem;
-    color: var(--color-text-medium);
-    font-style: italic;
+/* =========================================
+   4. CONTENIDO INTERNO
+   ========================================= */
+
+.pay-content {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
-/* Vista Previa */
-.image-preview.styled {
-  margin-top: 0; /* Ya hay gap en el form */
-  max-height: 250px;
-  overflow: hidden;
-  display: flex;
-  justify-content: center;
-  border: 1px solid #eee;
-  border-radius: var(--radius-md);
-  background-color: var(--color-bg-light);
-}
-.image-preview img {
-  max-width: 100%;
-  max-height: 250px;
-  object-fit: contain;
+/* --- ESTADO VISUAL (ESTILO CAJA DE ESTADO DE LA IMAGEN) --- */
+.pay-status-hologram {
+    text-align: center;
+    padding: 2rem;
+    background: var(--pay-bg-slot);
+    border: 1px dashed var(--pay-border-dim);
+    border-radius: 8px;
+    position: relative;
+    /* Imitando la caja "ESTADO: PENDIENTE PAGO" */
 }
 
-/* Botón y Spinner */
-.upload-form .btn {
-  margin-top: var(--spacing-xs);
-  display: flex; /* Para alinear icono spinner */
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-sm);
+/* Iconografía Gigante */
+.pay-status-icon {
+    font-size: 3rem; margin-bottom: 1rem;
+    display: inline-block;
 }
 
-.spinner { /* Animación de carga */
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.disabled-like { /* Clase visual para botones deshabilitados */
-    background-color: #e9ecef !important; /* Forzar gris */
-    color: #adb5bd !important;
-    cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
+/* Variantes de Estado */
+.status-pending { border-color: var(--pay-neon-yellow); background: rgba(254, 234, 0, 0.03); }
+.status-pending .pay-status-icon { color: var(--pay-neon-yellow); filter: drop-shadow(0 0 10px var(--pay-neon-yellow)); }
+.status-pending h3 { 
+    color: var(--pay-neon-yellow); 
+    font-family: var(--pay-font-tech); 
+    letter-spacing: 1px; margin: 0; 
+    text-transform: uppercase;
+    font-size: 1.2rem;
 }
 
-.back-link.styled {
-    margin-top: var(--spacing-xl);
-    font-size: 0.9rem;
+.status-approved { border-color: var(--pay-neon-green); background: rgba(5, 255, 0, 0.03); }
+.status-approved .pay-status-icon { color: var(--pay-neon-green); filter: drop-shadow(0 0 15px var(--pay-neon-green)); }
+.status-approved h3 { 
+    color: var(--pay-neon-green); 
+    font-family: var(--pay-font-tech); 
+    letter-spacing: 1px; margin: 0; 
+    text-transform: uppercase;
+    font-size: 1.2rem;
 }
-.back-link a {
-    color: var(--color-text-medium);
-    font-weight: 500;
+
+.status-text { color: var(--pay-text-secondary); font-size: 0.9rem; margin-top: 0.5rem; line-height: 1.5; }
+
+/* Acciones secundarias (Ver/Editar) */
+.pay-hologram-actions {
+    margin-top: 1.5rem;
+    display: flex; gap: 1rem; justify-content: center;
 }
-.back-link a:hover {
-    color: var(--color-primary);
+
+/* --- ZONA DE CARGA (DROPZONE) --- */
+.pay-dropzone {
+    border: 2px dashed var(--pay-border-dim);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 200px;
+    border-radius: 8px;
+}
+
+.pay-dropzone:hover, .pay-dropzone.dragging {
+    border-color: var(--pay-neon-cyan);
+    background: rgba(77, 255, 255, 0.05);
+    box-shadow: inset 0 0 20px rgba(77, 255, 255, 0.1);
+}
+
+.pay-upload-icon {
+    font-size: 2.5rem; color: var(--pay-text-secondary); margin-bottom: 1rem; transition: 0.3s;
+}
+.pay-dropzone:hover .pay-upload-icon { color: var(--pay-neon-cyan); transform: translateY(-5px); filter: drop-shadow(0 0 8px var(--pay-neon-cyan)); }
+
+.pay-label-main { 
+    font-family: var(--pay-font-tech); color: var(--pay-text-primary); font-size: 1rem; display: block; margin-bottom: 0.5rem; 
+}
+.pay-label-sub { 
+    color: var(--pay-text-secondary); font-size: 0.85rem; 
+}
+.pay-label-meta {
+    margin-top: 1rem; 
+    font-family: var(--pay-font-tech); 
+    color: var(--pay-neon-blue); 
+    font-size: 0.7rem; 
+    border: 1px solid var(--pay-neon-blue); 
+    padding: 4px 8px;
+    background: rgba(75, 135, 255, 0.1);
+    border-radius: 4px;
+}
+
+/* Archivo Seleccionado */
+.pay-dropzone.has-file {
+    border-style: solid; border-color: var(--pay-neon-green); background: rgba(5, 255, 0, 0.03);
+}
+.pay-file-preview { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.pay-filename { font-family: var(--pay-font-tech); color: var(--pay-text-primary); font-size: 0.9rem; word-break: break-all; }
+.pay-filesize { color: var(--pay-neon-green); font-size: 0.8rem; font-family: var(--pay-font-tech); }
+
+/* Preview Imagen */
+.pay-img-preview {
+    margin-top: 1rem; border: 1px solid var(--pay-border-dim); background: #000; padding: 5px; border-radius: 6px;
+}
+.pay-img-preview img { max-height: 180px; width: auto; display: block; margin: 0 auto; }
+
+/* =========================================
+   5. BOTONES (ESTILO COURSE DETAIL & IMAGEN)
+   ========================================= */
+
+.pay-actions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+/* Botón Base */
+.pay-btn {
+    display: flex; align-items: center; justify-content: center; gap: 0.8rem;
+    width: 100%; padding: 1.2rem;
+    font-family: var(--pay-font-tech); font-size: 1rem; letter-spacing: 1px; text-transform: uppercase;
+    border: none; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+    border-radius: 6px;
+    font-weight: 700;
+}
+
+/* Botón Primario (AZUL DEGRADADO - Como en la imagen) */
+.pay-btn-primary {
+    background: linear-gradient(135deg, var(--pay-neon-blue), #2b5cb8);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(75, 135, 255, 0.4);
+}
+.pay-btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(75, 135, 255, 0.6);
+    filter: brightness(1.1);
+}
+.pay-btn-primary:disabled { background: #222; color: #555; box-shadow: none; cursor: not-allowed; }
+
+/* Botón Secundario (Outline Cyan) */
+.pay-btn-secondary {
+    background: transparent; border: 1px solid var(--pay-neon-cyan); color: var(--pay-neon-cyan);
+    padding: 0.8rem; font-size: 0.8rem; width: auto;
+}
+.pay-btn-secondary:hover { background: rgba(77, 255, 255, 0.1); box-shadow: 0 0 10px rgba(77, 255, 255, 0.2); }
+
+/* Botón Destructivo (ROJO OUTLINE - Como en la imagen) */
+.pay-btn-danger {
+    background: rgba(230, 57, 70, 0.05); 
+    border: 1px solid var(--pay-neon-crimson); 
+    color: var(--pay-neon-crimson);
+}
+.pay-btn-danger:hover:not(:disabled) { 
+    background: rgba(230, 57, 70, 0.15); 
+    box-shadow: 0 0 20px rgba(230, 57, 70, 0.4); 
+    color: #fff;
+}
+
+/* Botón Texto */
+.pay-btn-text { background: none; color: var(--pay-text-secondary); font-size: 0.8rem; text-decoration: underline; padding: 0.5rem; cursor: pointer; border: none; }
+.pay-btn-text:hover { color: var(--pay-neon-cyan); }
+
+/* =========================================
+   6. FOOTER Y ALERTAS
+   ========================================= */
+
+.pay-footer {
+    padding: 1.5rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.2);
+}
+.pay-back-link {
+    color: var(--pay-text-secondary); font-family: var(--pay-font-tech); font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 0.6rem; transition: 0.3s;
+}
+.pay-back-link:hover { color: var(--pay-neon-cyan); letter-spacing: 1px; }
+
+/* Alertas */
+.pay-alert {
+    padding: 1rem; border-radius: 6px; display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; margin-bottom: 1rem; font-family: var(--pay-font-ui);
+}
+.pay-alert.success { background: rgba(5, 255, 0, 0.1); border-left: 3px solid var(--pay-neon-green); color: #ccffcc; }
+.pay-alert.error { background: rgba(230, 57, 70, 0.1); border-left: 3px solid var(--pay-neon-crimson); color: #ff8fa3; }
+
+/* Spinner Page */
+.pay-loader { text-align: center; padding: 4rem; color: var(--pay-neon-cyan); }
+.pay-loader svg { font-size: 3rem; margin-bottom: 1rem; filter: drop-shadow(0 0 10px var(--pay-neon-cyan)); }
+.pay-loader p { font-family: var(--pay-font-tech); letter-spacing: 2px; animation: blink 1.5s infinite; }
+@keyframes blink { 50% { opacity: 0.5; } }
+
+/* Animaciones */
+.fa-spin-slow { animation: paySpin 3s infinite linear; }
+@keyframes paySpin { to { transform: rotate(360deg); } }
+
+/* Adaptabilidad */
+@media (max-width: 600px) {
+    .payment-page-layout { padding: 1rem; }
+    .pay-header { flex-direction: column; text-align: center; }
+    .pay-hologram-actions { flex-direction: column; }
+    .pay-btn-secondary { width: 100%; }
 }

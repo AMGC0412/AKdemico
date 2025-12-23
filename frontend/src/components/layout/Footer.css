@@ -1,43 +1,99 @@
 /* ---
-  Estilos para Footer (Footer.css) - REDISEÑO ART POP
-  [MEJORA] Añadidos iconos sociales y efectos hover refinados.
+  Estilos para Footer (Footer.css) - REDISEÑO ART POP (DARK MODE)
+  [CON ANIMACIONES]: Añade efectos de brillo y movimiento sutil.
 --- */
 
-/* --- [NUEVA] PALETA DE COLORES (Consistente con HomePage.css) --- */
 :root {
   --font-display-pixel: '04b30', sans-serif;
   --font-body-poppins: 'Poppins', sans-serif;
   
-  /* Colores VIBRANTES de la mascota */
-  --color-brand-blue: #1A52B8;
-  --color-brand-purple: #4B004B;
-  --color-brand-cyan: #00A6AD;
+  /* --- PALETA DE COLORES (FONDOS OSCURECIDOS Y OPACIDAD GARANTIZADA) --- */
   
-  /* Acentos BRILLANTES de la mascota */
-  --color-accent-magenta: #FF3EFF;
-  --color-accent-cyan: #4DFFFF;
-  --color-accent-blue: #6C9EFF;
+  --color-admin-solid-bg: #1F001F;      /* Púrpura muy oscuro (Opaco) */
+  --color-docente-solid-bg: #081A36;    /* Azul noche profundo (Opaco) */
+  --color-estudiante-solid-bg: #00191b; /* Turquesa profundo (Opaco) */
+  --color-public-solid-bg: #0A0A0A;     /* Negro casi puro (Opaco) */
+  
+  /* Acentos Brillantes (Se mantienen vivos para el contraste) */
+  --color-admin-accent: #962296;       /* Magenta */
+  --color-docente-accent: #6C9EFF;     /* Azul Claro */
+  --color-estudiante-accent: #4DFFFF;  /* Cian */
 
-  /* Colores Base Neutros */
+  /* Colores Base */
   --color-bg-dark: #181818;
-  --color-bg-light: #2A2A2A;
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #E0E0E0;
-  --color-text-tertiary: #A0A0A0;
-  
-  --card-radius: 12px;
+  --color-text-secondary: #B0B0B0;     /* Gris medio para mejor lectura sobre oscuro */
+  --color-text-tertiary: #707070;      /* Gris oscuro para elementos secundarios */
 }
+
+/* =========================================
+   ESTILOS Y ANIMACIONES KEYFRAMES
+   ========================================= */
+
+@keyframes subtle-pulse {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+    100% { filter: brightness(1); }
+}
+
+@keyframes neon-border-pulse {
+    0%, 100% { box-shadow: 0 0 10px rgba(255, 255, 255, 0); }
+    50% { box-shadow: 0 0 15px currentColor; }
+}
+
 
 /* --- Estilo Base del Footer --- */
 .footer-akademic {
   padding: 4rem 2rem 2rem 2rem;
-  background: var(--color-bg-dark); /* Fondo oscuro Art Pop */
-  border-top: 2px solid #333; /* Borde superior sutil */
   width: 100%;
   margin-top: auto;
   box-sizing: border-box;
+  
+  /* Transición suave de color */
+  transition: background-color 0.4s ease, border-top-color 0.4s ease;
+  
+  /* Borde superior sólido (el color lo define el rol) */
+  border-top: 4px solid transparent; 
+  
+  /* [MEJORA DE OPACIDAD] */
+  position: relative; 
+  z-index: 100;
 }
 
+/* --- [LÓGICA DE COLOR POR ROL] --- */
+
+/* 1. Público (Default) */
+.footer-role-public {
+    background-color: var(--color-public-solid-bg); 
+    border-top-color: #333; 
+}
+
+/* 2. Administrador */
+.footer-role-administrador {
+    background-color: var(--color-admin-solid-bg); 
+    border-top-color: var(--color-admin-accent); 
+    /* Añadir animación de borde sutil */
+    animation: neon-border-pulse 4s infinite alternate;
+}
+
+/* 3. Docente */
+.footer-role-docente {
+    background-color: var(--color-docente-solid-bg); 
+    border-top-color: var(--color-docente-accent); 
+    /* Añadir animación de borde sutil */
+    animation: neon-border-pulse 4s infinite alternate;
+}
+
+/* 4. Estudiante */
+.footer-role-estudiante {
+    background-color: var(--color-estudiante-solid-bg); 
+    border-top-color: var(--color-estudiante-accent); 
+    /* Añadir animación de borde sutil */
+    animation: neon-border-pulse 4s infinite alternate;
+}
+
+
+/* --- Contenido --- */
 .footer-content {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
@@ -47,11 +103,11 @@
   margin: 0 auto 3rem auto;
 }
 
-/* --- Columna de Marca (Logo y Sociales) --- */
+/* --- Columna de Marca (Sin cambios estáticos) --- */
 .footer-brand-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem; /* Espacio entre logo, texto y sociales */
+  gap: 1.5rem; 
 }
 
 .footer-logo-brand {
@@ -64,116 +120,129 @@
 .footer-logo-brand img {
   height: 40px; 
   width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .footer-logo-text {
-  font-family: var(--font-display-pixel); /* Fuente Pixel */
+  font-family: var(--font-display-pixel); 
   font-size: 1.8rem;
   letter-spacing: 1px;
-  color: var(--color-brand-blue); /* Azul Eléctrico */
+  color: var(--color-text-primary);
   line-height: 1;
   text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
 }
 
 .footer-brand-column p {
-  font-size: 1.05rem;
-  color: var(--color-text-tertiary);
+  font-size: 1rem;
+  color: var(--color-text-secondary); 
   margin: 0;
   line-height: 1.6;
+  opacity: 0.8;
 }
 
-/* --- [NUEVO] Iconos de Redes Sociales --- */
+/* --- Iconos Sociales (ANIMACIÓN DE HOVER) --- */
 .footer-social-icons {
   display: flex;
   align-items: center;
-  gap: 1.75rem; /* Más espacio entre iconos */
-  margin-top: 0.5rem; /* Espacio extra */
+  gap: 1.75rem; 
+  margin-top: 0.5rem; 
 }
 
 .footer-social-icons a {
-  color: var(--color-text-tertiary); /* Color sutil por defecto */
-  font-size: 1.5rem; /* Tamaño del icono */
+  color: var(--color-text-secondary); 
+  font-size: 1.5rem; 
   transition: all 0.3s ease;
 }
 
 .footer-social-icons a:hover {
-  color: var(--color-accent-cyan); /* Resalta en Cian Brillante */
-  transform: scale(1.1) translateY(-2px); /* Efecto Pop */
-  text-shadow: 0 0 10px var(--color-accent-cyan);
+  color: var(--color-text-primary); 
+  transform: scale(1.2) translateY(-3px); 
+  /* Brillo neón al hacer hover */
+  filter: drop-shadow(0 0 10px var(--color-accent-cyan)) brightness(1.1); 
+  animation: subtle-pulse 0.8s infinite alternate; /* Animación de pulsación */
 }
 
 
-/* --- Columnas de Enlaces --- */
+/* --- Columnas de Enlaces (ANIMACIÓN DE DESLIZAMIENTO) --- */
 .footer-links h4 {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--color-text-primary); /* Blanco */
+  color: var(--color-text-primary); 
   margin-bottom: 1.5rem;
   margin-top: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .footer-links a {
   display: block;
   text-decoration: none;
-  color: var(--color-text-secondary); /* Gris claro */
+  color: var(--color-text-secondary); 
   margin-bottom: 0.8rem;
   transition: all 0.3s ease;
   font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.7;
 }
 
-/* [MEJORA] Hover de enlace más limpio */
 .footer-links a:hover {
-  color: var(--color-accent-cyan); 
-  /* Eliminado transform: translateX(5px); */
+  color: var(--color-text-primary); 
+  opacity: 1;
+  /* Deslizamiento lateral */
+  transform: translateX(8px); 
 }
 
-/* --- [MEJORA] Enlace CTA "Enseña con Nosotros" --- */
+/* --- Enlace CTA "Enseña con Nosotros" (ANIMACIÓN DE HOVER) --- */
 .footer-cta-link {
-  color: var(--color-accent-cyan) !important; /* Cian Brillante por defecto */
-  font-weight: 700;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-  border-radius: 6px;
-  padding: 0.25rem 0.5rem; /* Lo hacemos parecer un "tag" */
-  margin-left: -0.5rem; /* Alinea el padding */
+  color: var(--color-text-primary) !important;
+  font-weight: 800 !important;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 0.5rem 1rem; 
+  display: inline-block;
+  text-align: center;
+  opacity: 1 !important; 
+  transition: all 0.3s ease; /* Asegurar la transición */
 }
 
 .footer-cta-link:hover {
-  color: var(--color-accent-magenta) !important; /* Magenta al pasar el ratón */
-  background-color: rgba(255, 62, 255, 0.1); /* Fondo magenta sutil */
-  border-color: var(--color-accent-magenta); /* Borde magenta */
-  transform: none; /* Resetea el transform de 'a:hover' */
-  box-shadow: 0 0 10px rgba(255, 62, 255, 0.5);
+  background: rgba(255,255,255,0.15);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transform: translateY(-2px) !important;
+  border-color: var(--color-text-primary);
+  /* Brillo sutil */
+  filter: brightness(1.1);
 }
 
 
-/* --- Barra Inferior (Copyright) --- */
+/* --- Barra Inferior --- */
 .footer-bottom {
   text-align: center;
   padding-top: 2rem;
-  border-top: 1px solid #333;
+  border-top: 1px solid rgb(255, 255, 255); 
   color: var(--color-text-tertiary);
-  font-size: 1rem;
+  font-size: 0.9rem;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* --- Enlace de Admin Secreto (Sutil) --- */
 .footer-admin-login {
-  margin-top: 0.5rem;
+  margin-top: 0.8rem;
 }
 
 .footer-admin-login a {
   color: var(--color-text-tertiary);
   text-decoration: none;
-  font-size: 0.9rem;
-  opacity: 0.5;
+  font-size: 0.85rem;
+  opacity: 0.4;
   transition: opacity 0.3s ease;
 }
 
 .footer-admin-login a:hover {
   opacity: 1;
-  color: var(--color-accent-blue);
+  color: var(--color-text-primary);
   text-decoration: underline;
 }
 

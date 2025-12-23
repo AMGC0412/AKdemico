@@ -1,26 +1,25 @@
 import React from 'react';
-// [ARREGLADO] Importamos 'Navigate' para la redirección del admin
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext'; 
 
 // --- Layouts Principales ---
 import Header from './components/layout/Header.jsx'; 
 import Footer from './components/layout/Footer.jsx';
 import AuthPageLayout from './pages/Auth/AuthPageLayout.jsx'; 
-import AdminLayout from './components/layout/AdminLayout.jsx'; // <-- El layout del Admin
+import AdminLayout from './components/layout/AdminLayout.jsx'; 
 
-// --- Admin ---
+// --- Admin Pages ---
 import AdminDashboardPage from './pages/Admin/AdminDashboardPage.jsx';
 import AdminVerificationPage from './pages/Admin/AdminVerificationPage.jsx';
 import AdminTaxonomiaPage from './pages/Admin/AdminTaxonomiaPage.jsx';
 import AdminUserManagementPage from './pages/Admin/AdminUserManagementPage.jsx';
 import AdminModeracionPage from './pages/Admin/AdminModeracionPage.jsx';
-
 import AdminTestCenterPage from './components/admin/testcenter/AdminTestCenterPage.jsx';
 
 // --- Guardias de Ruta (Seguridad) ---
 import RutaProtegida from './components/common/RutaProtegida.jsx';
 import RutaDocente from './components/common/RutaDocente.jsx';
-import RutaAdmin from './components/common/RutaAdmin.jsx'; // <-- El guardia del Admin
+import RutaAdmin from './components/common/RutaAdmin.jsx'; 
 
 // --- Páginas de Autenticación ---
 import LoginPage from './pages/Auth/LoginPage.jsx';
@@ -42,28 +41,38 @@ import CrearLotePage from './pages/Docente/CrearLotePage.jsx';
 import EditarPlanPage from './pages/Docente/EditarPlanPage.jsx';
 import EditarLotePage from './pages/Docente/EditarLotePage.jsx';
 import DocentePagosPage from './pages/Docente/DocentePagosPage.jsx';
-import DocenteHorariosPage from './pages/Docente/DocenteHorariosPage.jsx';
-import ProfilePage from './pages/Perfil/ProfilePage.jsx';
+import DocenteHorariosPage from './pages/Docente/DocenteCalendarPage.jsx';
 
-const PaginaMisInscripciones = () => {
-    return (
-        <div style={{ padding: '3rem', color: 'white' }}>
-            <h2>Mis Inscripciones (Pendiente)</h2>
-            <p>Aquí se mostrará una lista de los cursos a los que el estudiante se ha inscrito.</p>
-        </div>
-    );
+// --- Perfil y Estudiante ---
+import ProfilePage from './pages/Perfil/ProfilePage.jsx';
+import MisInscripcionesPage from './pages/Estudiante/MisInscripcionesPage.jsx';
+import CalendarioPage from './pages/Estudiante/CalendarioPage.jsx';
+
+/**
+ * Componente de Redirección de Perfil
+ * Redirige /perfil (sin ID) a /perfil/:userId (con el ID del usuario logueado)
+ */
+const MyProfileRedirect = () => {
+  const { usuario } = useAuth();
+  
+  if (!usuario || !usuario.id) {
+    return <Navigate to="/auth/login" replace />;
+  }
+  
+  // Redirige al perfil del usuario logueado
+  return <Navigate to={`/perfil/${usuario.id}`} replace />;
 };
 
-// --- Placeholders del Panel de Admin (para probar) ---
-const AdminDashboardPlaceholder = () => <h1 style={{color: 'white'}}>Dashboard Admin (Página Pendiente)</h1>;
-const AdminUsuariosPlaceholder = () => <h1 style={{color: 'white'}}>Gestión de Usuarios (Página Pendiente)</h1>;
-const AdminVerifPlaceholder = () => <h1 style={{color: 'white'}}>Cola de Verificación (Página Pendiente)</h1>;
-const AdminTaxonomiaPlaceholder = () => <h1 style={{color: 'white'}}>Gestión de Taxonomía (Página Pendiente)</h1>;
-const AdminModeracionPlaceholder = () => <h1 style={{color: 'white'}}>Panel de Moderación (Página Pendiente)</h1>;
-
+/**
+ * Componente para Estudiante progreso/seguimiento
+ * Puedes crear esta página o usar la que ya exista
+ */
+const EstudianteProgresoPage = () => {
+  // TODO: Implementar página de progreso del estudiante
+  return <div style={{ padding: '2rem', textAlign: 'center' }}>Página de Progreso en construcción</div>;
+};
 
 function App() {
-
   return (
     <Router>
       <Header />
@@ -71,55 +80,72 @@ function App() {
       <div className="app-container">
         <Routes>
           
-          {/* --- 1. Rutas Públicas --- */}
+          {/* =========================================
+              1. RUTAS PÚBLICAS
+             ========================================= */}
           <Route path="/" element={<HomePage />} />
-          
-          {/* [RUTA MOVIDA] Búsqueda y Detalle ahora son públicos */}
           <Route path="/buscar" element={<CourseSearchPage />} />
           <Route path="/cursos/:cursoId" element={<CourseDetailPage />} />
 
-
-          {/* --- 2. Flujo de Autenticación (Público) --- */}
+          
+          {/* =========================================
+              2. FLUJO DE AUTENTICACIÓN (PÚBLICO)
+             ========================================= */}
           <Route path="/auth" element={<AuthPageLayout />}>
             <Route path="login" element={<LoginPage />} />
-            <Route path="registro-estudiante" element={<RegisterPage mode="estudiante" />} />
-            <Route path="registro-docente" element={<RegisterPage mode="docente" />} />
+            {/* Registro Unificado - permite elegir rol (estudiante, docente o ambos) */}
+            <Route path="registro" element={<RegisterPage />} />
           </Route>
           
-          {/* --- 3. Ruta de Creación de Admin (Pública pero Secreta) --- */}
+          {/* Ruta de Creación de Admin (Secreta) */}
           <Route path="/registro-admin-secreto" element={<AdminRegisterPage />} />
           
           
-          {/* --- 4. Rutas Protegidas (Requieren Login) --- */}
+          {/* =========================================
+              3. RUTAS PROTEGIDAS (REQUIEREN LOGIN)
+             ========================================= */}
           <Route element={<RutaProtegida />}>
             
-            {/* a) Rutas para TODOS los usuarios logueados */}
-            {/* 'buscar' y 'cursos/:cursoId' se movieron a públicas */}
+            {/* --- a) Rutas Comunes (Todos los roles) --- */}
+            
+            {/* Subida de pagos */}
             <Route path="/subir-pago/:inscripcionId" element={<PaymentUploadPage />} />
-            <Route path="/perfil" element={<ProfilePage />} />
-            <Route path="/mis-inscripciones" element={<PaginaMisInscripciones />} />
+            
+            {/* Perfil de Usuario (Unificado) */}
+            <Route path="/perfil" element={<MyProfileRedirect />} />
+            <Route path="/perfil/:userId" element={<ProfilePage />} />
+            
+            {/* --- b) Rutas de ESTUDIANTE --- */}
+            <Route path="/estudiante/cursos" element={<MisInscripcionesPage />} />
+            <Route path="/estudiante/progreso" element={<EstudianteProgresoPage />} />
+            <Route path="/calendario" element={<CalendarioPage />} />
 
-            {/* b) Rutas anidadas solo para DOCENTES */}
+            {/* --- c) Rutas exclusivas para DOCENTES --- */}
             <Route element={<RutaDocente />}>
               <Route path="/docente/dashboard" element={<DocenteDashboardPage />} />
               <Route path="/docente/verificacion" element={<DocenteVerificacionPage />} />
-              <Route path="/docente/cursos" element={<MisCursosPage />} />
-              <Route path="/docente/planes/crear" element={<CrearPlanPage />} />
+              
+              {/* Gestión de Cursos y Planes */}
+              <Route path="/docente/mis-cursos" element={<MisCursosPage />} />
+              <Route path="/docente/cursos" element={<CrearPlanPage />} />
+              <Route path="/docente/planes/crear" element={<MisCursosPage />} />
               <Route path="/docente/lotes/crear" element={<CrearLotePage />} />  
               <Route path="/docente/planes/editar/:planId" element={<EditarPlanPage />} />          
               <Route path="/docente/lotes/editar/:loteId" element={<EditarLotePage />} />
+              
+              {/* Gestión Administrativa Docente */}
               <Route path="/docente/pagos" element={<DocentePagosPage />} />
               <Route path="/docente/horarios" element={<DocenteHorariosPage />} />
             </Route>
 
-            {/* c) Rutas anidadas solo para ADMINISTRADORES */}
+
+            {/* --- d) Rutas exclusivas para ADMINISTRADORES --- */}
             <Route element={<RutaAdmin />}>
               <Route path="/admin" element={<AdminLayout />}>
-                {/* La ruta 'index' redirige /admin a /admin/dashboard */}
                 <Route index element={<Navigate to="dashboard" replace />} />
-                
-                {/* Usamos los placeholders para probar */}
                 <Route path="dashboard" element={<AdminDashboardPage />} />
+                
+                {/* Herramientas de Administración */}
                 <Route path="usuarios" element={<AdminUserManagementPage />} />
                 <Route path="verificaciones" element={<AdminVerificationPage />} />
                 <Route path="taxonomia" element={<AdminTaxonomiaPage />} />
@@ -129,6 +155,11 @@ function App() {
             </Route>
             
           </Route> {/* Fin de RutaProtegida */}
+
+          {/* =========================================
+              4. RUTAS DE FALLBACK (404)
+             ========================================= */}
+          <Route path="*" element={<Navigate to="/" replace />} />
 
         </Routes>
       </div>

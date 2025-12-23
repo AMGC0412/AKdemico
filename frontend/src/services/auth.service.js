@@ -5,15 +5,14 @@ const API_URL = 'http://localhost:4000/api/v1/auth';
 
 /**
  * Llama al endpoint de Login del backend.
+ * @returns {Promise<object>} Token y datos del usuario.
  */
 export const login = async (correo, contrasena) => {
   try {
     const response = await axios.post(`${API_URL}/login`, {
-      correo: correo,
-      contrasena: contrasena,
+      correo,
+      contrasena,
     });
-    // Asumimos que el login devuelve { token, rol, nombre }
-    // para la redirección inteligente en LoginPage
     return response.data; 
   } catch (error) {
     console.error("Error en servicio de login:", error.response?.data || error.message);
@@ -22,57 +21,33 @@ export const login = async (correo, contrasena) => {
 };
 
 /**
- * Llama al endpoint de Registro (Estudiante) del backend.
+ * [NUEVA FUNCIÓN] Registro Unificado para AKdémico.
+ * Reemplaza las funciones individuales para permitir la selección de múltiples roles
+ * y el envío del campo ciudad según la nueva base de datos.
+ * @param {Object} userData - Objeto con { nombre, correo, contrasena, ciudad, roles: [] }.
  */
-export const registerEstudiante = async (nombre, correo, contrasena) => {
+export const registerUnified = async (userData) => {
     try {
-        // Esta función llama a la ruta /register
-        const response = await axios.post(`${API_URL}/register`, {
-            nombre,
-            correo,
-            contrasena
-        });
+        // Envía el objeto completo al endpoint /register
+        const response = await axios.post(`${API_URL}/register`, userData);
         return response.data; 
     } catch (error) {
-        console.error("Error en servicio de registro (estudiante):", error.response?.data || error.message);
-        throw error;
-    }
-};
-
-// --- [FUNCIÓN CORREGIDA] ---
-
-/**
- * Llama al endpoint de Registro (Docente) del backend.
- */
-export const registerDocente = async (nombre, correo, contrasena) => {
-    try {
-        // [CORREGIDO] Esta función ahora llama a la ruta /register-docente
-        const response = await axios.post(`${API_URL}/register-docente`, {
-            nombre,
-            correo,
-            contrasena
-            // Ya no necesitamos enviar 'rol: docente' en el body,
-            // porque la ruta del backend ya se encarga de eso.
-        });
-        return response.data; 
-    } catch (error) {
-        console.error("Error en servicio de registro (docente):", error.response?.data || error.message);
+        console.error("Error en servicio de registro unificado:", error.response?.data || error.message);
         throw error;
     }
 };
 
 /**
  * Llama al endpoint de Registro (Admin) del backend.
- * Envía la clave secreta para autorización.
+ * Se mantiene independiente por el uso de la clave secreta de seguridad.
  */
 export const registerAdmin = async (nombre, correo, contrasena, adminSecret) => {
     try {
-        // Llamará a una nueva ruta que crearemos en el backend
         const response = await axios.post(`${API_URL}/register-admin`, {
             nombre,
             correo,
             contrasena,
-            adminSecret // <-- Enviamos la clave secreta
+            adminSecret
         });
         return response.data; 
     } catch (error) {
@@ -80,3 +55,9 @@ export const registerAdmin = async (nombre, correo, contrasena, adminSecret) => 
         throw error;
     }
 };
+
+export const updateUserRoles = async (userId, nuevosRoles) => {
+  // nuevosRoles debe ser un Array enviado como { nuevosRoles: [...] }
+  const response = await api.put(`/usuarios/${userId}/roles`, { nuevosRoles }); 
+  return response.data;
+}

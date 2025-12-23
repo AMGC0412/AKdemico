@@ -1,129 +1,230 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// [MODIFICADO] Importamos ambas funciones de registro
-import { registerEstudiante, registerDocente } from '../../services/auth.service'; 
-// 'Link' ya no es necesario aquí
-// 'AuthPages.css' se sigue usando para los estilos del formulario en sí
+import { registerUnified } from '../../services/auth.service';
+import { FaUser, FaEnvelope, FaLock, FaMapMarkerAlt, FaArrowRight, FaCheckCircle } from 'react-icons/fa';
+import { FaUserGraduate, FaChalkboardUser } from 'react-icons/fa6';
+import './AuthForms.css';
 
-/**
- * [MODIFICADO] El componente ahora acepta un 'mode'
- * para diferenciar entre registro de estudiante y docente.
- * Se quita el layout principal (div.auth-page, div.auth-container)
- * y el h2, ya que ahora vive dentro de AuthPageLayout.
- */
-const RegisterPage = ({ mode = 'estudiante' }) => { // <-- Acepta 'mode'
-  const [nombre, setNombre] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [contrasena, setContrasena] = useState('');
-  const [confirmarContrasena, setConfirmarContrasena] = useState('');
+const RegisterPage = () => {
+  const [formData, setFormData] = useState({
+    nombre: '',
+    correo: '',
+    contrasena: '',
+    confirmarContrasena: '',
+    ciudad: '',
+    roles: { estudiante: true, docente: false }
+  });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
 
-  // --- Lógica Dinámica basada en el 'mode' ---
-  const esDocente = mode === 'docente';
-  const buttonText = esDocente ? 'Registrarme como Docente' : 'Crear Cuenta';
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [id]: value
+    }));
+  };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const handleRoleToggle = (role) => {
+    setFormData(prev => ({
+      ...prev,
+      roles: { ...prev.roles, [role]: !prev.roles[role] }
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError(null);
 
-    if (contrasena !== confirmarContrasena) {
-      setError('Las contraseñas no coinciden.');
-      return;
+    // Validaciones
+    if (formData.contrasena !== formData.confirmarContrasena) {
+      return setError('Las contraseñas no coinciden.');
+    }
+
+    if (formData.contrasena.length < 6) {
+      return setError('La contraseña debe tener al menos 6 caracteres.');
+    }
+
+    const rolesSeleccionados = Object.keys(formData.roles).filter(r => formData.roles[r]);
+    if (rolesSeleccionados.length === 0) {
+      return setError('Debes seleccionar al menos un rol.');
     }
 
     setLoading(true);
-
     try {
-      // --- [MODIFICADO] Lógica de registro dinámico ---
-      let data;
-      if (esDocente) {
-        // Llama a la función de registro de docente
-        data = await registerDocente(nombre, correo, contrasena);
-      } else {
-        // Llama a la función de registro de estudiante
-        data = await registerEstudiante(nombre, correo, contrasena);
-      }
-      
-      console.log('Registro exitoso:', data);
-      setLoading(false);
-      
-      // Redirige al usuario a la página de Login después del registro
-      // La pestaña de Login ya estará visible en el layout
-      navigate('/auth/login'); 
-
+      await registerUnified({
+        nombre: formData.nombre,
+        correo: formData.correo,
+        contrasena: formData.contrasena,
+        ciudad: formData.ciudad,
+        roles: rolesSeleccionados
+      });
+      navigate('/auth/login');
     } catch (err) {
+      setError(err.response?.data?.mensaje || 'Error al crear la cuenta. Intenta de nuevo.');
+    } finally {
       setLoading(false);
-      if (err.response && err.response.status === 409) {
-        setError('El correo electrónico ya está registrado.');
-      } else {
-        setError('Ocurrió un error durante el registro. Inténtalo de nuevo.');
-      }
-      console.error("Error en registro:", err);
     }
   };
 
-  // [MODIFICADO] Se eliminan los contenedores exteriores y el h2
   return (
-    <>
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="form-group">
-          <label htmlFor="nombre">Nombre Completo</label>
+    <form onSubmit={handleSubmit} className="auth-form-unified">
+      <div className="auth-form-header">
+        <h2 className="auth-form-title">Únete a AKdémico</h2>
+        <p className="auth-form-subtitle">Crea tu cuenta y comienza tu viaje educativo</p>
+      </div>
+
+      {/* --- SELECTOR DE ROLES --- */}
+      <div className="auth-roles-section">
+        <label className="auth-roles-label">¿Cuál es tu rol?</label>
+        <div className="auth-roles-grid">
+          <div
+            className={`auth-role-card ${formData.roles.estudiante ? 'active' : ''}`}
+            onClick={() => handleRoleToggle('estudiante')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && handleRoleToggle('estudiante')}
+          >
+            <FaUserGraduate className="auth-role-icon" />
+            <span className="auth-role-name">Estudiante</span>
+            <p className="auth-role-desc">Accede a cursos y aprende</p>
+            {formData.roles.estudiante && <FaCheckCircle className="auth-role-check" />}
+          </div>
+
+          <div
+            className={`auth-role-card ${formData.roles.docente ? 'active' : ''}`}
+            onClick={() => handleRoleToggle('docente')}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && handleRoleToggle('docente')}
+          >
+            <FaChalkboardUser className="auth-role-icon" />
+            <span className="auth-role-name">Docente</span>
+            <p className="auth-role-desc">Crea y enseña cursos</p>
+            {formData.roles.docente && <FaCheckCircle className="auth-role-check" />}
+          </div>
+        </div>
+      </div>
+
+      {/* --- CAMPOS DEL FORMULARIO --- */}
+      <div className="form-group-unified">
+        <label htmlFor="nombre" className="form-label">Nombre Completo</label>
+        <div className="form-input-wrapper">
+          <FaUser className="form-input-icon" />
           <input
             type="text"
             id="nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
+            value={formData.nombre}
+            onChange={handleChange}
             required
-            placeholder="Tu Nombre Completo"
+            placeholder="Juan Pérez"
+            className="form-input"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="correo">Correo Electrónico</label>
+      </div>
+
+      <div className="form-group-unified">
+        <label htmlFor="correo" className="form-label">Correo Electrónico</label>
+        <div className="form-input-wrapper">
+          <FaEnvelope className="form-input-icon" />
           <input
             type="email"
             id="correo"
-            value={correo}
-            onChange={(e) => setCorreo(e.target.value)}
+            value={formData.correo}
+            onChange={handleChange}
             required
             placeholder="tu@correo.com"
+            className="form-input"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="contrasena">Contraseña</label>
+      </div>
+
+      <div className="form-group-unified">
+        <label htmlFor="ciudad" className="form-label">Ciudad (Opcional)</label>
+        <div className="form-input-wrapper">
+          <FaMapMarkerAlt className="form-input-icon" />
           <input
-            type="password"
-            id="contrasena"
-            value={contrasena}
-            onChange={(e) => setContrasena(e.target.value)}
-            required
-            placeholder="Mínimo 6 caracteres" 
-            minLength="6"
+            type="text"
+            id="ciudad"
+            value={formData.ciudad}
+            onChange={handleChange}
+            placeholder="Cusco, Perú"
+            className="form-input"
           />
         </div>
-        <div className="form-group">
-          <label htmlFor="confirmarContrasena">Confirmar Contraseña</label>
-          <input
-            type="password"
-            id="confirmarContrasena"
-            value={confirmarContrasena}
-            onChange={(e) => setConfirmarContrasena(e.target.value)}
-            required
-            placeholder="Repite tu contraseña"
-            minLength="6"
-          />
+      </div>
+
+      <div className="form-row-unified">
+        <div className="form-group-unified">
+          <label htmlFor="contrasena" className="form-label">Contraseña</label>
+          <div className="form-input-wrapper">
+            <FaLock className="form-input-icon" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="contrasena"
+              value={formData.contrasena}
+              onChange={handleChange}
+              required
+              minLength="6"
+              placeholder="••••••••"
+              className="form-input"
+            />
+            <button
+              type="button"
+              className="form-password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label="Mostrar/ocultar contraseña"
+            >
+              {showPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
+          </div>
         </div>
 
-        {error && <p className="error-message">{error}</p>}
+        <div className="form-group-unified">
+          <label htmlFor="confirmarContrasena" className="form-label">Confirmar</label>
+          <div className="form-input-wrapper">
+            <FaLock className="form-input-icon" />
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              id="confirmarContrasena"
+              value={formData.confirmarContrasena}
+              onChange={handleChange}
+              required
+              minLength="6"
+              placeholder="••••••••"
+              className="form-input"
+            />
+            <button
+              type="button"
+              className="form-password-toggle"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              aria-label="Mostrar/ocultar contraseña"
+            >
+              {showConfirmPassword ? '👁️' : '👁️‍🗨️'}
+            </button>
+          </div>
+        </div>
+      </div>
 
-        {/* [MODIFICADO] Texto del botón dinámico */}
-        <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-          {loading ? 'Registrando...' : buttonText}
-        </button>
-      </form>
-      {/* [ELIMINADO] Se quita el div.auth-links, ya que ahora lo manejan las pestañas */}
-    </>
+      {error && <div className="form-error">{error}</div>}
+
+      <button type="submit" className="btn-submit-unified" disabled={loading}>
+        {loading ? 'Creando cuenta...' : (
+          <>
+            Crear Cuenta <FaArrowRight />
+          </>
+        )}
+      </button>
+
+      <div className="auth-form-footer">
+        <p className="auth-terms">
+          Al registrarte, aceptas nuestros términos y condiciones
+        </p>
+      </div>
+    </form>
   );
 };
 

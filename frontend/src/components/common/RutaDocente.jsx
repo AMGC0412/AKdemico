@@ -2,10 +2,7 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-/**
- * Componente "guardia" que protege rutas
- * SOLO para usuarios con rol 'docente'.
- */
+// RutaDocente.jsx (Versión Corregida)
 const RutaDocente = () => {
   const { usuario, loading } = useAuth();
 
@@ -13,17 +10,15 @@ const RutaDocente = () => {
     return <div>Verificando autenticación...</div>;
   }
 
-  // 1. Si no hay usuario, redirige a login
   if (!usuario) {
     return <Navigate to="/login" replace />;
   }
 
-  // 2. Si hay usuario PERO NO es docente, redirige a inicio
-  if (usuario.rol !== 'docente') {
-    return <Navigate to="/" replace />; 
+  // [CAMBIO APLICADO] Verificación multi-rol para docentes
+  if (!usuario.roles || !usuario.roles.includes('docente')) {
+      return <Navigate to="/" replace />; 
   }
 
-  // 3. Si es docente, permite el acceso
   return <Outlet />;
 };
 

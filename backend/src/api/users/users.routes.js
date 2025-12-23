@@ -1,10 +1,24 @@
+/* Archivo: users.routes.js */
 import { Router } from 'express';
-import { obtenerMiPerfil, actualizarMiPerfil, cambiarMiContrasena } from './users.controller.js';
+// [MODIFICADO] Importar la nueva función del controlador
+import { 
+    obtenerMiPerfil, 
+    actualizarMiPerfil, 
+    cambiarMiContrasena, 
+    obtenerPerfilPublicoPorId // <-- NUEVA FUNCIÓN
+} from './users.controller.js';
 import { protegerRuta } from '../../middleware/auth.middleware.js';
 
 const router = Router();
 
-// Aplicamos el middleware de autenticación a todas las rutas de usuario
+// --- [NUEVA RUTA PÚBLICA] ---
+// Esta ruta debe ir ANTES de 'router.use(protegerRuta)'
+// GET /api/v1/users/:userId/publico
+router.get('/:userId/publico', obtenerPerfilPublicoPorId);
+
+
+// --- RUTAS PROTEGIDAS ---
+// Aplicamos el middleware de autenticación a todas las rutas DEBAJO de esta línea
 router.use(protegerRuta);
 
 // Ruta GET para ver el perfil

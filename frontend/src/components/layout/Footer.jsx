@@ -1,16 +1,33 @@
+/* Archivo: Footer.jsx */
 import React from 'react';
 import { Link } from 'react-router-dom';
-import './Footer.css'; // Importa el CSS Art Pop mejorado
-// [NUEVO] Importa los iconos sociales
+import { useAuth } from '../../context/AuthContext'; // Importamos el contexto para saber el rol
+import './Footer.css'; // Importa los estilos actualizados
 import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
 
 /**
- * Footer global de la aplicación con diseño "AKdémico Art Pop".
- * [MEJORA] Añadidos iconos sociales y efectos hover refinados.
+ * Footer global de la aplicación.
+ * [MEJORA] Ahora cambia su color de fondo dinámicamente según el rol del usuario,
+ * igual que el Header.
  */
 const Footer = () => {
+  const { usuario } = useAuth();
+
+  // Determinamos la clase base según el rol para el color de fondo
+  let footerClass = 'footer-akademic footer-role-public'; // Por defecto
+  
+  if (usuario) {
+    if (usuario.rol === 'administrador') {
+        footerClass = 'footer-akademic footer-role-administrador';
+    } else if (usuario.rol === 'docente') {
+        footerClass = 'footer-akademic footer-role-docente';
+    } else if (usuario.rol === 'estudiante') {
+        footerClass = 'footer-akademic footer-role-estudiante';
+    }
+  }
+
   return (
-    <footer className="footer-akademic"> 
+    <footer className={footerClass}> 
       <div className="footer-content">
         
         {/* Columna de Marca */}
@@ -24,7 +41,6 @@ const Footer = () => {
             Encuentra docentes verificados y gestiona tus reservas en un solo lugar.
           </p>
           
-          {/* [NUEVO] Iconos de Redes Sociales */}
           <div className="footer-social-icons">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
               <FaFacebookF />
@@ -41,7 +57,7 @@ const Footer = () => {
           </div>
         </div>
         
-        {/* Enlaces (sin cambios de estructura) */}
+        {/* Enlaces */}
         <div className="footer-links">
           <h4>Cursos</h4>
           <Link to="/buscar?categoria=matematicas">Matemáticas</Link>

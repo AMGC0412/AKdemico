@@ -1,61 +1,67 @@
-import { query, pool } from '../../config/database.js'; // Importamos 'pool' para transacciones
+import { query, pool } from '../../config/database.js';
 
 /**
  * Controlador para que un docente defina o actualice su
  * disponibilidad semanal completa (US-09).
+ * Mantenemos la transacción íntegra y el manejo de errores.
  */
 export const actualizarDisponibilidadSemanal = async (req, res) => {
   const docenteId = req.usuario.id;
-  
-  // Esperamos un array de bloques de horario en el body.
-  // Ej: [ { dia_semana: 1, hora_inicio: '09:00', hora_fin: '11:00' }, ... ]
   const bloques = req.body.bloques;
 
   if (!Array.isArray(bloques)) {
     return res.status(400).json({ mensaje: 'Se requiere un array de "bloques" en el body.' });
   }
 
-  // Iniciamos una transacción para asegurar que todo o nada se ejecute
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
 
-    // 1. Borramos TODA la disponibilidad anterior de este docente
+    // 1. Verificación de Rol: Aseguramos que el usuario es un 'docente' en la nueva BD
+    const [rolCheck] = await connection.query(
+      `SELECT u.id FROM usuarios u
+       INNER JOIN usuario_roles ur ON u.id = ur.usuario_id
+       INNER JOIN roles r ON ur.rol_id = r.id
+       WHERE u.id = ? AND r.nombre = 'docente'`,
+      [docenteId]
+    );
+
+    if (rolCheck.length === 0) {
+      await connection.rollback();
+      return res.status(403).json({ mensaje: 'No tienes permisos de docente para esta acción.' });
+    }
+
+    // 2. Borramos TODA la disponibilidad anterior de este docente
     await connection.query(
       'DELETE FROM disponibilidad_docente WHERE docente_id = ?', 
       [docenteId]
     );
 
-    // 2. Si el array está vacío, solo queríamos borrar (limpiar horario)
     if (bloques.length === 0) {
       await connection.commit();
       return res.status(200).json({ mensaje: 'Disponibilidad eliminada exitosamente.' });
     }
 
-    // 3. Insertamos los nuevos bloques de disponibilidad
+    // 3. Insertamos los nuevos bloques (Inserción múltiple original)
     const sqlInsert = `
       INSERT INTO disponibilidad_docente (docente_id, dia_semana, hora_inicio, hora_fin)
       VALUES ?
     `;
 
-    // Mapeamos el array de objetos a un array de arrays para la inserción múltiple
     const valoresAInsertar = bloques.map(bloque => [
       docenteId,
-      bloque.dia_semana, // Ej: 1 (Lunes)
-      bloque.hora_inicio, // Ej: '09:00:00'
-      bloque.hora_fin    // Ej: '11:00:00'
+      bloque.dia_semana, 
+      bloque.hora_inicio, 
+      bloque.hora_fin    
     ]);
 
     await connection.query(sqlInsert, [valoresAInsertar]);
 
-    // 4. Confirmamos la transacción
     await connection.commit();
-
     res.status(200).json({ mensaje: 'Disponibilidad semanal actualizada exitosamente.' });
 
   } catch (error) {
-    // Si algo falla, revertimos todos los cambios
-    await connection.rollback();
+    if (connection) await connection.rollback();
     console.error('Error al actualizar disponibilidad:', error);
     
     if (error.code === 'ER_DATA_TOO_LONG') {
@@ -67,33 +73,33 @@ export const actualizarDisponibilidadSemanal = async (req, res) => {
     
     res.status(500).json({ mensaje: 'Error interno del servidor.' });
   } finally {
-    // Siempre liberamos la conexión al pool
-    connection.release();
+    if (connection) connection.release();
   }
 };
 
 /**
  * Controlador para obtener la disponibilidad semanal actual del docente.
- * (Función FALTANTE)
+ * Validando el rol de docente en la consulta.
  */
 export const obtenerDisponibilidad = async (req, res) => {
     const docenteId = req.usuario.id;
 
     try {
-        const disponibilidad = await query(
-            // Seleccionamos los campos necesarios
-            `SELECT dia_semana, hora_inicio, hora_fin FROM disponibilidad_docente 
-             WHERE docente_id = ? 
-             ORDER BY dia_semana, hora_inicio`,
-            [docenteId]
-        );
+        const sql = `
+            SELECT dd.dia_semana, dd.hora_inicio, dd.hora_fin 
+            FROM disponibilidad_docente dd
+            INNER JOIN usuarios u ON dd.docente_id = u.id
+            INNER JOIN usuario_roles ur ON u.id = ur.usuario_id
+            INNER JOIN roles r ON ur.rol_id = r.id
+            WHERE dd.docente_id = ? AND r.nombre = 'docente'
+            ORDER BY dd.dia_semana, dd.hora_inicio
+        `;
         
-        if (disponibilidad.length === 0) {
-            // Si no hay nada, devolvemos 200 con array vacío, o 404 (usaremos 200 con array vacío)
-            return res.status(200).json([]);
-        }
-
-        res.status(200).json(disponibilidad);
+        const disponibilidad = await query(sql, [docenteId]);
+        
+        // Devolvemos 200 con array vacío si no hay registros, tal como pediste
+        res.status(200).json(disponibilidad || []);
+        
     } catch (error) {
         console.error('Error al obtener disponibilidad:', error);
         res.status(500).json({ mensaje: 'Error interno del servidor.' });

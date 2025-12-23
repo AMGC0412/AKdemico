@@ -20,7 +20,11 @@ export const AuthProvider = ({ children }) => {
           // Usamos nuestro servicio, que ya tiene la ruta correcta ('/api/users/me').
           const datosUsuario = await getMiPerfil(authToken);
           
-          setUsuario(datosUsuario); // Guardamos los datos del usuario
+          if (datosUsuario && datosUsuario.roles && typeof datosUsuario.roles === 'string') {
+              datosUsuario.roles = datosUsuario.roles.split(',').map(r => r.trim().toLowerCase());
+          }
+
+          setUsuario(datosUsuario);
           // -----------------------------
 
         } catch (error) {

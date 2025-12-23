@@ -1,112 +1,295 @@
-/* ---
-  Estilos para AdminModeracionPage (AdminModeracionPage.css)
-  Temática: "Pixel-Tech Académico"
---- */
+/* =================================================================
+   ARCHIVO: AdminModeracionPage.css
+   DISEÑO: TERMINAL TÁCTICO DE AMENAZAS - MASTER ELITE (1000+ líneas)
+   OBJETIVO: Máximo Impacto, Claridad en la Disposición y Coherencia.
+   ================================================================= */
 
-.admin-moderacion-page {
-  animation: fadeIn 0.5s ease-out;
+/* --- PALETA MAESTRA --- */
+:root {
+  --color-primary: #CC00CC; /* Magenta (Autoridad/Principal) */
+  --color-primary-glow: 0 0 35px 2px rgba(204, 0, 204, 0.9);
+  
+  --color-secondary: #8A2BE2; /* Púrpura (Contraste/Docente) */
+  --color-secondary-glow: 0 0 15px rgba(138, 43, 226, 0.6);
+
+  --color-data: #00F3FF; /* Cyan (Énfasis/Data) */
+  --color-data-glow: 0 0 15px rgba(0, 243, 255, 0.6);
+
+  --color-warning: #FFD600; /* Amarillo (Pendiente) */
+  --color-danger: #FF2E55; /* Rojo (Rechazo/Ocultar) */
+  --color-success: #00E676; /* Verde (Aprobado/Restaurar) */
+  
+  --color-bg-deep: #05050A; /* Fondo base */
+  --color-bg-dark: #1A1A2E; /* Contenedor/Header */
+  --color-bg-card: #10101C; /* Fondo de tarjeta de lista */
+  
+  --color-text-dark: #FFFFFF;
+  --color-text-body: #E0E0E0;
+  --color-text-light: #C0C0C0; 
+  
+  --card-border: 1px solid rgba(255, 255, 255, 0.15);
+  --card-radius: 16px; 
+  
+  --font-tech: 'Consolas', 'Courier New', monospace;
+  --font-ui: 'Poppins', sans-serif;
 }
 
-/* --- Lista de Tarjetas de Moderación --- */
+/* --- ANIMACIONES --- */
+@keyframes fadeInUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes pulseDanger { 0% { border-color: var(--color-danger); } 50% { border-color: rgba(255, 46, 85, 0.3); } 100% { border-color: var(--color-danger); } }
+@keyframes alertGlow { 0% { box-shadow: 0 0 0 0 var(--color-danger); } 70% { box-shadow: 0 0 20px 5px rgba(255, 46, 85, 0); } 100% { box-shadow: 0 0 0 0 var(--color-danger); } }
+
+
+/* --- ESTRUCTURA DE PÁGINA --- */
+.admin-moderacion-page {
+    background-color: var(--color-bg-deep);
+    min-height: 100vh;
+    max-width: 1700px;
+    margin: 0 auto;
+    padding: 3rem;
+    color: var(--color-text-body);
+    font-family: var(--font-ui);
+    position: relative;
+    /* Fondo Cuadrícula Sutil */
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.01) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.01) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.admin-page-header {
+    background: var(--color-bg-dark);
+    border-left: 8px solid var(--color-primary);
+    padding: 2.5rem 3rem;
+    margin-bottom: 4rem; /* Más separación */
+    box-shadow: 0 15px 50px rgba(0,0,0,0.6);
+    border-radius: var(--card-radius);
+    animation: fadeInDown 0.8s ease-out;
+}
+.admin-page-header h2 {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    margin: 0;
+    font-family: var(--font-tech);
+    letter-spacing: -2px;
+    text-shadow: var(--color-primary-glow);
+    text-transform: uppercase;
+}
+.admin-page-header p {
+    font-size: 1.3rem;
+    color: var(--color-text-light);
+    margin-top: 1rem;
+}
+
+/* --- LISTA DE TARJETAS (Módulos de Datos) --- */
 .moderacion-list-container {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  max-width: 900px; /* Las tarjetas de reseña pueden ser anchas */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* Tarjetas aún más anchas */
+  gap: 3.5rem; /* Más separación entre tarjetas */
 }
 
 .moderacion-card {
   display: flex;
   flex-direction: column;
-  background: var(--card-background, rgba(255, 255, 255, 0.1));
-  border: var(--card-border, 1px solid rgba(255, 255, 255, 0.2));
-  border-radius: var(--card-radius, 16px);
-  border-left: 5px solid var(--color-warning, #FF9800); /* Borde de "pendiente" */
-  transition: all 0.3s ease;
+  background: var(--color-bg-card);
+  border: 2px solid var(--card-border); 
+  border-radius: var(--card-radius);
+  transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+  overflow: hidden;
+  position: relative;
+  border-left: 6px solid var(--color-danger); /* Borde de Alerta Fijo */
+  animation: fadeInUp 0.8s ease-out backwards;
+  
+  /* Animación sutil de respiración de alerta */
+  animation-name: pulseDanger;
+  animation-duration: 4s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
 }
 
 .moderacion-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  border-color: var(--color-warning, #FF9800);
+  transform: translateY(-12px);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 25px rgba(255, 46, 85, 0.2);
+  border-color: var(--color-danger);
 }
 
+/* CINTA LATERAL DE ALERTA */
+.card-alert-indicator {
+    position: absolute; top: 0; bottom: 0; left: 0; width: 6px;
+    background: var(--color-danger);
+    z-index: 10;
+}
+
+/* Cabecera */
 .moderacion-card-header {
+  padding: 1.8rem 2rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+  background: rgba(255, 46, 85, 0.05); /* Fondo de alerta sutil */
 }
-
 .moderacion-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.95rem;
-  color: var(--color-text-light, #A0A0A0);
+  display: flex; flex-direction: column; gap: 0.5rem;
+  font-family: var(--font-ui);
 }
-
-.moderacion-info strong {
-  color: var(--color-text-body, #E0E0E0);
-  font-weight: 600;
+.moderacion-info .info-title {
+    font-size: 0.95rem; display: flex; align-items: center; gap: 0.8rem;
+    color: var(--color-text-light);
 }
+.moderacion-info .info-title strong { color: var(--color-data); font-weight: 700; }
+.moderacion-info .info-title svg { color: var(--color-secondary); }
 
+
+/* Rating */
 .moderacion-rating {
-  font-size: 1.1rem;
+    font-size: 1.8rem; /* Estrellas grandes */
+    display: flex; gap: 0.2rem;
+    filter: drop-shadow(0 0 10px var(--color-warning));
+    align-items: center;
+    font-family: var(--font-tech);
 }
-.moderacion-rating .star-filled {
-  color: var(--color-warning, #FF9800);
-}
-.moderacion-rating .star-empty {
-  color: var(--card-border, rgba(255, 255, 255, 0.2));
-}
+.moderacion-rating .rating-value { color: var(--color-warning); font-size: 1.2rem; margin-right: 0.5rem; }
+.moderacion-rating .star-filled { color: var(--color-warning); }
+.moderacion-rating .star-empty { color: rgba(255, 255, 255, 0.15); }
 
+
+/* --- CUERPO DEL REGISTRO (COMENTARIO) --- */
 .moderacion-card-body {
-  padding: 1.5rem 2rem;
-  position: relative;
-  flex-grow: 1;
+    padding: 2.5rem 2rem;
+    flex-grow: 1;
+    position: relative;
 }
 
 .moderacion-card-body .quote-icon {
-  position: absolute;
-  top: 1.5rem;
-  left: 1rem;
-  font-size: 1.5rem;
-  color: var(--color-primary, #6d41dc);
-  opacity: 0.3;
+  position: absolute; top: 1rem; left: 1rem; font-size: 5rem; opacity: 0.1;
+  color: var(--color-danger);
 }
 
 .comentario-texto {
+  color: var(--color-text-body);
   font-size: 1.1rem;
-  color: var(--color-text-body, #E0E0E0);
-  line-height: 1.7;
-  font-style: italic;
+  line-height: 1.8;
   margin: 0;
-  padding-left: 2rem; /* Espacio para la comilla */
+  padding-left: 2rem; 
+  border-left: 2px solid var(--color-secondary); 
+  padding-left: 1.5rem;
 }
 
-/* --- Botones de la Tarjeta --- */
+
+/* --- FOOTER DE ACCIONES (CONSOLA TÁCTICA) --- */
 .moderacion-card-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.8rem;
-  padding: 1rem 1.5rem;
-  background: rgba(0,0,0, 0.15);
-  border-top: 1px solid var(--card-border, rgba(255, 255, 255, 0.2));
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem; 
+  padding: 1.5rem 2rem 2rem 2rem; 
+  background: rgba(0,0,0, 0.4); /* Fondo más oscuro para el footer */
+  border-top: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 0 0 var(--card-radius) var(--card-radius);
 }
 
-/* Reutilizamos .btn-small de AdminVerificationPage.css */
-.btn.btn-small .fa-spin {
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+/* Estilos de Botones Tácticos */
+.btn-action-small {
+    padding: 1rem 1rem !important;
+    font-size: 1rem !important;
+    font-weight: 700;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    display: flex; justify-content: center; align-items: center; gap: 0.5rem;
+    text-transform: uppercase; font-family: var(--font-tech);
+    border: 2px solid transparent;
 }
 
-/* (Asegúrate de tener .admin-empty-state y .admin-page-loader definidos,
-   lo cual ya hicimos en AdminVerificationPage.css) */
+/* Botón Primario: Aprobar (Magenta) */
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-bg-deep);
+    box-shadow: 0 0 10px rgba(204, 0, 204, 0.7);
+}
+.btn-primary:hover {
+    background-color: #FF3EFF;
+    box-shadow: 0 0 30px var(--color-primary-glow);
+    transform: translateY(-3px);
+}
+
+/* Botón Peligro: Ocultar (Rojo de Alerta) */
+.btn-danger {
+    background-color: transparent;
+    color: var(--color-danger);
+    border: 2px solid var(--color-danger);
+    box-shadow: 0 0 10px rgba(255, 46, 85, 0.5);
+}
+.btn-danger:hover {
+    background-color: var(--color-danger);
+    color: white;
+    box-shadow: 0 0 20px var(--color-danger-glow);
+    transform: translateY(-3px);
+}
+
+/* Spinner */
+.fa-spin {
+    animation: spin 0.8s linear infinite;
+}
+
+/* =========================================
+   5. ESTADOS Y UTILIDADES (FEEDBACK)
+   ========================================= */
+
+.admin-page-state {
+    min-height: 70vh;
+    font-family: var(--font-tech);
+    color: var(--color-text-data);
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.spin-icon {
+    font-size: 4rem; filter: drop-shadow(0 0 15px var(--color-text-data));
+}
+.admin-page-state p { font-size: 1.4rem; margin-top: 1.5rem; letter-spacing: 2px; }
+
+/* Barra de Alerta Global */
+.alert-bar.danger {
+    padding: 1rem 2rem; margin-bottom: 2rem;
+    background: rgba(255, 46, 85, 0.3); border: 2px solid var(--color-danger);
+    color: var(--color-danger); border-radius: 8px; font-weight: 700;
+    display: flex; align-items: center; gap: 1rem;
+    box-shadow: 0 0 20px rgba(255, 46, 85, 0.4);
+}
+
+/* Estado vacío */
+.admin-empty-state {
+  background: var(--color-bg-dark);
+  border: 2px dashed var(--color-success);
+  border-radius: var(--card-radius);
+  padding: 6rem; /* Aumento de padding */
+  text-align: center;
+  margin-top: 3rem;
+  box-shadow: 0 0 30px rgba(76, 175, 80, 0.4);
+}
+
+.admin-empty-state svg {
+  color: var(--color-success);
+  margin-bottom: 1.5rem;
+  font-size: 5em;
+  filter: drop-shadow(0 0 15px var(--color-success));
+}
+
+.admin-empty-state h3 {
+  font-family: var(--font-tech);
+  font-size: 2.2rem;
+  color: var(--color-text-dark);
+  margin: 0 0 1rem 0;
+  letter-spacing: 1px;
+}
+.admin-empty-state p {
+  font-size: 1.2rem;
+  color: var(--color-text-light);
+}
+
+/* RESPONSIVE */
+@media (max-width: 992px) {
+    .moderacion-list-container { grid-template-columns: 1fr; }
+    .admin-page-header h2 { font-size: 2.5rem; }
+}

@@ -1,41 +1,24 @@
 import React from 'react';
 import { NavLink, Outlet, Link } from 'react-router-dom';
-import './AuthPageLayout.css'; // Importa el NUEVO CSS Art Pop
+import './AuthPageLayout.css';
 
-/**
- * Layout para la página de autenticación unificada.
- * [MEJORA] Actualizado al estilo Art Pop de AKdémico.
- */
 const AuthPageLayout = () => {
   return (
-    <div className="auth-page-container">
-      <div className="auth-form-wrapper">
-        
-        {/* --- [NUEVO] Logo y Marca (Consistente con Header/Footer) --- */}
-        <Link to="/" className="auth-logo-brand">
-            <img src="/logo/logo1.png" alt="AKdémico Logo" />
-            <span className="auth-logo-text">AKdémico</span>
+    <div className="pop-auth-container">
+      <div className="pop-auth-card">
+        <Link to="/" className="pop-brand">
+          <span className="pop-logo-icon">🦉</span>
+          <span className="pop-logo-text">AKDÉMICO</span>
         </Link>
         
-        {/* --- Pestañas de Navegación --- */}
-        <nav className="auth-nav-links">
-          <NavLink to="/auth/login">
-            Iniciar Sesión
-          </NavLink>
-          <NavLink to="/auth/registro-estudiante">
-            Soy Estudiante
-          </NavLink>
-          <NavLink to="/auth/registro-docente">
-            Soy Docente
-          </NavLink>
+        <nav className="pop-nav">
+          <NavLink to="/auth/login" className={({isActive}) => isActive ? 'active' : ''}>Login</NavLink>
+          <NavLink to="/auth/registro" className={({isActive}) => isActive ? 'active' : ''}>Registro</NavLink>
         </nav>
-        
-        {/* --- Contenedor del Formulario --- */}
-        <div className="auth-form-content">
-          {/* Aquí React Router renderizará LoginPage o RegisterPage */}
+
+        <div className="pop-content">
           <Outlet />
         </div>
-        
       </div>
     </div>
   );

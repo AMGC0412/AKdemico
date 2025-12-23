@@ -1,11 +1,10 @@
 /* ---
-  Estilos para Header (Header.css) - REDISEÑO COMPLETO INSPIRADO EN LA MASCOTA AKDÉMICO
+  Estilos para Header (Header.css) - REDISEÑO COMPLETO
   Temática: "Art Pop Vibrante & Funcional"
   Paleta: Colores de la lechuza (Azul Eléctrico, Turquesa Brillante, Púrpura/Magenta Profundo)
-  Estructura: Moderna, limpia, con elementos destacados.
+  Estructura: Moderna, limpia, con menú desplegable único y dinámico
 --- */
 
-/* --- Importación de la fuente personalizada --- */
 @font-face {
   font-family: '04b30';
   src: url('public/fonts/04b30.TTF') format('truetype');
@@ -13,91 +12,108 @@
   font-style: normal;
 }
 
-/* --- PALETA DE COLORES INSPIRADA EN LA MASCOTA AKDÉMICO --- */
 :root {
-  --header-height: 80px; /* Un poco más alto para el nuevo diseño */
-  --logo-text-font: '04b30', sans-serif; /* Fuente para el texto "AKdémico" */
-  --logo-img-size: 45px; /* Tamaño del logo de la lechuza */
+  --header-height: 80px;
+  --logo-text-font: '04b30', sans-serif;
+  --logo-img-size: 45px;
 
-  /* [NUEVOS FONDOS SÓLIDOS - DIRECTAMENTE DE LA MASCOTA] */
-  --color-admin-solid-bg: #4B004B;    /* Púrpura Profundo del libro/plumas de la lechuza */
-  --color-docente-solid-bg: #1A52B8;   /* Azul Eléctrico del cuerpo de la lechuza */
-  --color-estudiante-solid-bg: #00A6AD; /* Turquesa Brillante de las gafas/plumas de la lechuza */
-  --color-public-solid-bg: #181818;     /* Gris Oscuro / Negro para no logueado, base Art Pop */
-  
-  /* [NUEVOS ACENTOS CLAROS - ILUMINAN CON LOS COLORES VIBRANTES DE LA MASCOTA] */
-  --color-admin-accent: #FF3EFF;       /* Magenta brillante para acentos Admin */
-  --color-docente-accent: #6C9EFF;     /* Azul claro vibrante para acentos Docente */
-  --color-estudiante-accent: #4DFFFF;  /* Cian muy brillante para acentos Estudiante */
-  
-  /* Derivados SUAVES (para fondos de enlaces activos/hover) - Art Pop Overlay */
-  --color-admin-soft: rgba(255, 255, 255, 0.2); 
-  --color-docente-soft: rgba(255, 255, 255, 0.2); 
-  --color-estudiante-soft: rgba(255, 255, 255, 0.2); 
+  /* Colores por rol */
+  --color-admin-bg: #4B004B;
+  --color-docente-bg: #1A52B8;
+  --color-estudiante-bg: #00A6AD;
+  --color-ambos-bg: linear-gradient(135deg, #1A52B8 0%, #00A6AD 100%);
+  --color-public-bg: #181818;
 
-  /* Colores Base */
-  --color-bg-dark: #000000;          /* Negro puro para el Header Scrolled y texto contraste */
-  --color-text-primary: #FFFFFF;     /* Texto principal blanco (máximo contraste) */
-  --color-text-secondary: #E0E0E0;   /* Texto secundario gris muy claro */
-  --card-border: 1px solid rgba(255, 255, 255, 0.1); /* Borde sutil general */
+  /* Acentos */
+  --color-admin-accent: #FF3EFF;
+  --color-docente-accent: #6C9EFF;
+  --color-estudiante-accent: #4DFFFF;
+  --color-ambos-accent: linear-gradient(135deg, #6C9EFF 0%, #4DFFFF 100%);
+
+  /* Base */
+  --color-bg-dark: #000000;
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #E0E0E0;
+  --card-border: 1px solid rgba(255, 255, 255, 0.1);
+
+  /* Dropdown */
+  --dropdown-bg: rgba(0, 0, 0, 0.95);
+  --dropdown-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  --dropdown-border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* --- DISEÑO BASE DEL HEADER --- */
+/* --- HEADER BASE --- */
 .header-akademic {
-  background-color: var(--color-public-solid-bg); 
-  position: fixed; 
+  background-color: var(--color-public-bg);
+  position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   z-index: 5000;
-  height: var(--header-height); 
+  height: var(--header-height);
   font-family: 'Poppins', sans-serif;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Sombra sutil para "despegarlo" */
-  transition: background-color 0.4s ease, box-shadow 0.4s ease, border-bottom-color 0.4s ease;
-  border-bottom: 3px solid transparent; /* Borde de acento dinámico */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.4s ease;
+  border-bottom: 3px solid transparent;
 }
 
-/* [CLAVE] Modificadores del color de fondo SÓLIDO POR ROL (Colores de la Lechuza) */
-.header-akademic.header-role-administrador {
-    background-color: var(--color-admin-solid-bg);
-    border-bottom-color: var(--color-admin-accent); /* Borde magenta brillante */
-}
-.header-akademic.header-role-docente {
-    background-color: var(--color-docente-solid-bg);
-    border-bottom-color: var(--color-docente-accent); /* Borde azul claro */
-}
-.header-akademic.header-role-estudiante {
-    background-color: var(--color-estudiante-solid-bg);
-    border-bottom-color: var(--color-estudiante-accent); /* Borde cian brillante */
+.header-akademic.header-admin {
+  background-color: var(--color-admin-bg);
+  border-bottom-color: var(--color-admin-accent);
 }
 
+.header-akademic.header-docente {
+  background-color: var(--color-docente-bg);
+  border-bottom-color: var(--color-docente-accent);
+}
 
-/* El header-scrolled se vuelve aún más oscuro para el máximo contraste */
-.header-scrolled {
-  background-color: var(--color-bg-dark) !important; /* Negro puro */
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8) !important; 
-  border-bottom-color: var(--card-border) !important; /* Borde general */
+.header-akademic.header-estudiante {
+  background-color: var(--color-estudiante-bg);
+  border-bottom-color: var(--color-estudiante-accent);
+}
+
+.header-akademic.header-ambos {
+  background: var(--color-ambos-bg);
+  position: relative;
+}
+
+.header-akademic.header-ambos::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--color-ambos-accent);
+}
+
+.header-akademic.header-scrolled {
+  background-color: var(--color-bg-dark) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8) !important;
+  border-bottom-color: var(--card-border) !important;
 }
 
 .header-akademic-placeholder {
   height: var(--header-height);
 }
 
+/* --- CONTENEDOR PRINCIPAL --- */
 .header-nav-container {
-  max-width: 1300px; /* Un poco más ancho */
+  max-width: 1300px;
   height: 100%;
   margin: 0 auto;
-  padding: 0 2rem; 
+  padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
 }
 
-/* --- ESTILO DEL LOGO AKDÉMICO --- */
+/* --- LOGO --- */
 .header-logo-brand {
   display: flex;
   align-items: center;
-  gap: 10px; /* Espacio entre imagen y texto */
+  gap: 10px;
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -105,101 +121,191 @@
 .header-logo-brand img {
   height: var(--logo-img-size);
   width: auto;
-  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5)); /* Sombra para el logo */
+  filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.5));
 }
 
 .header-logo-text {
-  font-family: var(--logo-text-font); /* Fuente 04b30.TTF */
-  font-size: 2.2rem; /* Tamaño grande y audaz */
-  color: var(--color-text-primary); 
-  letter-spacing: 2px; /* Un poco de espaciado para el estilo */
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4); /* Sombra para el texto */
-  line-height: 1; /* Para ajustar verticalmente */
+  font-family: var(--logo-text-font);
+  font-size: 2.2rem;
+  color: var(--color-text-primary);
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  line-height: 1;
 }
 
-
+/* --- CONTENIDO DESKTOP --- */
 .header-desktop-content {
   display: flex;
   align-items: center;
-  gap: 2.5rem; 
+  gap: 2.5rem;
 }
 
-/* --- LINKS DE NAVEGACIÓN (DESKTOP) --- */
-.header-nav-links-desktop {
+/* --- NAVEGACIÓN DESKTOP --- */
+.header-nav-desktop {
   display: flex;
-  gap: 0.8rem; /* Más espacio entre enlaces */
+  align-items: center;
+  gap: 1.5rem;
 }
 
-.header-nav-links-desktop a {
+.header-nav-item {
   font-size: 1.05rem;
-  font-weight: 600; /* Un poco más audaz */
-  color: var(--color-text-secondary); /* Gris claro */
+  font-weight: 600;
+  color: var(--color-text-secondary);
   text-decoration: none;
-  padding: 0.6rem 1.2rem; /* Más padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  border: 2px solid transparent; /* Borde más visible */
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  border: 2px solid transparent;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem; /* Espacio para iconos */
+  gap: 0.7rem;
+  cursor: pointer;
 }
 
-/* Estado general de Hover */
-.header-nav-links-desktop a:hover {
-  color: var(--color-text-primary); 
-  background: rgba(255, 255, 255, 0.15); /* Efecto suave de pop */
-  border-color: rgba(255, 255, 255, 0.5); /* Borde sutil blanco al hover */
-  transform: translateY(-2px); /* Pequeña elevación */
+.header-nav-item:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
 }
 
-/* Base para Activo */
-.header-nav-links-desktop a.active {
-    color: var(--color-text-primary) !important; 
-    font-weight: 700; 
-    background: var(--color-admin-soft); /* Por defecto, se sobrescribe por rol */
-    border-color: var(--color-text-primary); /* Borde blanco por defecto */
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Sombra para destacar activo */
-}
-
-/* Estilos de activo/hover por ROL (Acentos de la Lechuza) */
-.role-admin .header-nav-links-desktop a.active {
-  background: var(--color-admin-soft);
-  border-color: var(--color-admin-accent);
-  box-shadow: 0 0 12px var(--color-admin-accent);
-}
-.role-admin .header-nav-links-desktop a:hover:not(.active) {
-    color: var(--color-admin-accent) !important;
-    border-color: var(--color-admin-accent);
-}
-
-.role-docente .header-nav-links-desktop a.active {
-  background: var(--color-docente-soft);
-  border-color: var(--color-docente-accent);
-  box-shadow: 0 0 12px var(--color-docente-accent);
-}
-.role-docente .header-nav-links-desktop a:hover:not(.active) {
-    color: var(--color-docente-accent) !important;
-    border-color: var(--color-docente-accent);
-}
-
-.role-estudiante .header-nav-links-desktop a.active {
-  background: var(--color-estudiante-soft);
-  border-color: var(--color-estudiante-accent);
-  box-shadow: 0 0 12px var(--color-estudiante-accent);
-}
-.role-estudiante .header-nav-links-desktop a:hover:not(.active) {
-    color: var(--color-estudiante-accent) !important;
-    border-color: var(--color-estudiante-accent);
-}
-
-.role-public .header-nav-links-desktop a.active {
-  background: rgba(255, 255, 255, 0.1); 
+.header-nav-item.active {
+  color: var(--color-text-primary);
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.2);
   border-color: var(--color-text-primary);
   box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-/* --- LINKS DE AUTENTICACIÓN (DESKTOP) --- */
-.header-auth-links-desktop {
+/* --- DROPDOWN DINÁMICO --- */
+.header-dropdown {
+  position: relative;
+}
+
+.header-dropdown-toggle {
+  background: none;
+  border: 2px solid transparent;
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.header-dropdown-toggle:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.header-dropdown-toggle.active {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.header-dropdown-toggle svg {
+  transition: transform 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.header-dropdown.open .header-dropdown-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.header-dropdown.open .header-dropdown-toggle svg {
+  transform: rotate(180deg);
+}
+
+/* Menú desplegable */
+.header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: var(--dropdown-bg);
+  min-width: 280px;
+  border-radius: 12px;
+  box-shadow: var(--dropdown-shadow);
+  border: var(--dropdown-border);
+  backdrop-filter: blur(10px);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-dropdown.open .header-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.header-dropdown-section {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-dropdown-section:last-child {
+  border-bottom: none;
+}
+
+.header-dropdown-section-title {
+  padding: 0.8rem 1.2rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 1.2rem;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.header-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-primary);
+  border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.header-dropdown-item.active {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.header-dropdown-item svg {
+  font-size: 1.1rem;
+  width: 20px;
+  text-align: center;
+}
+
+/* --- AUTENTICACIÓN DESKTOP --- */
+.header-auth-desktop {
   display: flex;
   align-items: center;
   gap: 1.2rem;
@@ -207,67 +313,67 @@
 
 .header-user-welcome {
   font-size: 1rem;
-  color: var(--color-text-secondary); 
+  color: var(--color-text-secondary);
   font-weight: 500;
   white-space: nowrap;
 }
 
-/* Botones con estilo Art Pop */
 .btn-akademic {
-  padding: 12px 22px; /* Más padding para que sean más grandes */
+  padding: 12px 22px;
   font-size: 1rem;
   font-weight: 600;
-  border-radius: 12px; /* Más redondeado */
+  border-radius: 12px;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.7rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  border: 2px solid transparent;
+  font-family: 'Poppins', sans-serif;
 }
 
-/* Botón de Logout (Secundario) */
 .btn-akademic.btn-secondary {
-    background: transparent;
-    border: 2px solid var(--color-text-secondary);
-    color: var(--color-text-secondary);
+  background: transparent;
+  border: 2px solid var(--color-text-secondary);
+  color: var(--color-text-secondary);
 }
+
 .btn-akademic.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--color-text-primary);
-    border-color: var(--color-text-primary);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Botón de Registro (Primario) - Basado en color Estudiante Accent */
 .btn-akademic.btn-primary {
-    background: var(--color-estudiante-accent); 
-    border: 2px solid var(--color-estudiante-accent);
-    color: var(--color-bg-dark); /* Texto negro para contraste en fondo cian brillante */
-}
-.btn-akademic.btn-primary:hover {
-    background: #007D82; /* Tono ligeramente más oscuro al pasar el ratón */
-    border-color: #007D82;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  background: #4DFFFF;
+  border: 2px solid #4DFFFF;
+  color: var(--color-bg-dark);
 }
 
-/* --- ESTILOS MÓVILES --- */
-.header-mobile-toggle {
-  display: none;
+.btn-akademic.btn-primary:hover {
+  background: #007D82;
+  border-color: #007D82;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
-.header-mobile-menu {
+
+/* --- MÓVIL --- */
+.header-mobile-toggle {
   display: none;
 }
 
 @media (max-width: 992px) {
   .header-nav-container {
-      padding: 0 1.5rem;
+    padding: 0 1.5rem;
   }
+
   .header-desktop-content {
-    display: none; 
+    display: none;
   }
 
   .header-mobile-toggle {
@@ -275,79 +381,102 @@
     background: none;
     border: none;
     color: var(--color-text-primary);
-    font-size: 2rem; /* Icono más grande */
+    font-size: 2rem;
     cursor: pointer;
+    z-index: 100;
   }
 
   .header-mobile-menu {
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: var(--header-height); 
+    top: var(--header-height);
     left: 0;
     width: 100%;
-    background: var(--color-bg-dark); /* Fondo oscuro para móviles */
-    padding: 1.5rem 1.5rem 2rem 1.5rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    background: var(--color-bg-dark);
+    padding: 1.5rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     border-top: 1px solid var(--card-border);
     animation: fadeInDown 0.3s ease;
+    z-index: 5000;
+    gap: 1.5rem;
   }
 
-  /* Links Móviles */
-  .header-nav-links-mobile {
+  .header-nav-mobile {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem; /* Más espacio */
+    gap: 1rem;
     border-bottom: 1px solid var(--card-border);
     padding-bottom: 1.5rem;
-    margin-bottom: 1.5rem;
   }
 
-  .header-nav-links-mobile a {
-    font-size: 1.2rem; /* Texto más grande */
+  .header-nav-item-mobile {
+    font-size: 1.1rem;
     font-weight: 500;
-    color: var(--color-text-primary); 
+    color: var(--color-text-primary);
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 0.8rem 1rem; 
+    gap: 0.8rem;
+    padding: 0.8rem 1rem;
     border-radius: 8px;
     transition: all 0.3s ease;
-  }
-  
-  .header-nav-links-mobile a:hover {
-    background: rgba(255, 255, 255, 0.15); 
-    color: var(--color-text-primary);
+    border: none;
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
   }
 
-  /* --- Roles para Activo en Móvil (Usando colores soft y accent) --- */
-  .role-admin .header-nav-links-mobile a.active { background: var(--color-admin-soft); color: var(--color-admin-accent); }
-  .role-docente .header-nav-links-mobile a.active { background: var(--color-docente-soft); color: var(--color-docente-accent); }
-  .role-estudiante .header-nav-links-mobile a.active { background: var(--color-estudiante-soft); color: var(--color-estudiante-accent); }
-  .role-public .header-nav-links-mobile a.active { background: rgba(255, 255, 255, 0.1); color: var(--color-text-primary); }
-  
-  /* Auth Móvil */
-  .header-auth-links-mobile {
+  .header-nav-item-mobile:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .header-dropdown-mobile {
+    position: static;
+  }
+
+  .header-dropdown-menu-mobile {
+    position: static;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    margin: 1rem 0 0 1rem;
+    padding: 1rem 0 0 1rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    min-width: auto;
+    display: none;
+    flex-direction: column;
+  }
+
+  .header-dropdown-mobile.open .header-dropdown-menu-mobile {
+    display: flex;
+  }
+
+  .header-auth-mobile {
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    border-top: 1px solid var(--card-border);
+    padding-top: 1.5rem;
   }
-  
-  .header-auth-links-mobile .btn-akademic {
+
+  .header-auth-mobile .btn-akademic {
     width: 100%;
     justify-content: center;
   }
-  
-  .header-auth-links-mobile .header-user-welcome {
+
+  .header-auth-mobile .header-user-welcome {
     text-align: center;
     font-size: 1.1rem;
-    margin-bottom: 0.5rem;
     color: var(--color-text-primary);
   }
 }
 
-/* Keyframe para el menú desplegable */
 @keyframes fadeInDown {
   from {
     opacity: 0;

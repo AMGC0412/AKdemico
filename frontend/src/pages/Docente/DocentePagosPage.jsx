@@ -1,137 +1,188 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import { obtenerPagosPendientes, validarPago } from '../../services/pagos.service.js';
-import './DocentePagosPage.css'; // Importamos el CSS de este módulo
-import { FaCreditCard, FaCheck, FaTimes, FaSpinner, FaPaperclip, FaHourglassHalf, FaCalendarAlt, FaTimesCircle, FaCheckCircle } from 'react-icons/fa';
+import './DocentePagosPage.css'; 
+import { 
+    FaMoneyBillWave, FaCheck, FaTimes, FaSpinner, FaEye, 
+    FaCalendarAlt, FaUserGraduate, FaReceipt, FaBarcode, FaHashtag 
+} from 'react-icons/fa';
 
 const DocentePagosPage = () => {
     const [pagos, setPagos] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(null); 
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+    const [mensaje, setMensaje] = useState(null);
+    const [imagenModal, setImagenModal] = useState(null);
 
-    // Función para cargar/recargar la lista de pagos
-    const cargarPagos = async () => {
+    const cargarData = async () => {
         setLoading(true);
-        setError(null);
         try {
             const data = await obtenerPagosPendientes();
             setPagos(data);
         } catch (err) {
-            setError(err.mensaje || "Error al cargar los pagos pendientes.");
+            setError("Error de conexión al cargar pagos.");
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        cargarPagos();
-    }, []);
+    useEffect(() => { cargarData(); }, []);
 
-    // Función para validar/rechazar el pago
-    const handleValidarRechazar = async (pagoId, accion) => {
-        const estado = accion === 'aprobar' ? 'validado' : 'rechazado';
-        let observacion = '';
+    const procesar = async (id, accion) => {
+        const esAprobar = accion === 'aprobar';
+        let obs = '';
 
-        // Si la acción es rechazar, solicitamos un motivo al docente
-        if (accion === 'rechazar') {
-             observacion = window.prompt('Escribe el motivo del rechazo (obligatorio si rechazas):');
-             if (!observacion) {
-                 setError('Debes proporcionar un motivo para rechazar el pago.');
-                 return;
-             }
-        }
-        
-        if (!window.confirm(`¿Confirmas que deseas ${estado.toUpperCase()} este pago?`)) {
-            return;
+        if (!esAprobar) {
+            obs = prompt("Motivo del rechazo (Obligatorio):");
+            if (!obs) return alert("El motivo es obligatorio.");
+        } else {
+            if (!confirm("¿Validar este pago y activar la inscripción?")) return;
         }
 
-        setLoading(true); // Bloquear UI
-        setSuccessMessage(null);
-        setError(null);
-
+        setActionLoading(id);
         try {
-            const respuesta = await validarPago(pagoId, { estado, observacion });
-            setSuccessMessage(respuesta.mensaje || `Pago ${estado} exitosamente.`);
-            
-            // Recargar la lista para eliminar el pago procesado
-            await cargarPagos(); 
-
+            await validarPago(id, { 
+                estado: esAprobar ? 'validado' : 'rechazado', 
+                observacion: obs 
+            });
+            setMensaje(esAprobar ? "¡Transacción aprobada con éxito!" : "Transacción rechazada.");
+            setPagos(prev => prev.filter(p => p.pago_id !== id)); 
         } catch (err) {
-            setError(err.mensaje || "No se pudo procesar la solicitud.");
+            alert(err.mensaje || "Error al procesar.");
         } finally {
-            setLoading(false);
-            // Limpiar mensaje después de un tiempo
-            setTimeout(() => setSuccessMessage(null), 4000);
+            setActionLoading(null);
+            setTimeout(() => setMensaje(null), 4000);
         }
     };
-
-    if (loading && pagos.length === 0) return <div className="page-loading"><FaSpinner className="spinner" /> Cargando lista de pagos...</div>;
 
     return (
-        <div className="docente-pagos-page page-container">
-            <div className="page-header-actions">
-                <h1><FaCreditCard /> Validación de Pagos</h1>
-                <p className="page-summary">Revisa los comprobantes de pago subidos por tus estudiantes y valida la transacción.</p>
-            </div>
+        <div className="pagos-page-wrapper">
+            <div className="cyber-grid-bg"></div>
             
-            {error && <div className="message error"><FaTimesCircle /> {error}</div>}
-            {successMessage && <div className="message success"><FaCheckCircle /> {successMessage}</div>}
-            
-            {pagos.length === 0 && !loading ? (
-                 <div className="no-data-box frosted-glass">
-                    <h3><FaCheckCircle /> No hay pagos pendientes de revisión.</h3>
-                    <p>¡Todo está al día!</p>
-                 </div>
-            ) : (
-                <div className="pagos-list-grid">
-                    {pagos.map(pago => (
-                        <div key={pago.pago_id} className="pago-card frosted-glass">
-                            <div className="pago-header">
-                                <span className="pago-status-pending"><FaHourglassHalf /> Pendiente</span>
-                                <span className="pago-monto">S/ {Number(pago.monto).toFixed(2)}</span>
-                            </div>
-                            
-                            <div className="pago-details">
-                                <p><strong>Estudiante:</strong> {pago.estudiante_nombre} ({pago.estudiante_correo})</p>
-                                <p><strong>Curso:</strong> {pago.curso_titulo}</p>
-                                <p><strong>Inscripción:</strong> #{pago.inscripcion_id}</p>
-                                <p className="fecha-subida"><FaCalendarAlt /> Subido el: {new Date(pago.fecha_subida).toLocaleDateString()}</p>
-                                
-                                {pago.comprobante_url && (
-                                    // Servimos el archivo usando la ruta estática del backend /files
-                                    <a href={`http://localhost:4000/files/${pago.comprobante_url}`} target="_blank" rel="noopener noreferrer" className="btn-comprobante-link">
-                                        <FaPaperclip /> Ver Comprobante
-                                    </a>
-                                )}
-                            </div>
-                            
-                            <div className="pago-acciones">
-                                <button 
-                                    onClick={() => handleValidarRechazar(pago.pago_id, 'aprobar')} 
-                                    className="btn btn-primary btn-accion-sm"
-                                    disabled={loading}
-                                >
-                                    <FaCheck /> Aprobar
-                                </button>
-                                <button 
-                                    onClick={() => handleValidarRechazar(pago.pago_id, 'rechazar')} 
-                                    className="btn btn-danger btn-accion-sm"
-                                    disabled={loading}
-                                >
-                                    <FaTimes /> Rechazar
-                                </button>
-                            </div>
-                            
+            <div className="pagos-container">
+                {/* HEADER */}
+                <header className="pagos-header">
+                    <div className="header-glow"></div>
+                    <div className="header-content">
+                        <div className="icon-box">
+                            <FaMoneyBillWave />
                         </div>
-                    ))}
-                </div>
-            )}
+                        <div className="title-box">
+                            <h1>Validación de Tesorería</h1>
+                            <p>Centro de control de transacciones entrantes.</p>
+                        </div>
+                        <div className="stats-box">
+                            <span className="stat-label">COLA DE REVISIÓN</span>
+                            <span className="stat-number">{pagos.length}</span>
+                        </div>
+                    </div>
+                </header>
 
-            {/* Spinner global (solo si la lista ya cargó y está haciendo una acción) */}
-            {loading && pagos.length > 0 && (
-                <div className="overlay-spinner">
-                    <FaSpinner className="spinner" size={40} />
+                {/* NOTIFICACIONES */}
+                {mensaje && (
+                    <div className={`cyber-toast ${mensaje.includes('rechazada') ? 'warning' : 'success'}`}>
+                        <div className="toast-icon">
+                            {mensaje.includes('rechazada') ? <FaTimes /> : <FaCheck />}
+                        </div>
+                        <span>{mensaje}</span>
+                    </div>
+                )}
+
+                {/* CONTENIDO */}
+                {loading ? (
+                    <div className="loader-cyber">
+                        <FaSpinner className="spin-icon" />
+                        <p>ESCANEANDO TRANSACCIONES...</p>
+                    </div>
+                ) : pagos.length === 0 ? (
+                    <div className="empty-state-cyber">
+                        <div className="empty-icon"><FaCheck /></div>
+                        <h3>Bandeja Sincronizada</h3>
+                        <p>No hay operaciones pendientes en este momento.</p>
+                    </div>
+                ) : (
+                    <div className="tickets-grid">
+                        {pagos.map((p, index) => (
+                            <div 
+                                key={p.pago_id} 
+                                className={`cyber-ticket ${actionLoading === p.pago_id ? 'processing' : ''}`}
+                                style={{ animationDelay: `${index * 0.1}s` }} 
+                            >
+                                {/* CINTA DE ESTADO */}
+                                <div className="ticket-status-bar"></div>
+
+                                {/* CABECERA TICKET */}
+                                <div className="ticket-header">
+                                    <div className="amount-group">
+                                        <span className="currency">S/</span>
+                                        <span className="value">{Number(p.monto).toFixed(2)}</span>
+                                    </div>
+                                    <div className="id-badge">
+                                        <FaHashtag /> {p.pago_id.toString().padStart(4, '0')}
+                                    </div>
+                                </div>
+
+                                {/* CUERPO TICKET */}
+                                <div className="ticket-body">
+                                    <div className="info-group">
+                                        <label><FaUserGraduate /> ALUMNO</label>
+                                        <div className="info-value highlight">{p.estudiante_nombre}</div>
+                                        <div className="info-sub">{p.estudiante_correo}</div>
+                                    </div>
+
+                                    <div className="info-group">
+                                        <label><FaBarcode /> CONCEPTO</label>
+                                        <div className="info-value">{p.curso_titulo}</div>
+                                    </div>
+
+                                    <div className="info-meta">
+                                        <span><FaCalendarAlt /> {new Date(p.fecha_subida).toLocaleDateString()}</span>
+                                        <span className="status-dot">PENDIENTE</span>
+                                    </div>
+
+                                    <button 
+                                        className="btn-evidence"
+                                        onClick={() => setImagenModal(p.comprobante_url)}
+                                    >
+                                        <FaReceipt /> <span>VER EVIDENCIA</span> <FaEye className="eye" />
+                                    </button>
+                                </div>
+
+                                {/* ACCIONES (PIE DEL TICKET) */}
+                                <div className="ticket-footer">
+                                    <button 
+                                        className="action-btn reject"
+                                        disabled={actionLoading === p.pago_id}
+                                        onClick={() => procesar(p.pago_id, 'rechazar')}
+                                    >
+                                        RECHAZAR
+                                    </button>
+                                    <button 
+                                        className="action-btn approve"
+                                        disabled={actionLoading === p.pago_id}
+                                        onClick={() => procesar(p.pago_id, 'aprobar')}
+                                    >
+                                        {actionLoading === p.pago_id ? <FaSpinner className="spin-icon"/> : 'AUTORIZAR'}
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* LIGHTBOX DE ALTA DEFINICIÓN */}
+            {imagenModal && (
+                <div className="cyber-modal-overlay" onClick={() => setImagenModal(null)}>
+                    <div className="cyber-modal-window" onClick={e => e.stopPropagation()}>
+                        <div className="cyber-modal-header">
+                            <h4>EVIDENCIA DIGITAL</h4>
+                            <button onClick={() => setImagenModal(null)}><FaTimes/></button>
+                        </div>
+                        <div className="cyber-modal-content">
+                            <img src={`http://localhost:4000/files/${imagenModal}`} alt="Comprobante" />
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

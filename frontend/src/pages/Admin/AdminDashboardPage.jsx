@@ -1,25 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getDashboardMetrics } from '../../services/admin.service';
+import { getDashboardMetrics } from '../../services/admin.service'; 
 import { useAuth } from '../../context/AuthContext';
 import { 
-  FaUsers, FaDollarSign, FaChalkboardTeacher, FaUserCheck, 
-  FaSpinner, FaExclamationTriangle,
-  FaUserClock, FaFlag, FaArrowRight
+  FaUsers, FaDollarSign, FaChalkboardTeacher, FaCalendarCheck, FaFlag, FaArrowRight,
+  FaSpinner, FaExclamationTriangle, FaUserClock, FaChartBar, FaClipboardList,
+  FaArrowUp, FaArrowDown
 } from 'react-icons/fa';
 import './AdminDashboardPage.css';
 
 /**
- * Tarjeta de estadística individual para el grid.
+ * Tarjeta de estadística individual (Estructura de Terminal de Datos).
  */
-const StatCard = ({ icon, label, value, colorClass }) => (
+const StatCard = ({ icon, label, value, colorClass, delta }) => (
   <div className={`stat-card ${colorClass}`}>
-    <div className="stat-card-icon">
-      {icon}
+    <div className="stat-card-top-info">
+      <div className="stat-card-icon">{icon}</div>
+      {/* Línea de escaneo decorativa */}
+      <div className="top-scan-line"></div> 
     </div>
-    <div className="stat-card-info">
+    
+    <div className="stat-card-value-row">
       <span className="stat-card-value">{value}</span>
+    </div>
+    
+    <div className="stat-card-footer-info">
       <span className="stat-card-label">{label}</span>
+      {delta !== undefined && (
+        <span className={`stat-delta ${delta >= 0 ? 'up' : 'down'}`}>
+          {delta >= 0 ? <FaArrowUp /> : <FaArrowDown />}
+          {Math.abs(delta)}%
+        </span>
+      )}
     </div>
   </div>
 );
@@ -33,7 +45,7 @@ const PendingActionsCard = ({ actions }) => {
 
   return (
     <div className="admin-section-container pending-actions-card">
-      <h3 className="admin-section-title">Centro de Acciones</h3>
+      <h3 className="admin-section-title"><FaClipboardList /> CENTRO DE ACCIONES</h3>
       <ul className="pending-actions-list">
         {/* Tarea 1: Verificaciones */}
         <li>
@@ -42,7 +54,7 @@ const PendingActionsCard = ({ actions }) => {
               <FaUserClock />
             </div>
             <div className="action-item-info">
-              <span>Verificaciones Pendientes</span>
+              <span>Verificaciones Docentes</span>
               <small>{hasVerificaciones ? 'Docentes esperando aprobación' : 'No hay tareas pendientes'}</small>
             </div>
             <span className={`action-count ${hasVerificaciones ? 'highlight' : ''}`}>
@@ -58,7 +70,7 @@ const PendingActionsCard = ({ actions }) => {
               <FaFlag />
             </div>
             <div className="action-item-info">
-              <span>Reseñas Reportadas</span>
+              <span>Moderación Reseñas</span>
               <small>{hasResenas ? 'Reseñas marcadas por abuso' : 'No hay tareas pendientes'}</small>
             </div>
             <span className={`action-count ${hasResenas ? 'highlight' : ''}`}>
@@ -73,11 +85,37 @@ const PendingActionsCard = ({ actions }) => {
 };
 
 /**
+ * Componente para la barra de progreso (Desglose de Usuarios).
+ */
+const UserBreakdownBar = ({ total, current, label, color }) => {
+    const percentage = total > 0 ? ((current / total) * 100) : 0;
+    return (
+        <div className="breakdown-bar-wrapper">
+            <div className="bar-info">
+                <span className="bar-label">{label}</span>
+                <span className="bar-percentage" style={{color: color}}>{percentage.toFixed(1)}%</span>
+            </div>
+            <div className="bar-container">
+                <div 
+                    className="bar-progress" 
+                    style={{ 
+                        width: `${percentage}%`, 
+                        backgroundColor: color, 
+                        boxShadow: `0 0 10px ${color}`
+                    }}
+                ></div>
+            </div>
+        </div>
+    );
+};
+
+
+/**
  * Página principal del Dashboard del Administrador.
  */
 const AdminDashboardPage = () => {
   const { usuario } = useAuth();
-  const [metrics, setMetrics] = useState(null);
+  const [metrics, setMetrics] = useState(null); 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -86,11 +124,11 @@ const AdminDashboardPage = () => {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await getDashboardMetrics();
+        // LLAMADA REAL (Descomentar y usar la función real en producción)
+        const data = await getDashboardMetrics(); 
         setMetrics(data);
       } catch (err) {
-        console.error("Error al cargar métricas:", err);
-        setError("No se pudieron cargar las métricas. Inténtalo de nuevo.");
+        setError("Error de conexión con la Matrix. No se pudieron cargar las métricas.");
       } finally {
         setIsLoading(false);
       }
@@ -99,125 +137,140 @@ const AdminDashboardPage = () => {
     fetchMetrics();
   }, []);
 
-  // Función para formatear los nombres de los roles
-  const formatearRol = (rol) => {
-    const formatos = {
-      'estudiante': 'Estudiante',
-      'docente': 'Profesor',
-      'administrador': 'Administrador'
-    };
-    return formatos[rol] || rol;
+  // Función para formatear los nombres de los roles y asignar colores
+  const getRoleStyle = (rol) => {
+    const item = metrics?.usuarios?.detalle?.find(d => d.rol === rol);
+    const count = item ? item.total : 0;
+    
+    switch (rol) {
+        case 'estudiante': return { label: 'Estudiante', color: 'var(--color-data)', count: count }; 
+        case 'docente': return { label: 'Profesor', color: 'var(--color-secondary)', count: count }; 
+        case 'administrador': return { label: 'Administrador', color: 'var(--color-primary)', count: count }; 
+        default: return { label: capitalizar(rol), color: 'var(--color-text-light)', count: count };
+    }
+  };
+  const capitalizar = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+
+  const totalUsuarios = metrics?.usuarios?.total || 1; 
+  
+  // Datos MOCK de Delta (Asumiendo que el servicio real los proporciona)
+  const mockDelta = (value) => {
+    switch(value) {
+        case 'Usuarios Totales': return 2.5;
+        case 'Ingresos (Total)': return -1.2;
+        case 'Lotes Activos': return 5;
+        case 'Inscripciones': return 0.8;
+        default: return undefined;
+    }
   };
 
-  // Estado de Carga
+  // --- Renderizado de Estados ---
   if (isLoading) {
     return (
-      <div className="admin-page-loader">
-        <FaSpinner className="fa-spin" size="3em" />
-        <p>Cargando métricas...</p>
+      <div className="admin-page-state loading">
+        <FaSpinner className="spin-icon" />
+        <p>CALIBRANDO SISTEMA...</p>
       </div>
     );
   }
 
-  // Estado de Error
   if (error) {
     return (
-      <div className="admin-page-error">
-        <FaExclamationTriangle size="3em" />
-        <h3>Error al Cargar</h3>
+      <div className="admin-page-state error">
+        <FaExclamationTriangle className="error-icon" />
+        <h3>ERROR: FALLA EN LA MATRIZ</h3>
         <p>{error}</p>
       </div>
     );
   }
 
   return (
-    <div className="admin-dashboard-page admin-dashboard-layout">
+    <div className="admin-dashboard-page">
       
       {/* --- COLUMNA PRINCIPAL --- */}
       <div className="dashboard-main-content">
         <header className="admin-page-header">
-          <h2>¡Bienvenido, {usuario?.nombre}!</h2>
-          <p>Este es el resumen del estado de la plataforma.</p>
+          <h2 className="admin-page-title">BIENVENIDO, {usuario?.nombre?.toUpperCase()}!</h2>
+          <p className="admin-page-subtitle">Panel de Control Operacional de la Plataforma.</p>
         </header>
 
-        {/* --- Grid de Estadísticas --- */}
+        {/* --- Grid de Estadísticas (KPI) --- */}
         <div className="stats-grid">
           <StatCard
             icon={<FaUsers />}
             label="Usuarios Totales"
             value={metrics?.usuarios?.total || 0}
             colorClass="color-primary"
+            delta={mockDelta('Usuarios Totales')}
           />
           <StatCard
             icon={<FaDollarSign />}
-            label="Ingresos Totales"
+            label="Ingresos (Total)"
             value={`S/ ${parseFloat(metrics?.ingresosTotales || 0).toFixed(2)}`}
             colorClass="color-success"
+            delta={mockDelta('Ingresos (Total)')}
           />
           <StatCard
             icon={<FaChalkboardTeacher />}
-            label="Lotes Publicados"
+            label="Lotes Activos"
             value={metrics?.lotesPublicados || 0}
             colorClass="color-secondary"
+            delta={mockDelta('Lotes Activos')}
           />
           <StatCard
-            icon={<FaUserCheck />}
-            label="Inscripciones Pagadas"
+            icon={<FaCalendarCheck />}
+            label="Inscripciones"
             value={metrics?.inscripcionesCompletadas || 0}
-            colorClass="color-warning"
+            colorClass="color-data"
+            delta={mockDelta('Inscripciones')}
           />
+        </div>
+        
+        {/* --- Desglose de Usuarios (Gráfico de Barras Simple) --- */}
+        <div className="admin-section-container user-breakdown-card">
+          <h3 className="admin-section-title"><FaChartBar /> DISTRIBUCIÓN DE ROLES</h3>
+          <div className="breakdown-chart-area">
+            {['estudiante', 'docente', 'administrador'].map((rol) => {
+                const style = getRoleStyle(rol);
+                return (
+                    <UserBreakdownBar 
+                        key={rol}
+                        total={totalUsuarios}
+                        current={style.count}
+                        label={style.label}
+                        color={style.color}
+                    />
+                );
+            })}
+          </div>
         </div>
       </div>
       
-      {/* --- COLUMNA SECUNDARIA --- */}
+      {/* --- COLUMNA SECUNDARIA (SIDEBAR) --- */}
       <div className="dashboard-sidebar-content">
         
         {/* --- Centro de Acciones Pendientes --- */}
         {metrics && <PendingActionsCard actions={metrics.accionesPendientes} />}
 
-        {/* --- Desglose de Usuarios --- */}
-        <div className="admin-section-container">
-          <h3 className="admin-section-title">Desglose de Usuarios</h3>
-          <div className="admin-table-container">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Rol de Usuario</th>
-                  <th>Cantidad Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {metrics?.usuarios?.detalle?.length > 0 ? (
-                  metrics.usuarios.detalle.map((item) => (
-                    <tr key={item.rol}>
-                      <td className="rol-capitalize">{formatearRol(item.rol)}</td>
-                      <td>{item.total}</td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="2" style={{ textAlign: 'center', color: '#A0A0A0' }}>
-                      No hay datos de usuarios disponibles
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-              <tfoot>
-                <tr>
-                  <td style={{ fontWeight: 'bold', color: '#FFFFFF' }}>Total General</td>
-                  <td style={{ fontWeight: 'bold', color: '#FFFFFF' }}>
-                    {metrics?.usuarios?.total || 0}
-                  </td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+        {/* --- Log de Actividad Reciente --- */}
+        <div className="admin-section-container recent-activity-card">
+            <h3 className="admin-section-title"><FaFlag /> LOG DE ACTIVIDAD</h3>
+            <ul className="activity-list">
+                {metrics?.actividadReciente?.map((act, index) => (
+                    <li key={index} className={`activity-item status-${act.estado}`}>
+                        <span className="activity-type">{act.tipo}</span>
+                        <span className="activity-desc">{act.descripcion}</span>
+                        <FaArrowRight className="activity-arrow" />
+                    </li>
+                ))}
+            </ul>
+            <Link to="/admin/logs" className="btn-view-all">VER LOG COMPLETO</Link>
         </div>
+        
       </div>
       
     </div>
   );
 };
 
-// CORRECCIÓN: Exportación por defecto
 export default AdminDashboardPage;

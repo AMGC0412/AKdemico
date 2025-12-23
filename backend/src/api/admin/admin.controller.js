@@ -5,63 +5,37 @@ import { query } from '../../config/database.js';
  */
 export const obtenerMetricasDashboard = async (req, res) => {
   try {
-    // --- Consultas de Métricas Principales ---
-
-    // 1. Conteo de Usuarios por Rol - CORREGIDO según la estructura de BD
+    // 1. Conteo de Usuarios por Rol
     const conteoUsuarios = await query(`
-      SELECT 
-        rol, 
-        COUNT(*) as total 
-      FROM usuarios 
-      WHERE rol IN ('estudiante', 'docente', 'administrador')
-      GROUP BY rol
-      ORDER BY 
-        CASE rol 
-          WHEN 'administrador' THEN 1
-          WHEN 'docente' THEN 2
-          WHEN 'estudiante' THEN 3
-          ELSE 4
-        END
+      SELECT r.nombre as rol, COUNT(ur.usuario_id) as total 
+      FROM roles r
+      LEFT JOIN usuario_roles ur ON r.id = ur.rol_id
+      GROUP BY r.nombre
     `);
 
-    // 2. Total de Lotes Publicados - CORREGIDO
+    // 2. Lotes activos (programados o en curso)
     const [totalLotes] = await query(`
-      SELECT COUNT(*) as total 
-      FROM cursos_lotes 
+      SELECT COUNT(*) as total FROM cursos_lotes 
       WHERE estado IN ('programado', 'en_curso')
     `);
 
-    // 3. Total de Inscripciones Pagadas - CORREGIDO
+    // 3. Inscripciones pagadas
     const [totalInscripciones] = await query(`
-      SELECT COUNT(*) as total 
-      FROM inscripciones 
+      SELECT COUNT(*) as total FROM inscripciones 
       WHERE estado = 'inscrito'
     `);
 
-    // 4. Total de Ingresos (Pagos Validados) - CORREGIDO
+    // 4. Ingresos totales (Pagos validados)
     const [ingresos] = await query(`
-      SELECT SUM(monto) as total 
-      FROM pagos 
+      SELECT COALESCE(SUM(monto), 0) as total FROM pagos 
       WHERE estado = 'validado'
     `);
 
-    // 5. Conteo de Verificaciones de Docentes Pendientes - CORREGIDO
-    const [conteoVerificaciones] = await query(`
-      SELECT COUNT(*) as total 
-      FROM verificaciones_docente 
-      WHERE estado = 'en_revision'
-    `);
+    // 5. Verificaciones y Reseñas pendientes
+    const [conteoVerificaciones] = await query("SELECT COUNT(*) as total FROM verificaciones_docente WHERE estado = 'en_revision'");
+    const [conteoResenas] = await query("SELECT COUNT(*) as total FROM resenas WHERE estado = 'reportada'");
 
-    // 6. Conteo de Reseñas Reportadas - CORREGIDO
-    const [conteoResenas] = await query(`
-      SELECT COUNT(*) as total 
-      FROM resenas 
-      WHERE estado = 'reportada'
-    `);
-
-    // --- Formateamos la respuesta ---
-    const metricas = {
-      // Métricas Principales
+    res.status(200).json({
       usuarios: {
         total: conteoUsuarios.reduce((acc, item) => acc + item.total, 0),
         detalle: conteoUsuarios
@@ -69,24 +43,13 @@ export const obtenerMetricasDashboard = async (req, res) => {
       lotesPublicados: totalLotes?.total || 0,
       inscripcionesCompletadas: totalInscripciones?.total || 0,
       ingresosTotales: ingresos?.total || 0,
-
-      // Acciones Pendientes
       accionesPendientes: {
         verificaciones: conteoVerificaciones?.total || 0,
         resenas: conteoResenas?.total || 0
       }
-    };
-
-    console.log('Métricas obtenidas:', metricas); // Para debug
-
-    res.status(200).json(metricas);
-
-  } catch (error) {
-    console.error('Error al obtener métricas del dashboard:', error);
-    res.status(500).json({ 
-      mensaje: 'Error interno del servidor.',
-      error: error.message 
     });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener métricas.', error: error.message });
   }
 };
 
@@ -96,34 +59,15 @@ export const obtenerMetricasDashboard = async (req, res) => {
 export const obtenerTodasLasVerificaciones = async (req, res) => {
   try {
     const sql = `
-      SELECT 
-        v.id, 
-        v.docente_id, 
-        v.fecha_postulacion,
-        v.fecha_revision,
-        v.estado, 
-        v.url_cv, 
-        v.url_dni, 
-        v.url_titulo,
-        v.observaciones_admin,
-        u.nombre AS docente_nombre,
-        u.correo AS docente_correo
-      FROM 
-        verificaciones_docente v
-      JOIN 
-        usuarios u ON v.docente_id = u.id
-      ORDER BY 
-        v.fecha_postulacion DESC
+      SELECT v.*, u.nombre AS docente_nombre, u.correo AS docente_correo
+      FROM verificaciones_docente v
+      JOIN usuarios u ON v.docente_id = u.id
+      ORDER BY v.fecha_postulacion DESC
     `;
     const verificaciones = await query(sql);
     res.status(200).json(verificaciones);
-
   } catch (error) {
-    console.error('Error al obtener todas las verificaciones:', error);
-    res.status(500).json({ 
-      mensaje: 'Error interno del servidor.',
-      error: error.message 
-    });
+    res.status(500).json({ mensaje: 'Error al obtener verificaciones.' });
   }
 };
 
@@ -133,41 +77,16 @@ export const obtenerTodasLasVerificaciones = async (req, res) => {
 export const aprobarVerificacion = async (req, res) => {
   const { id } = req.params;
   const { observaciones } = req.body;
-  
   try {
-    const [verificacion] = await query(
-      "SELECT docente_id FROM verificaciones_docente WHERE id = ?", 
-      [id]
-    );
+    const [verificacion] = await query("SELECT docente_id FROM verificaciones_docente WHERE id = ?", [id]);
+    if (!verificacion) return res.status(404).json({ mensaje: 'No encontrada.' });
+
+    await query("UPDATE verificaciones_docente SET estado = 'aprobado', observaciones_admin = ?, fecha_revision = NOW() WHERE id = ?", [observaciones, id]);
+    await query("UPDATE usuarios SET estado_verificacion = 'verificado' WHERE id = ?", [verificacion.docente_id]);
     
-    if (!verificacion) {
-      return res.status(404).json({ mensaje: 'Verificación no encontrada.' });
-    }
-    
-    const { docente_id } = verificacion;
-    
-    // Actualizar verificación
-    await query(
-      `UPDATE verificaciones_docente 
-       SET estado = 'aprobado', observaciones_admin = ?, fecha_revision = NOW() 
-       WHERE id = ?`,
-      [observaciones || null, id]
-    );
-    
-    // Actualizar estado del usuario
-    await query(
-      "UPDATE usuarios SET estado_verificacion = 'verificado' WHERE id = ?",
-      [docente_id]
-    );
-    
-    res.status(200).json({ mensaje: 'Docente aprobado y verificado exitosamente.' });
-    
+    res.status(200).json({ mensaje: 'Docente aprobado.' });
   } catch (error) {
-    console.error('Error al aprobar la verificación:', error);
-    res.status(500).json({ 
-      mensaje: 'Error interno del servidor.',
-      error: error.message 
-    });
+    res.status(500).json({ mensaje: 'Error en aprobación.' });
   }
 };
 
@@ -230,117 +149,78 @@ export const obtenerTodosLosUsuarios = async (req, res) => {
 
     let sql = `
       SELECT 
-        id, 
-        nombre, 
-        correo, 
-        rol, 
-        estado_verificacion,
-        ciudad,
-        foto_url
-      FROM usuarios
+        u.id, u.nombre, u.correo, u.estado_verificacion, u.ciudad, u.foto_url,
+        GROUP_CONCAT(r.nombre) as roles_string
+      FROM usuarios u
+      LEFT JOIN usuario_roles ur ON u.id = ur.usuario_id
+      LEFT JOIN roles r ON ur.rol_id = r.id
     `;
     const params = [];
 
-    // --- Lógica de Filtros ---
-    let whereAdded = false;
-
-    // 1. Filtro de Búsqueda (nombre o correo)
     if (search) {
-      sql += ' WHERE (nombre LIKE ? OR correo LIKE ?)';
-      params.push(`%${search}%`);
-      params.push(`%${search}%`);
-      whereAdded = true;
+      sql += ' WHERE (u.nombre LIKE ? OR u.correo LIKE ?)';
+      params.push(`%${search}%`, `%${search}%`);
     }
 
-    // 2. Filtro de Rol
+    sql += ' GROUP BY u.id';
+
     if (rol) {
-      sql += whereAdded ? ' AND' : ' WHERE';
-      sql += ' rol = ?';
-      params.push(rol);
+      sql += ' HAVING roles_string LIKE ?';
+      params.push(`%${rol}%`);
     }
     
-    sql += ' ORDER BY nombre ASC';
+    sql += ' ORDER BY u.nombre ASC';
 
-    const usuarios = await query(sql, params);
-    res.status(200).json(usuarios);
+    const resultados = await query(sql, params);
 
+    // Formatear la respuesta: Convertir "docente,estudiante" en ["docente", "estudiante"]
+    const usuariosFormateados = resultados.map(u => ({
+      ...u,
+      roles: u.roles_string ? u.roles_string.split(',') : []
+    }));
+
+    res.status(200).json(usuariosFormateados);
   } catch (error) {
-    console.error('Error al obtener todos los usuarios:', error);
-    res.status(500).json({ 
-      mensaje: 'Error interno del servidor.',
-      error: error.message 
-    });
+    res.status(500).json({ mensaje: 'Error al listar identidades.' });
   }
 };
 
 /**
  * Controlador para que un Admin actualice el ROL de un usuario
  */
-export const actualizarRolUsuario = async (req, res) => {
-  const { id } = req.params;
-  const { nuevoRol } = req.body;
+export const actualizarRolesUsuario = async (req, res) => {
+  const { id } = req.params; // ID del usuario a modificar
+  const { nuevosRoles } = req.body; // Se espera un array: ['estudiante', 'docente']
   const adminId = req.usuario.id;
 
-  // 1. Validar el nuevo rol
-  if (!nuevoRol || !['estudiante', 'docente', 'administrador'].includes(nuevoRol)) {
-    return res.status(400).json({ mensaje: 'El rol proporcionado no es válido.' });
-  }
-
-  // 2. Impedir que un admin se quite el rol a sí mismo
-  if (Number(id) === Number(adminId) && nuevoRol !== 'administrador') {
-    return res.status(403).json({ 
-      mensaje: 'No puedes cambiar tu propio rol de administrador.' 
-    });
+  // Seguridad: Evitar que un admin se quite a sí mismo el acceso total
+  if (Number(id) === Number(adminId) && !nuevosRoles.includes('administrador')) {
+    return res.status(403).json({ mensaje: 'No puedes revocar tu propio acceso de administrador.' });
   }
 
   try {
-    // Verificamos si es una "degradación" de un docente
-    if (nuevoRol !== 'docente') {
-      const [usuarioActual] = await query(
-        'SELECT rol FROM usuarios WHERE id = ?', 
-        [id]
-      );
+    // 1. Iniciar Transacción (Suponiendo que tu config de database soporta transacciones)
+    await query("START TRANSACTION");
 
-      // Si el usuario es actualmente 'docente' y lo queremos cambiar
-      if (usuarioActual && usuarioActual.rol === 'docente') {
-        
-        // Comprobamos si tiene cursos (lotes) asociados
-        const [cursos] = await query(
-          'SELECT COUNT(*) as total FROM cursos_lotes WHERE docente_id = ?', 
-          [id]
-        );
-        
-        // Comprobamos si tiene planes de estudio asociados
-        const [planes] = await query(
-          'SELECT COUNT(*) as total FROM planes_estudio WHERE docente_id = ?', 
-          [id]
-        );
+    // 2. Limpiar roles actuales del usuario
+    await query("DELETE FROM usuario_roles WHERE usuario_id = ?", [id]);
 
-        // Si tiene cursos O planes, bloqueamos la acción
-        if (cursos.total > 0 || planes.total > 0) {
-          return res.status(409).json({ 
-            mensaje: 'Error: No se puede cambiar el rol. El docente tiene cursos o planes de estudio activos. Reasígnelos o elimínelos primero.' 
-          });
-        }
-      }
+    // 3. Insertar la nueva selección de roles
+    if (nuevosRoles && nuevosRoles.length > 0) {
+      const sqlInsert = `
+        INSERT INTO usuario_roles (usuario_id, rol_id) 
+        SELECT ?, id FROM roles WHERE nombre IN (?)
+      `;
+      // Pasamos el array de nombres para el IN (?)
+      await query(sqlInsert, [id, nuevosRoles]);
     }
 
-    // Si pasa todas las validaciones, actualizamos el rol
-    const sql = 'UPDATE usuarios SET rol = ? WHERE id = ?';
-    const resultado = await query(sql, [nuevoRol, id]);
-
-    if (resultado.affectedRows === 0) {
-      return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
-    }
-
-    res.status(200).json({ mensaje: 'Rol del usuario actualizado exitosamente.' });
-
+    await query("COMMIT");
+    res.status(200).json({ mensaje: 'Roles sincronizados exitosamente.' });
   } catch (error) {
-    console.error('Error al actualizar rol de usuario:', error);
-    res.status(500).json({ 
-      mensaje: 'Error interno del servidor.',
-      error: error.message 
-    });
+    await query("ROLLBACK");
+    console.error("Error en actualizarRolesUsuario:", error);
+    res.status(500).json({ mensaje: 'Error al sincronizar permisos.' });
   }
 };
 

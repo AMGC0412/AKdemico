@@ -33,7 +33,7 @@ const DocenteVerificacionPage = () => {
             }
         };
         // Solo cargar si el usuario de AuthContext está listo y es docente
-        if (!authLoading && usuario?.rol === 'docente') {
+        if (!authLoading && usuario?.roles?.includes('docente')) {
             cargarEstado();
         } else if (authLoading) {
             // Esperar que la autenticación termine...
@@ -74,7 +74,7 @@ const DocenteVerificacionPage = () => {
     if (authLoading || loading) return <div className="page-loading">Cargando...</div>;
     
     // (La RutaDocente ya protege esto, pero es una doble seguridad)
-    if (!usuario || usuario.rol !== 'docente') {
+    if (!usuario || !usuario.roles?.includes('docente')) {
         return <Navigate to="/" replace />;
     }
 

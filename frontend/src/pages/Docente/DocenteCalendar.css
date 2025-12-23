@@ -1,0 +1,122 @@
+/* =================================================================
+   ARCHIVO: DocenteCalendar.css
+   DISEÑO: TACTICAL WEEKLY GRID
+   ================================================================= */
+
+.calendar-page {
+    padding: 2rem;
+    color: #FFF;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* HEADER */
+.calendar-header {
+    background: rgba(20, 20, 30, 0.9);
+    border: 1px solid rgba(51, 64, 204, 0.3);
+    border-left: 4px solid #3340CC;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.calendar-title h1 { margin: 0; font-family: 'Poppins', sans-serif; font-size: 1.8rem; display: flex; align-items: center; gap: 1rem; }
+.calendar-title p { margin: 0.5rem 0 0 0; color: #888; }
+.calendar-icon { color: #00F3FF; font-size: 2rem; filter: drop-shadow(0 0 10px #00F3FF); }
+
+/* CONTROLES DE SEMANA (Opcional si quisieras navegar entre fechas reales) */
+.week-controls {
+    display: flex; gap: 1rem; align-items: center;
+    background: rgba(0,0,0,0.3); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+}
+.current-week-label { font-family: 'Consolas', monospace; color: #00F3FF; font-weight: bold; letter-spacing: 1px; }
+
+/* GRID SEMANAL */
+.week-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 Días exactos */
+    gap: 1rem;
+    align-items: start;
+}
+
+/* COLUMNA DE DÍA */
+.day-column {
+    background: rgba(15, 15, 25, 0.8);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    min-height: 500px;
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.day-column:hover {
+    background: rgba(20, 20, 35, 0.95);
+    border-color: rgba(51, 64, 204, 0.3);
+    transform: translateY(-5px);
+}
+
+.day-column.today {
+    border-color: #00F3FF;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+    background: linear-gradient(180deg, rgba(0, 243, 255, 0.05) 0%, rgba(15, 15, 25, 0.8) 100%);
+}
+
+.day-header {
+    background: rgba(0,0,0,0.3);
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.day-name { display: block; font-size: 0.9rem; color: #AAA; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+.day-column.today .day-name { color: #00F3FF; text-shadow: 0 0 10px #00F3FF; }
+
+/* TARJETA DE CLASE (EVENTO) */
+.events-container {
+    padding: 0.8rem;
+    display: flex; flex-direction: column; gap: 0.8rem;
+}
+
+.class-card {
+    background: rgba(51, 64, 204, 0.1);
+    border-left: 3px solid #3340CC;
+    padding: 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative; overflow: hidden;
+}
+.class-card:hover {
+    background: rgba(51, 64, 204, 0.25);
+    transform: scale(1.02);
+}
+
+.class-card.presencial { border-left-color: #FFD600; } /* Amarillo para presencial */
+.class-card.virtual { border-left-color: #00F3FF; }    /* Cyan para virtual */
+
+.class-time {
+    font-family: 'Consolas', monospace; font-size: 0.8rem; color: #FFF; font-weight: bold;
+    display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.3rem;
+}
+.class-title {
+    font-size: 0.85rem; color: #E0E0E0; line-height: 1.3; font-weight: 600;
+}
+.class-badges {
+    display: flex; gap: 0.5rem; margin-top: 0.5rem;
+}
+.badge-mini {
+    font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; text-transform: uppercase;
+}
+.badge-mini.virtual { background: rgba(0, 243, 255, 0.1); color: #00F3FF; }
+.badge-mini.presencial { background: rgba(255, 214, 0, 0.1); color: #FFD600; }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+    .week-grid { 
+        grid-template-columns: 1fr; /* Una columna (lista) en móviles */
+        gap: 2rem;
+    }
+    .day-column { min-height: auto; }
+}

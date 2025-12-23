@@ -1,130 +1,388 @@
-/* ---
-  Estilos para AuthPageLayout (AuthPageLayout.css) - REDISEÑO ART POP
-  Paleta: Colores de la lechuza (Azul, Turquesa, Púrpura)
---- */
+/* ==========================================================================
+   ARCHIVO: AuthPageLayout.css
+   SISTEMA: CYBERNETIC COMMAND CORE (ESTILO AKDÉMICO V3.0)
+   CONCEPTO: TERMINAL DE ACCESO DE ALTA SEGURIDAD / AZUL NEÓN
+   PREFIX: cyber- (Sistemas de Fondo), pop- (Componentes)
+   ========================================================================== */
 
-/* --- Paleta de Colores (Consistente con index.css) --- */
+/* --------------------------------------------------------------------------
+   SECCIÓN 0: VARIABLES DE ENTORNO (SISTEMA DE DISEÑO)
+   -------------------------------------------------------------------------- */
 :root {
-  --font-display-pixel: '04b30', sans-serif;
-  --font-body-poppins: 'Poppins', sans-serif;
-  
-  --color-brand-blue: #1A52B8;
-  --color-brand-purple: #4B004B;
-  --color-brand-cyan: #00A6AD;
-  
-  --color-accent-magenta: #FF3EFF;
-  --color-accent-cyan: #4DFFFF;
-  --color-accent-blue: #6C9EFF;
-
-  --color-bg-dark: #181818;
-  --color-bg-light: #2A2A2A;
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #E0E0E0;
-  --color-text-tertiary: #A0A0A0;
-  
-  --card-radius: 12px;
+    /* --- PALETA PRIMARIA: AZULES ELÉCTRICOS --- */
+    --cyber-bg-black: #020205;           /* Fondo abisal */
+    --cyber-blue-neon: #00f3ff;         /* Cian de alta energía */
+    --cyber-blue-deep: #1A52B8;         /* Azul base de marca */
+    --cyber-blue-vibrant: #0066ff;      /* Azul de enlace */
+    --cyber-cyan-glow: rgba(0, 243, 255, 0.4);
+    
+    /* --- ACENTOS TÁCTICOS --- */
+    --cyber-magenta: #bc00ff;           /* Alerta de acceso */
+    --cyber-magenta-glow: rgba(188, 0, 255, 0.4);
+    --cyber-yellow: #fefe00;            /* Precaución de sistema */
+    --cyber-red: #ff0055;               /* Error crítico / Fallo */
+    
+    /* --- CAPAS DE OPACIDAD Y CRISTAL --- */
+    --cyber-glass-dark: rgba(10, 10, 25, 0.92);
+    --cyber-grid-line: rgba(0, 243, 255, 0.08);
+    --cyber-scanline-opacity: 0.15;
+    
+    /* --- TIPOGRAFÍA Y GEOMETRÍA --- */
+    --font-cyber: 'Orbitron', 'Share Tech Mono', 'Consolas', monospace;
+    --font-body: 'Poppins', 'Segoe UI', sans-serif;
+    --cyber-radius: 4px;                /* Bordes angulares para look industrial */
+    --cyber-border-width: 2px;
+    
+    /* --- ANIMACIONES --- */
+    --anim-speed-slow: 30s;
+    --anim-speed-fast: 0.8s;
 }
 
-/* --- Contenedor Principal --- */
-.auth-page-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start; /* Alinea arriba */
-  min-height: calc(100vh - 80px); /* Ocupa la pantalla menos el header */
-  width: 100%;
-  padding: 4rem 1.5rem;
-  background-color: var(--color-bg-dark); /* Fondo oscuro global */
-  box-sizing: border-box;
+/* --------------------------------------------------------------------------
+   SECCIÓN 1: RESET Y BASE DE ESTRUCTURA
+   -------------------------------------------------------------------------- */
+.pop-auth-container {
+    min-height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--cyber-bg-black);
+    font-family: var(--font-body);
+    position: relative;
+    overflow: hidden; /* Importante para los fondos móviles */
+    color: #ffffff;
 }
 
-/* --- Tarjeta de Formulario (Estilo Art Pop) --- */
-.auth-form-wrapper {
-  width: 100%;
-  max-width: 480px; 
-  
-  /* [NUEVO] Estilo de tarjeta Art Pop */
-  background: var(--color-bg-light);
-  border: 2px solid var(--color-brand-blue); /* Borde Azul Eléctrico */
-  border-radius: var(--card-radius);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  
-  padding: 2.5rem 3rem;
-  animation: fadeIn 0.5s ease;
+/* --------------------------------------------------------------------------
+   SECCIÓN 2: ATMÓSFERA Y MOTORES DE FONDO (FONDO 3D)
+   -------------------------------------------------------------------------- */
+
+/* REJILLA DE DATOS EN PERSPECTIVA (The Infinite Grid) */
+.pop-auth-container::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background-image: 
+        linear-gradient(var(--cyber-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--cyber-grid-line) 1px, transparent 1px);
+    background-size: 60px 60px;
+    background-position: center center;
+    /* Efecto 3D de profundidad */
+    transform: perspective(1000px) rotateX(60deg) translateY(0);
+    animation: cyber-grid-scrolling var(--anim-speed-slow) linear infinite;
+    z-index: 1;
+    pointer-events: none;
 }
 
-/* --- [NUEVO] Logo y Marca --- */
-.auth-logo-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  text-decoration: none;
-  margin-bottom: 2.5rem;
-}
-.auth-logo-brand img {
-  height: 45px; /* Tamaño del logo */
-  width: auto;
-}
-.auth-logo-text {
-  font-family: var(--font-display-pixel); /* Fuente Pixel */
-  font-size: 2.2rem;
-  letter-spacing: 1px;
-  color: var(--color-text-primary); /* Blanco */
-  line-height: 1;
-  text-transform: uppercase;
-  text-shadow: 2px 2px 0px var(--color-brand-blue);
+@keyframes cyber-grid-scrolling {
+    0% { transform: perspective(1000px) rotateX(60deg) translateY(0); }
+    100% { transform: perspective(1000px) rotateX(60deg) translateY(60px); }
 }
 
-/* --- Estilo de Pestañas de Navegación --- */
-.auth-nav-links {
-  display: flex;
-  justify-content: space-around;
-  border-bottom: 2px solid #444; /* Borde oscuro */
-  margin-bottom: 2rem;
+/* EFECTO DE VIÑETA Y RADIAL (Profundidad Visual) */
+.pop-auth-container::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        circle at center, 
+        transparent 20%, 
+        rgba(2, 2, 5, 0.8) 70%, 
+        var(--cyber-bg-black) 100%
+    );
+    z-index: 2;
+    pointer-events: none;
 }
 
-.auth-nav-links a {
-  flex: 1;
-  text-align: center;
-  padding: 1rem 0.5rem;
-  text-decoration: none;
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--color-text-tertiary); /* Color tenue por defecto */
-  border-bottom: 4px solid transparent;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* LÍNEAS DE ESCANEO CRT (Scanlines Static) */
+.cyber-scanlines {
+    position: fixed;
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    z-index: 999;
+    pointer-events: none;
+    opacity: var(--cyber-scanline-opacity);
 }
 
-.auth-nav-links a:hover {
-  color: var(--color-text-secondary);
-  background-color: rgba(255, 255, 255, 0.05);
+/* RUIDO VISUAL (Grain Effect) */
+.cyber-noise-overlay {
+    position: fixed;
+    inset: 0;
+    background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+    opacity: 0.03;
+    z-index: 3;
+    pointer-events: none;
 }
 
-/* [NUEVO] Estilo de la pestaña activa (Cian Brillante) */
-.auth-nav-links a.active {
-  color: var(--color-accent-cyan);
-  border-bottom-color: var(--color-accent-cyan);
+/* --------------------------------------------------------------------------
+   SECCIÓN 3: EL MÓDULO DE COMANDO (THE CARD)
+   -------------------------------------------------------------------------- */
+.pop-auth-card {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 520px;
+    background: var(--cyber-glass-dark);
+    backdrop-filter: blur(15px);
+    border: var(--cyber-border-width) solid var(--cyber-blue-deep);
+    padding: 60px 45px;
+    box-shadow: 
+        0 0 40px rgba(0, 0, 0, 0.9),
+        inset 0 0 25px rgba(0, 243, 255, 0.05);
+    
+    /* CORTE GEOMÉTRICO (Cyberpunk Chamfer) */
+    clip-path: polygon(
+        0 30px, 30px 0, 100% 0, 
+        100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%
+    );
+    
+    /* Animación de "Arranque de Sistema" */
+    animation: cyber-boot-sequence var(--anim-speed-fast) cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Contenedor del formulario (Outlet) */
-.auth-form-content {
-  color: var(--color-text-secondary);
+@keyframes cyber-boot-sequence {
+    from { 
+        opacity: 0; 
+        transform: scale(0.85) translateY(40px); 
+        filter: blur(15px) brightness(2);
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1) translateY(0); 
+        filter: blur(0) brightness(1);
+    }
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+/* ELEMENTOS HUD: ESQUINAS TÁCTICAS */
+.hud-corner {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    border: 3px solid var(--cyber-blue-neon);
+    z-index: 11;
+    pointer-events: none;
+}
+.corner-tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+.corner-tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+.corner-bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+.corner-br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+/* --------------------------------------------------------------------------
+   SECCIÓN 4: IDENTIDAD Y SISTEMA DE MARCA (LOGO)
+   -------------------------------------------------------------------------- */
+.pop-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 45px;
+    text-decoration: none;
+    position: relative;
 }
 
-@media (max-width: 480px) {
-  .auth-form-wrapper {
-    padding: 2rem 1.5rem;
-  }
-  .auth-nav-links a {
-    font-size: 0.9rem;
-    padding: 1rem 0.2rem;
-  }
+/* ICONO CON EFECTO GLITCH */
+.pop-logo-icon {
+    font-size: 4.5rem;
+    filter: drop-shadow(0 0 15px var(--cyber-blue-neon));
+    margin-bottom: 12px;
+    animation: cyber-icon-flicker 5s infinite step-end;
 }
+
+@keyframes cyber-icon-flicker {
+    0%, 100% { transform: translate(0); opacity: 1; }
+    92% { transform: translate(-3px, 1px); opacity: 0.8; }
+    94% { transform: translate(3px, -1px); opacity: 0.9; }
+    96% { transform: scale(1.05); filter: hue-rotate(90deg); }
+}
+
+.pop-logo-text {
+    font-family: var(--font-cyber);
+    font-size: 2.8rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px var(--cyber-blue-neon);
+    /* Degradado metálico */
+    background: linear-gradient(to bottom, #ffffff 40%, var(--cyber-blue-neon) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   SECCIÓN 5: INTERFAZ DE NAVEGACIÓN (TABS TÁCTICOS)
+   -------------------------------------------------------------------------- */
+.pop-nav {
+    display: flex;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid #333;
+    padding: 4px;
+    margin-bottom: 40px;
+    gap: 4px;
+    position: relative;
+}
+
+/* Decoración HUD superior del nav */
+.pop-nav::before {
+    content: "SYSTEM_ACCESS_MODES";
+    position: absolute;
+    top: -18px; left: 0;
+    font-family: var(--font-cyber);
+    font-size: 9px;
+    color: var(--cyber-blue-neon);
+    letter-spacing: 1px;
+}
+
+.pop-nav a {
+    flex: 1;
+    text-align: center;
+    padding: 15px 10px;
+    text-decoration: none;
+    font-family: var(--font-cyber);
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #555;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #080808;
+    position: relative;
+    overflow: hidden;
+}
+
+.pop-nav a.active {
+    color: var(--cyber-blue-neon);
+    background: rgba(0, 243, 255, 0.1);
+    text-shadow: 0 0 8px var(--cyber-blue-neon);
+}
+
+/* Línea de estado activa con brillo */
+.pop-nav a.active::after {
+    content: "";
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--cyber-blue-neon);
+    box-shadow: 0 0 15px var(--cyber-blue-neon);
+}
+
+.pop-nav a:hover:not(.active) {
+    color: #fff;
+    background: #121212;
+}
+
+/* --------------------------------------------------------------------------
+   SECCIÓN 6: ELEMENTOS HUD DE MONITOREO (DATA STREAMS)
+   -------------------------------------------------------------------------- */
+
+/* Flujo de datos lateral (estético) */
+.cyber-data-stream {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    font-family: var(--font-cyber);
+    font-size: 10px;
+    color: var(--cyber-blue-neon);
+    opacity: 0.4;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cyber-status-bar {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    gap: 20px;
+    font-family: var(--font-cyber);
+    font-size: 10px;
+}
+
+.status-node {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cyber-blue-neon);
+}
+
+.node-pulse {
+    width: 8px; height: 8px;
+    background: var(--cyber-blue-neon);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--cyber-blue-neon);
+    animation: cyber-node-pulse 2s infinite ease-in-out;
+}
+
+@keyframes cyber-node-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.4; }
+}
+
+/* --------------------------------------------------------------------------
+   SECCIÓN 7: MEDIA QUERIES (RESPONSIVE CORE)
+   -------------------------------------------------------------------------- */
+@media (max-width: 650px) {
+    .pop-auth-container { 
+        padding: 15px; 
+    }
+    
+    .pop-auth-card { 
+        padding: 40px 25px; 
+        clip-path: none; /* Mejor legibilidad en móviles */
+        border-radius: 8px;
+        max-width: 100%;
+    }
+    
+    .pop-logo-text { 
+        font-size: 2rem; 
+        letter-spacing: 4px; 
+    }
+    
+    .pop-logo-icon { 
+        font-size: 3.5rem; 
+    }
+
+    .pop-nav a {
+        font-size: 0.75rem;
+        padding: 12px 5px;
+    }
+
+    /* Ocultar elementos HUD en móviles para evitar saturación */
+    .cyber-data-stream, .cyber-status-bar {
+        display: none;
+    }
+}
+
+/* OPTIMIZACIÓN PARA DISPOSITIVOS DE ALTA RESOLUCIÓN */
+@media (min-width: 1920px) {
+    .pop-auth-card {
+        max-width: 600px;
+    }
+    .pop-logo-text {
+        font-size: 3.2rem;
+    }
+}
+
+/* ESTILOS DE ACCESIBILIDAD: REDUCCIÓN DE MOVIMIENTO */
+@media (prefers-reduced-motion: reduce) {
+    .pop-auth-container::before,
+    .pop-logo-icon,
+    .node-pulse,
+    .pop-auth-card {
+        animation: none;
+    }
+}
+
+/* FIN DEL ARCHIVO AUTH-PAGE-LAYOUT.CSS */

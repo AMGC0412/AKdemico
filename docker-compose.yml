@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8.4 # Versión estable de larga duración
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: proyecto_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # Importación automática de la base de datos
+      - ./Dump20251217.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: backend_api
+    restart: always
+    ports:
+      - "4000:4000"
+    environment:
+      DB_HOST: mysql
+      DB_USER: user
+      DB_PASSWORD: pass
+      DB_NAME: proyecto_db
+      DB_PORT: 3306
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: frontend_app
+    ports:
+      - "5173:5173"
+    environment:
+      # UNIFICADO: El front busca al back mediante el proxy de Vite
+      - VITE_API_URL=/api/v1 
+    depends_on:
+      - backend
+    # Mantiene el contenedor abierto y permite ver cambios en tiempo real
+    stdin_open: true
+    tty: true
+
+volumes:
+  mysql_data:

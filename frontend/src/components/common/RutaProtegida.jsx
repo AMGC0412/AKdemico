@@ -1,30 +1,33 @@
 import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
+// 1. [MODIFICADO] Asegúrate de importar 'useAuth'
+import { useAuth } from '../../context/AuthContext'; 
 
 /**
  * Componente "guardia" para proteger rutas.
- * Si el usuario está autenticado, renderiza el contenido de la ruta anidada (Outlet).
- * Si no, redirige a la página de Login.
+ * [CORREGIDO] Ahora revisa el 'authToken' (que es inmediato) 
+ * en lugar del 'usuario' (que tarda en cargar).
  */
 const RutaProtegida = () => {
-  const { usuario, loading } = useAuth(); // Obtiene el usuario y el estado de carga del contexto
+  // 2. [MODIFICADO] Obtenemos 'authToken' en lugar de 'usuario'
+  const { authToken, loading } = useAuth(); 
+  const location = useLocation();
 
-  // Si aún estamos cargando la información del usuario (verificando el token inicial),
+  // Si aún estamos cargando la información del token inicial,
   // mostramos un mensaje temporal.
   if (loading) {
     return <div>Verificando autenticación...</div>;
   }
 
-  // Si no estamos cargando y NO hay usuario, redirigimos a /login
-// En RutaProtegida.jsx
-  if (!usuario) {
-    return <Navigate to="/auth/login" replace />; 
+  // 3. [MODIFICADO] La comprobación ahora es sobre 'authToken'
+  // Si no estamos cargando y NO hay token, redirigimos a /login
+  if (!authToken) {
+    // 4. [CORREGIDO] Pasamos el 'state' para recordar la ubicación
+    return <Navigate to="/auth/login" state={{ from: location }} replace />; 
   }
 
-  // Si no estamos cargando y SÍ hay usuario, mostramos el contenido de la ruta anidada
+  // Si no estamos cargando y SÍ hay token, mostramos el contenido
   return <Outlet />; 
-  // Outlet renderiza el componente hijo definido en App.jsx para esta ruta
 };
 
 export default RutaProtegida;

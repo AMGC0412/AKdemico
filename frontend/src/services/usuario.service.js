@@ -1,6 +1,7 @@
+/* Archivo: src/services/usuario.service.js */
 import axios from 'axios';
 
-// [CORREGIDO] Añadimos /v1/ para que coincida con AuthContext.jsx
+// La URL base coincide con tu archivo original
 const API_URL = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api') + '/v1/users';
 
 const apiClient = axios.create({
@@ -17,7 +18,7 @@ const setAuthToken = (token) => {
 
 /**
  * Obtiene el perfil del usuario actualmente autenticado.
- * [CORREGIDO] Llama a la ruta /me
+ * Llama a la ruta /me
  */
 export const getMiPerfil = async (token) => {
   setAuthToken(token);
@@ -32,7 +33,7 @@ export const getMiPerfil = async (token) => {
 
 /**
  * Actualiza el perfil del usuario autenticado (Implementa US-04).
- * [CORREGIDO] Llama a la ruta /me
+ * Llama a la ruta /me
  */
 export const actualizarPerfil = async (profileData, token) => {
   setAuthToken(token);
@@ -48,7 +49,7 @@ export const actualizarPerfil = async (profileData, token) => {
 
 /**
  * Cambia la contraseña del usuario autenticado.
- * [NUEVO] Llama a la ruta /cambiar-contrasena
+ * Llama a la ruta /cambiar-contrasena
  */
 export const cambiarContrasena = async (passwords, token) => {
   setAuthToken(token);
@@ -58,6 +59,25 @@ export const cambiarContrasena = async (passwords, token) => {
     return response.data;
   } catch (error) {
     console.error('Error al cambiar la contraseña:', error.response?.data || error.message);
+    throw error.response?.data || error;
+  }
+};
+
+/**
+ * -----------------------------------------------------------------
+ * [NUEVA FUNCIÓN - LA QUE FALTABA]
+ * -----------------------------------------------------------------
+ * Obtiene el perfil PÚBLICO de un usuario por su ID.
+ * Esta ruta es pública y no requiere token.
+ */
+export const obtenerPerfilPublicoPorId = async (userId) => {
+  try {
+    // Llama a GET /api/v1/users/:userId/publico
+    // No usamos setAuthToken() porque es una ruta pública
+    const response = await apiClient.get(`/${userId}/publico`); 
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener el perfil público:', error.response?.data || error.message);
     throw error.response?.data || error;
   }
 };

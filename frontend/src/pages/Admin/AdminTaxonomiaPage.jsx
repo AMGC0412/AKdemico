@@ -1,45 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   getTaxonomias, createTaxonomia, updateTaxonomia, deleteTaxonomia 
 } from '../../services/admin.service';
 import { 
   FaSpinner, FaExclamationTriangle, FaTags, FaPlus, FaEdit, FaTrash,
-  FaTimes // <-- [CORREGIDO] Añadimos el ícono que faltaba
+  FaTimes, FaLayerGroup, FaSignal, FaDatabase, FaClipboardList
 } from 'react-icons/fa';
 import './AdminTaxonomiaPage.css';
-import '../Admin/AdminVerificationPage.css'; // Reutilizamos estilos del Modal
 
 /**
  * Componente Modal para Editar/Confirmar
- * Es reutilizable para Edición y Borrado
  */
 const TaxonomiaModal = ({ modo, item, onClose, onConfirm, error }) => {
   const [nombre, setNombre] = useState(item?.nombre || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isDeleting = modo === 'delete';
-  const title = isDeleting ? 'Confirmar Eliminación' : 'Editar Taxonomía';
+  const title = isDeleting ? 'CONFIRMAR ELIMINACIÓN DE REGISTRO' : 'MODIFICAR NOMBRE';
 
   const handleSubmit = async () => {
+    setError('');
     setIsSubmitting(true);
-    // Reiniciamos el error del modal padre
-    onConfirm(isDeleting ? item.id : nombre, true); // true para 'resetear error'
     
+    if (!isDeleting && !nombre.trim()) {
+        alert('El nombre no puede estar vacío.');
+        setIsSubmitting(false);
+        return;
+    }
+
     try {
-      if (isDeleting) {
-        await onConfirm(item.id);
-      } else {
-        await onConfirm(item.id, nombre);
-      }
+      await onConfirm(item.id, isDeleting ? null : nombre); 
       setIsSubmitting(false);
-      onClose(); // Cierra solo si tiene éxito
+      onClose(); 
     } catch (err) {
-      // El onConfirm (manejado por el padre) ya setea el error
       setIsSubmitting(false);
+      setError(err.message || 'Error desconocido.');
     }
   };
   
-  // Limpiamos el 'nombre' si el item cambia (para editar)
   useEffect(() => {
     if (modo === 'edit') {
       setNombre(item?.nombre || '');
@@ -51,35 +49,41 @@ const TaxonomiaModal = ({ modo, item, onClose, onConfirm, error }) => {
       <div className="admin-modal-content" onClick={(e) => e.stopPropagation()}>
         <header className="admin-modal-header">
           <h3>{title}</h3>
-          {/* Esta línea ahora funcionará */}
           <button onClick={onClose} className="modal-close-btn"><FaTimes /></button>
         </header>
         <div className="admin-modal-body">
+          <div className="modal-target-info">
+              Tipo: <strong style={{ color: item.tipo === 'materia' ? 'var(--color-secondary)' : 'var(--color-data)' }}>{item.tipo.toUpperCase()}</strong>
+          </div>
+          
           {isDeleting ? (
-            <p>¿Estás seguro de que quieres eliminar <strong>"{item.nombre}"</strong>? Esta acción no se puede deshacer.</p>
+            <p className="deletion-warning">ALERTA: ¿Estás seguro de eliminar el registro <strong>"{item.nombre}"</strong>? Esto podría afectar a planes de estudio asociados.</p>
           ) : (
             <div className="form-group-modal">
-              <label htmlFor="nombre">Nuevo Nombre</label>
+              <label htmlFor="nombre">NOMBRE ACTUAL</label>
+              <p className="current-value">{item.nombre}</p>
+              <label htmlFor="nombre">NUEVO NOMBRE</label>
               <input
                 id="nombre"
                 type="text"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                placeholder="Ej: Física Cuántica"
+                placeholder="Introduzca el nuevo nombre de la taxonomía"
+                className="input-modal-edit"
               />
             </div>
           )}
         </div>
         <footer className="admin-modal-footer">
           {error && <p className="error-message-modal">{error}</p>}
-          <button className="btn btn-secondary" onClick={onClose} disabled={isSubmitting}>
-            Cancelar
+          <button className="btn btn-ghost" onClick={onClose} disabled={isSubmitting}>
+            CANCELAR
           </button>
           <button 
             className={`btn ${isDeleting ? 'btn-danger' : 'btn-primary'}`} 
             onClick={handleSubmit} 
             disabled={isSubmitting}>
-            {isSubmitting ? (isDeleting ? 'Eliminando...' : 'Guardando...') : (isDeleting ? 'Eliminar' : 'Guardar Cambios')}
+            {isSubmitting ? <FaSpinner className="spin"/> : `CONFIRMAR ${title.split(' ')[0]}`}
           </button>
         </footer>
       </div>
@@ -103,45 +107,45 @@ const CrearTaxonomiaForm = ({ onTaxonomiaCreada, setError, formError, setFormErr
     }
     
     setIsLoading(true);
-    setFormError(null); // Limpiamos error de formulario
-    setError(null); // Limpiamos error global
+    setFormError(null); 
+    setError(null); 
     try {
       await createTaxonomia(tipo, nombre);
-      setNombre(''); // Limpiar formulario
-      onTaxonomiaCreada(); // Refrescar la lista en el padre
+      setNombre(''); 
+      onTaxonomiaCreada(); 
     } catch (err) {
-      setFormError(err.message); // Mostramos el error en el formulario
+      setFormError(err.message); 
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="admin-section-container">
-      <h3 className="admin-section-title">Añadir Nuevo Ítem</h3>
+    <div className="admin-section-container form-creation-card">
+      <h3 className="admin-section-title"><FaPlus /> AÑADIR NUEVO REGISTRO</h3>
       <form onSubmit={handleSubmit} className="taxonomia-form">
         <div className="form-group">
-          <label htmlFor="tipo">Tipo</label>
-          <select id="tipo" value={tipo} onChange={(e) => setTipo(e.target.value)}>
-            <option value="materia">Materia</option>
-            <option value="nivel">Nivel</option>
+          <label htmlFor="tipo"><FaDatabase/> TIPO DE REGISTRO</label>
+          <select id="tipo" className="input-field" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+            <option value="materia">MATERIA / CATEGORÍA</option>
+            <option value="nivel">NIVEL EDUCATIVO</option>
           </select>
         </div>
         <div className="form-group">
-          <label htmlFor="nombre">Nombre</label>
+          <label htmlFor="nombre"><FaTags/> NOMBRE DEL ÍTEM</label>
           <input
             id="nombre"
+            className="input-field"
             type="text"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
-            placeholder="Ej: Cálculo II"
+            placeholder={tipo === 'materia' ? "Ej: Álgebra Lineal" : "Ej: Avanzado"}
           />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={isLoading}>
-          {isLoading ? <FaSpinner className="fa-spin" /> : <FaPlus />}
-          Añadir
+        <button type="submit" className="btn btn-primary btn-submit" disabled={isLoading}>
+          {isLoading ? <FaSpinner className="spin"/> : 'CREAR REGISTRO'}
         </button>
-        {formError && <p className="error-message-global" style={{marginTop: '1rem'}}>{formError}</p>}
+        {formError && <p className="error-message-global" style={{marginTop: '1rem'}}><FaExclamationTriangle/> {formError}</p>}
       </form>
     </div>
   );
@@ -155,25 +159,25 @@ const AdminTaxonomiaPage = () => {
   const [materias, setMaterias] = useState([]);
   const [niveles, setNiveles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [globalError, setGlobalError] = useState(null); // Para errores de carga
-  const [formError, setFormError] = useState(null); // Para errores del formulario
+  const [globalError, setGlobalError] = useState(null); 
+  const [formError, setFormError] = useState(null); 
 
   // Estado para los modales
-  const [modalInfo, setModalInfo] = useState({ modo: null, item: null }); // modo: 'edit' o 'delete'
+  const [modalInfo, setModalInfo] = useState({ modo: null, item: null }); 
   const [modalError, setModalError] = useState(null);
 
   // Cargar datos
   const fetchTaxonomias = async () => {
     try {
-      // No seteamos loading aquí para evitar parpadeo al crear/borrar
       setGlobalError(null);
-      const data = await getTaxonomias();
-      setMaterias(data.materias || []);
+      // Asumo que el servicio real devuelve un objeto { categorias: [...], niveles: [...] }
+      const data = await getTaxonomias(); 
+      setMaterias(data.categorias || data.materias || []); 
       setNiveles(data.niveles || []);
     } catch (err) {
-      setGlobalError("No se pudieron cargar las taxonomías.");
+      setGlobalError("No se pudieron cargar los registros base. Error de conexión.");
     } finally {
-      setIsLoading(false); // Solo seteamos loading en la carga inicial
+      setIsLoading(false); 
     }
   };
 
@@ -185,95 +189,98 @@ const AdminTaxonomiaPage = () => {
   // --- Handlers de Acciones (CRUD) ---
 
   const handleModalConfirm = async (id, nuevoNombre) => {
-    setModalError(null); // Limpiamos error previo del modal
+    setModalError(null); 
     const { modo, item } = modalInfo;
 
     try {
       if (modo === 'edit') {
-        await updateTaxonomia(id, nuevoNombre); // 'valor' es el nuevo nombre
+        // Asumo que el servicio updateTaxonomia necesita ID, nuevo nombre y el tipo (para el endpoint)
+        await updateTaxonomia(id, nuevoNombre, item.tipo); 
       } else if (modo === 'delete') {
-        await deleteTaxonomia(id); // 'valor' es el id
+        await deleteTaxonomia(id); 
       }
-      fetchTaxonomias(); // Refrescar toda la lista
-      setModalInfo({ modo: null, item: null }); // Cerrar modal
+      fetchTaxonomias(); 
+      setModalInfo({ modo: null, item: null }); 
     } catch (err) {
-      // Mostrar error DENTRO del modal
       setModalError(err.message);
-      // Lanzamos error para que el modal sepa que no debe cerrar
       throw err;
     }
   };
   
   const handleOpenModal = (modo, item) => {
-    setModalInfo({ modo, item });
-    setModalError(null); // Limpiamos errores al abrir
+    // Definimos el tipo aquí para que el modal sepa qué etiqueta mostrar
+    const itemWithTipo = item.tipo ? item : {...item, tipo: item.nombre.includes('Avanzado') ? 'nivel' : 'materia'};
+    setModalInfo({ modo, item: itemWithTipo });
+    setModalError(null); 
   };
 
   // 1. Estado de Carga
   if (isLoading) {
-    return <div className="admin-page-loader"><FaSpinner className="fa-spin" size="3em" /><p>Cargando taxonomías...</p></div>;
+    return <div className="admin-page-state loading"><FaSpinner className="spin-icon" /><p>SINCRONIZANDO REGISTROS DE TAXONOMÍA...</p></div>;
   }
 
   // 2. Estado de Error (Solo para la carga inicial)
-  if (globalError && !isLoading && materias.length === 0 && niveles.length === 0) {
-    return <div className="admin-page-error"><FaExclamationTriangle size="3em" /><h3>Error al Cargar</h3><p>{globalError}</p></div>;
+  if (globalError && !isLoading) {
+    return <div className="admin-page-state error"><FaExclamationTriangle className="error-icon" /><h3>ERROR DE CONEXIÓN</h3><p>{globalError}</p></div>;
   }
 
   // 3. Estado de Éxito
   return (
     <div className="admin-taxonomia-page">
       <header className="admin-page-header">
-        <h2>Gestión de Taxonomía</h2>
-        <p>Añade, edita o elimina las Materias y Niveles disponibles en la plataforma.</p>
+        <h2>TERMINAL DE EDICIÓN DE TAXONOMÍA</h2>
+        <p>Control de los registros base de Materias (Categorías) y Niveles disponibles en la plataforma.</p>
       </header>
 
       {/* --- Layout de 2 columnas --- */}
       <div className="taxonomia-layout">
-        {/* Columna Izquierda: Listas */}
+        
+        {/* Columna 1: Listas (Contenido Denso) */}
         <div className="taxonomia-listas">
           {/* Lista de Materias */}
-          <div className="admin-section-container">
-            <h3 className="admin-section-title"><FaTags /> Materias</h3>
+          <div className="admin-section-container list-materia-card">
+            <h3 className="admin-section-title"><FaLayerGroup /> REGISTROS DE MATERIAS</h3>
             <ul className="taxonomia-list">
-              {materias.length === 0 && <li>No hay materias creadas.</li>}
+              {materias.length === 0 && <li className="empty-list-item"><FaClipboardList/> No hay materias creadas.</li>}
               {materias.map(item => (
-                <li key={item.id}>
-                  <span>{item.nombre}</span>
+                <li key={item.id} className="taxonomia-item item-materia">
+                  <span className="item-name">{item.nombre}</span>
                   <div className="item-actions">
-                    <button onClick={() => handleOpenModal('edit', item)} className="btn-icon btn-edit"><FaEdit /></button>
-                    <button onClick={() => handleOpenModal('delete', item)} className="btn-icon btn-delete"><FaTrash /></button>
+                    <button onClick={() => handleOpenModal('edit', {...item, tipo: 'materia'})} className="btn-icon btn-edit" title="Editar"><FaEdit /></button>
+                    <button onClick={() => handleOpenModal('delete', {...item, tipo: 'materia'})} className="btn-icon btn-delete" title="Eliminar"><FaTrash /></button>
                   </div>
                 </li>
               ))}
             </ul>
           </div>
           {/* Lista de Niveles */}
-          <div className="admin-section-container">
-            <h3 className="admin-section-title"><FaTags /> Niveles</h3>
+          <div className="admin-section-container list-nivel-card">
+            <h3 className="admin-section-title"><FaSignal /> REGISTROS DE NIVELES</h3>
             <ul className="taxonomia-list">
-              {niveles.length === 0 && <li>No hay niveles creados.</li>}
+              {niveles.length === 0 && <li className="empty-list-item"><FaClipboardList/> No hay niveles creados.</li>}
               {niveles.map(item => (
-                <li key={item.id}>
-                  <span>{item.nombre}</span>
+                <li key={item.id} className="taxonomia-item item-nivel">
+                  <span className="item-name">{item.nombre}</span>
                   <div className="item-actions">
-                    <button onClick={() => handleOpenModal('edit', item)} className="btn-icon btn-edit"><FaEdit /></button>
-                    <button onClick={() => handleOpenModal('delete', item)} className="btn-icon btn-delete"><FaTrash /></button>
+                    <button onClick={() => handleOpenModal('edit', {...item, tipo: 'nivel'})} className="btn-icon btn-edit" title="Editar"><FaEdit /></button>
+                    <button onClick={() => handleOpenModal('delete', {...item, tipo: 'nivel'})} className="btn-icon btn-delete" title="Eliminar"><FaTrash /></button>
                   </div>
                 </li>
               ))}
             </ul>
           </div>
         </div>
-
-        {/* Columna Derecha: Formulario de Creación */}
+        
+        {/* Columna 2: Formulario de Creación (Sticky Control Module) */}
         <div className="taxonomia-form-container">
           <CrearTaxonomiaForm 
             onTaxonomiaCreada={fetchTaxonomias} 
-            setError={setGlobalError} // Pasamos el error global
+            setError={setGlobalError} 
             formError={formError}
             setFormError={setFormError}
           />
         </div>
+
       </div>
 
       {/* Modal de Edición/Borrado */}

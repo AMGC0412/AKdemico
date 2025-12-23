@@ -1,16 +1,19 @@
+/* Archivo: ViewProfileDetails.jsx */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from 'react-icons/fa';
 
 /**
  * Muestra los detalles del perfil en modo "solo lectura".
- * Incluye la tarjeta de estado de verificación para docentes.
+ * [MODIFICADO] Lógica corregida para mostrar estado de verificación solo al dueño.
  */
-const ViewProfileDetails = ({ usuario }) => {
+const ViewProfileDetails = ({ usuario, esPropietario }) => {
     
     // Tarjeta de Estado de Verificación para Docentes
     const renderVerificationStatus = () => {
-        if (usuario.rol !== 'docente') return null;
+        // 1. Si no es docente, no mostrar nada.
+        // 2. [NUEVA LÓGICA] Si NO es el propietario, tampoco mostrar nada (privacidad).
+        if (usuario.rol !== 'docente' || !esPropietario) return null;
         
         switch (usuario.estado_verificacion) {
             case 'verificado':
@@ -51,7 +54,7 @@ const ViewProfileDetails = ({ usuario }) => {
                         <div>
                             <h4>Postulación Requerida</h4>
                             <p>Aún no has completado tu postulación de docente. ¡Hazlo para empezar a enseñar!</p>
-                            {/* Este enlace asume que tienes la ruta en App.jsx */}
+                            
                             <Link to="/docente/verificacion" className="btn btn-primary" style={{marginTop: '1rem'}}>
                                 Postular Ahora
                             </Link>
@@ -64,17 +67,24 @@ const ViewProfileDetails = ({ usuario }) => {
     return (
         <div className="profile-details-view">
             <dl>
-                <dt>Correo Electrónico</dt>
-                <dd>{usuario.correo}</dd>
+                <div className="detail-item-group">
+                    <dt>Correo Electrónico</dt>
+                    {/* Oculta el correo si no eres propietario */}
+                    <dd>{esPropietario ? usuario.correo : <em>Información privada</em>}</dd>
+                </div>
                 
-                <dt>Ciudad</dt>
-                <dd>{usuario.ciudad || <em>No especificada</em>}</dd>
+                <div className="detail-item-group">
+                    <dt>Ubicación</dt>
+                    <dd>{usuario.ciudad || <em>No especificada</em>}</dd>
+                </div>
                 
-                <dt>Biografía</dt>
-                <dd className="bio-text">{usuario.biografia || <em>No has añadido una biografía.</em>}</dd>
+                <div className="detail-item-group">
+                    <dt>Biografía</dt>
+                    <dd className="bio-text">{usuario.biografia || <em>No hay biografía disponible.</em>}</dd>
+                </div>
             </dl>
             
-            {/* Renderiza la tarjeta de estado del docente */}
+            {/* Solo se renderizará si eres docente Y el dueño del perfil */}
             {renderVerificationStatus()}
         </div>
     );

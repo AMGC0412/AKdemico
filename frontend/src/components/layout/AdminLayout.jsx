@@ -1,75 +1,68 @@
 import React from 'react';
-import { NavLink, Outlet, Link } from 'react-router-dom';
+import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { 
-    FaTachometerAlt, FaUsers, FaCheckCircle, FaTags, 
-    FaGavel, FaSignOutAlt, FaHome 
+    FaTachometerAlt, FaUsers, FaShieldAlt, FaTags, 
+    FaGavel, FaArrowLeft, FaSignOutAlt, FaCircle
 } from 'react-icons/fa';
-import './AdminLayout.css'; // Crearemos este CSS
+import './AdminLayout.css';
 
-/**
- * Layout principal para el panel de administración.
- * Incluye un Sidebar (menú lateral) y un área de contenido (<Outlet />)
- * para las páginas anidadas.
- */
+// Estructura de navegación para el menú
+const adminNav = [
+    { to: 'dashboard', icon: <FaTachometerAlt />, label: 'Dashboard' },
+    { to: 'usuarios', icon: <FaUsers />, label: 'Gestión de Usuarios' },
+    { to: 'verificaciones', icon: <FaShieldAlt />, label: 'Verificación Docentes' },
+    { to: 'taxonomia', icon: <FaTags />, label: 'Taxonomía (Catálogos)' },
+    { to: 'moderacion', icon: <FaGavel />, label: 'Moderación' },
+];
+
 const AdminLayout = () => {
-  return (
-    <div className="admin-layout-container">
-      
-      {/* --- Sidebar (Menú Lateral) --- */}
-      <nav className="admin-sidebar">
-        <div className="admin-sidebar-header">
-          <h3>Panel de Control</h3>
+    const location = useLocation();
+
+    return (
+        // Contenedor principal con fondo técnico
+        <div className="admin-layout-wrapper">
+            
+            {/* Sidebar de Navegación */}
+            <div className="admin-sidebar">
+                
+                <header className="admin-sidebar-header">
+                    <h3>CENTRO DE MANDO</h3>
+                    <p className="system-status"><FaCircle className="status-indicator"/> SISTEMA ACTIVO</p>
+                </header>
+
+                <nav className="admin-nav-links">
+                    {adminNav.map((item) => (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                        >
+                            <span className="nav-icon">{item.icon}</span>
+                            <span className="nav-label">{item.label}</span>
+                        </NavLink>
+                    ))}
+                </nav>
+                
+                <footer className="admin-sidebar-footer">
+                    <a href="/" className="admin-footer-link back-to-site">
+                        <FaArrowLeft /> VOLVER AL SITIO PÚBLICO
+                    </a>
+                    {/* Placeholder para LogOut o Información de Sesión */}
+                    <a href="/logout" className="admin-footer-link logout-btn">
+                        <FaSignOutAlt /> TERMINAR SESIÓN
+                    </a>
+                </footer>
+            </div>
+            
+            {/* Área de Contenido Principal (Renderiza Dashboard, TGI, etc.) */}
+            <div className="admin-content-area">
+                {/* Router Outlet para renderizar la página actual */}
+                <div className="admin-content-overlay"></div> {/* Capa de Glassmorphism sutil */}
+                <Outlet />
+            </div>
+            
         </div>
-        
-        <ul className="admin-nav-links">
-          <li>
-            <NavLink to="/admin/dashboard">
-              <FaTachometerAlt /> Dashboard
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/usuarios">
-              <FaUsers /> Usuarios
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/verificaciones">
-              <FaCheckCircle /> Verificaciones
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/taxonomia">
-              <FaTags /> Taxonomía
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/moderacion">
-              <FaGavel /> Moderación
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/admin/pruebas">
-              <FaGavel /> Pruebas
-            </NavLink>
-          </li>
-        </ul>
-        
-        <div className="admin-sidebar-footer">
-          <Link to="/" className="admin-footer-link">
-            <FaHome /> Volver al Sitio
-          </Link>
-        </div>
-      </nav>
-      
-      {/* --- Área de Contenido Principal --- */}
-      <main className="admin-content-area">
-        {/* Aquí es donde React Router renderizará las páginas
-            (AdminDashboardPage, AdminUserManagementPage, etc.) */}
-        <Outlet />
-      </main>
-      
-    </div>
-  );
+    );
 };
 
 export default AdminLayout;

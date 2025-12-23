@@ -1,49 +1,299 @@
 /* ---
-  Estilos para ProfilePage (ProfilePage.css)
-  [MEJORA] Corregida la especificidad para forzar fondos oscuros uniformes
+  Archivo: ProfilePage.css
+  DISEÑO: Cyberpunk Premium / Command Center
+  Inspiración: Unificación con MisInscripciones y PaymentUpload
 --- */
 
-/* --- Paleta de Colores (Consistente con index.css) --- */
 :root {
-  --font-display-pixel: '04b30', sans-serif;
-  --font-body-poppins: 'Poppins', sans-serif;
+  /* --- Tipografía --- */
+  --font-display: '04b30', 'Courier New', monospace;
+  --font-body: 'Poppins', sans-serif;
   
-  --color-brand-blue: #1A52B8;
-  --color-brand-purple: #4B004B;
-  --color-brand-cyan: #00A6AD;
-  
-  --color-accent-magenta: #FF3EFF;
-  --color-accent-cyan: #4DFFFF;
-  --color-accent-blue: #6C9EFF;
-  --color-accent-green: #4CAF50;
-  --color-accent-yellow: #FFC107;
-  --color-accent-red: #E63946;
+  /* --- Paleta de Neón --- */
+  --color-neon-cyan: #4DFFFF;
+  --color-neon-blue: #4B87FF;
+  --color-neon-magenta: #FF3EFF;
+  --color-neon-green: #05FF00;
+  --color-neon-red: #B8004A;
+  --color-neon-yellow: #FEEA00;
 
-  --color-bg-dark: #181818;
-  --color-bg-light: #2A2A2A;
+  /* --- Fondos --- */
+  --color-bg-deep: #07070F;
+  --color-bg-panel: rgba(20, 20, 30, 0.75); /* Vidrio oscuro */
+  --color-bg-input: rgba(255, 255, 255, 0.05);
+  
+  /* --- Textos --- */
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #E0E0E0;
-  --color-text-tertiary: #A0A0A0;
+  --color-text-secondary: #CCCCFF;
+  --color-text-muted: #8888AA;
   
-  --card-radius: 12px;
+  /* --- Bordes y Efectos --- */
+  --border-glass: rgba(255, 255, 255, 0.15);
+  --glow-cyan: 0 0 20px rgba(77, 255, 255, 0.4);
+  --glow-blue: 0 0 20px rgba(75, 135, 255, 0.4);
+  --card-radius: 16px;
 }
 
-/* --- Contenedor Principal --- */
+/* =========================================
+   ESTRUCTURA Y FONDO (Efecto Monitor)
+   ========================================= */
+
 .profile-page-akademic {
-  max-width: 900px;
-  margin: 2rem auto; 
-  padding: 2rem;
-  background-color: var(--color-bg-dark);
+  min-height: 100vh;
+  padding: 3rem 1.5rem;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-deep);
+  position: relative;
+  overflow-x: hidden;
+  
+  /* Fondo con gradientes profundos */
+  background: 
+      radial-gradient(circle at 10% 20%, rgba(75, 135, 255, 0.08), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(255, 62, 255, 0.08), transparent 40%),
+      linear-gradient(135deg, #050508 0%, #0F0F18 100%);
 }
 
-/* --- Tarjeta de Perfil --- */
+/* Efecto Scanlines (Líneas de TV) */
+.profile-page-akademic::before {
+  content: "";
+  position: fixed; 
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(77, 255, 255, 0.02),
+    rgba(77, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =========================================
+   TARJETA PRINCIPAL (GLASSMORPHISM)
+   ========================================= */
+
 .profile-card {
-  background: var(--color-bg-light);
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  background: var(--color-bg-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-glass);
   border-radius: var(--card-radius);
-  border: 2px solid #444;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
   overflow: hidden;
-  animation: fadeIn 0.5s ease;
+  animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Línea de Neón Superior Animada */
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-neon-cyan), var(--color-neon-blue), var(--color-neon-magenta));
+  box-shadow: 0 0 15px var(--color-neon-blue);
+  animation: shimmerBorder 3s infinite alternate;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmerBorder {
+  0% { opacity: 0.7; filter: brightness(1); }
+  100% { opacity: 1; filter: brightness(1.5); }
+}
+
+/* =========================================
+   HEADER DEL PERFIL
+   ========================================= */
+
+.profile-header {
+  padding: 3rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  border-bottom: 1px solid var(--border-glass);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);
+  position: relative;
+}
+
+/* Avatar con efecto de anillo de energía */
+.profile-avatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--color-neon-cyan);
+  box-shadow: 0 0 25px rgba(77, 255, 255, 0.3);
+  background-color: #000;
+  flex-shrink: 0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05) rotate(2deg);
+  box-shadow: 0 0 35px rgba(77, 255, 255, 0.5);
+}
+
+.profile-header-info {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.profile-header-info h2 {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  margin: 0;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(77, 255, 255, 0.4);
+  line-height: 1.1;
+}
+
+/* Botón de Edición (Flotante estilo Tech) */
+.profile-edit-button {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--color-neon-cyan);
+  color: var(--color-neon-cyan);
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.profile-edit-button:hover {
+  background: var(--color-neon-cyan);
+  color: #000;
+  box-shadow: 0 0 20px var(--color-neon-cyan);
+  transform: rotate(90deg);
+}
+
+/* =========================================
+   BADGES Y ROLES
+   ========================================= */
+
+.role-badge-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.profile-role-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  backdrop-filter: blur(5px);
+}
+
+.profile-role-badge.role-estudiante {
+  background: rgba(77, 255, 255, 0.1);
+  border-color: var(--color-neon-cyan);
+  color: var(--color-neon-cyan);
+  box-shadow: 0 0 10px rgba(77, 255, 255, 0.1);
+}
+
+.profile-role-badge.role-docente {
+  background: rgba(75, 135, 255, 0.1);
+  border-color: var(--color-neon-blue);
+  color: var(--color-neon-blue);
+  box-shadow: 0 0 10px rgba(75, 135, 255, 0.1);
+}
+
+.profile-role-badge.role-administrador {
+  background: rgba(255, 62, 255, 0.1);
+  border-color: var(--color-neon-magenta);
+  color: var(--color-neon-magenta);
+  box-shadow: 0 0 10px rgba(255, 62, 255, 0.1);
+}
+
+.profile-role-badge.role-verificado {
+  background: rgba(5, 255, 0, 0.1);
+  border-color: var(--color-neon-green);
+  color: var(--color-neon-green);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* =========================================
+   PESTAÑAS (TABS) - COMMAND DECK
+   ========================================= */
+
+.profile-tabs {
+  display: flex;
+  background: rgba(0,0,0,0.2);
+  border-bottom: 1px solid var(--border-glass);
+  padding: 0 2rem;
+}
+
+.profile-tabs button {
+  background: transparent;
+  border: none;
+  padding: 1.2rem 2rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.profile-tabs button:hover {
+  color: var(--color-text-primary);
+  background: rgba(255,255,255,0.02);
+}
+
+.profile-tabs button.active {
+  color: var(--color-neon-cyan);
+}
+
+/* Indicador de pestaña activa (línea inferior brillante) */
+.profile-tabs button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: var(--color-neon-cyan);
+  box-shadow: 0 -2px 10px var(--color-neon-cyan);
+}
+
+/* =========================================
+   CONTENIDO Y VISTA DE DETALLES
+   ========================================= */
+
+.tab-content {
+  padding: 3rem;
+  animation: fadeIn 0.4s ease-out;
 }
 
 @keyframes fadeIn {
@@ -51,280 +301,291 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Cabecera del Perfil (Avatar, Nombre, Rol) --- */
-.profile-header {
-  display: flex;
-  align-items: center;
+/* Lista de detalles (Read Mode) */
+.profile-details-view dl {
+  margin: 0;
+  display: grid;
   gap: 2rem;
-  padding: 2rem 2.5rem;
-  background: linear-gradient(110deg, var(--color-brand-blue), var(--color-brand-purple));
-  position: relative;
 }
 
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  border: 4px solid var(--color-text-primary);
-  object-fit: cover;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+.detail-item-group {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.detail-item-group:last-child {
+  border-bottom: none;
+}
+
+.profile-details-view dt {
+  font-family: var(--font-display);
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  letter-spacing: 1px;
+  opacity: 0.8;
+}
+
+.profile-details-view dd {
+  font-size: 1.2rem;
+  color: var(--color-text-primary);
+  margin: 0;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.profile-details-view .bio-text {
+  font-style: italic;
+  color: var(--color-text-secondary);
+  background: rgba(0,0,0,0.2);
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-neon-blue);
+}
+
+/* =========================================
+   TARJETA DE ESTADO (Docentes)
+   ========================================= */
+
+.verification-status-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px dashed;
+  position: relative;
+  overflow: hidden;
+}
+
+.verification-status-card .icon {
+  font-size: 2.5rem;
   flex-shrink: 0;
 }
 
-.profile-header-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.verification-status-card h4 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
 }
 
-.profile-header-info h2 {
-  font-family: var(--font-display-pixel);
-  font-size: 2.5rem;
-  color: var(--color-text-primary);
+.verification-status-card p {
   margin: 0;
-  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
-  text-transform: uppercase;
-}
-
-/* --- Insignia de Rol (Estilo Art Pop) --- */
-.profile-role-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-weight: 700;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--color-bg-dark);
-  align-self: flex-start;
-}
-
-.profile-role-badge.role-estudiante {
-  background-color: var(--color-accent-cyan);
-}
-.profile-role-badge.role-docente {
-  background-color: var(--color-accent-blue);
-}
-.profile-role-badge.role-administrador {
-  background-color: var(--color-accent-magenta);
-  color: var(--color-text-primary);
-}
-.profile-role-badge.role-verificado {
-  background-color: var(--color-accent-green);
-  color: white;
-  margin-left: 1rem;
-}
-
-/* Botón de Editar (Absoluto) */
-.profile-edit-button {
-  position: absolute;
-  top: 1.5rem;
-  right: 1.5rem;
-}
-
-
-/* --- Pestañas de Navegación --- */
-.profile-tabs {
-  display: flex;
-  background-color: var(--color-bg-dark); 
-  border-bottom: 1px solid #444;
-}
-
-.profile-tabs button {
-  font-family: var(--font-display-pixel);
-  font-size: 1.1rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  background: none;
-  border: none;
-  color: var(--color-text-tertiary);
-  padding: 1rem 2rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border-bottom: 3px solid transparent;
-}
-
-.profile-tabs button:hover {
+  font-size: 0.95rem;
   color: var(--color-text-secondary);
-  background-color: rgba(255, 255, 255, 0.05);
 }
 
-.profile-tabs button.active {
-  color: var(--color-accent-cyan);
-  border-bottom-color: var(--color-accent-cyan);
+/* Variantes de estado */
+.status-verificado {
+  border-color: var(--color-neon-green);
+  background: rgba(5, 255, 0, 0.05);
 }
+.status-verificado .icon, .status-verificado h4 { color: var(--color-neon-green); }
 
-/* --- Contenido de Pestaña --- */
-.tab-content {
-  padding: 2.5rem;
+.status-pendiente {
+  border-color: var(--color-neon-yellow);
+  background: rgba(254, 234, 0, 0.05);
 }
+.status-pendiente .icon, .status-pendiente h4 { color: var(--color-neon-yellow); }
 
-/* --- Formulario de Edición --- */
+.status-rechazado {
+  border-color: var(--color-neon-red);
+  background: rgba(184, 0, 74, 0.05);
+}
+.status-rechazado .icon, .status-rechazado h4 { color: var(--color-neon-red); }
+
+/* =========================================
+   FORMULARIOS (Cyberpunk Inputs)
+   ========================================= */
+
 .profile-form {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-.form-group {
-  text-align: left; 
-}
-
 .form-group label {
   display: block;
-  margin-bottom: 0.6rem;
-  font-weight: 600;
-  color: var(--color-text-secondary); 
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.5px;
 }
 
-/* --- [CORRECCIÓN CLAVE] Estilos de Input Forzados --- */
-/* Usamos selectores más específicos y !important para ganar al navegador */
-.profile-card .form-group input[type="text"],
-.profile-card .form-group input[type="email"],
-.profile-card .form-group input[type="password"],
-.profile-card .form-group textarea {
+/* Estilos de inputs forzados con !important para consistencia */
+.profile-card input[type="text"],
+.profile-card input[type="email"],
+.profile-card input[type="password"],
+.profile-card textarea {
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #555; 
+  background-color: var(--color-bg-input) !important;
+  border: 1px solid var(--border-glass) !important;
+  color: var(--color-text-primary) !important;
   border-radius: 8px;
-  box-sizing: border-box; 
+  font-family: var(--font-body);
   font-size: 1rem;
-  /* Fondo oscuro y texto blanco FORZADOS */
-  background-color: var(--color-bg-dark) !important; 
-  color: var(--color-text-primary) !important; 
-  font-family: var(--font-body-poppins);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-}
-.profile-card .form-group textarea {
-  min-height: 120px;
-  resize: vertical;
+  transition: all 0.3s ease;
 }
 
-.profile-card .form-group input:focus,
-.profile-card .form-group textarea:focus {
-  border-color: var(--color-accent-cyan) !important; 
+.profile-card input:focus,
+.profile-card textarea:focus {
   outline: none;
-  box-shadow: 0 0 10px rgba(77, 255, 255, 0.5) !important; 
+  border-color: var(--color-neon-cyan) !important;
+  box-shadow: 0 0 15px rgba(77, 255, 255, 0.2) !important;
+  background-color: rgba(77, 255, 255, 0.05) !important;
 }
 
-/* [CORRECCIÓN CLAVE] Estilo de Solo Lectura (Uniforme) */
-.profile-card .form-group-readonly label {
-  opacity: 0.7;
-}
-.profile-card .form-group-readonly input,
-.profile-card .form-group input:disabled {
-  background-color: var(--color-bg-dark) !important; /* Mismo fondo oscuro */
-  color: var(--color-text-tertiary) !important; /* Texto atenuado */
-  opacity: 0.7;
+/* Campos de solo lectura */
+.profile-card input[readonly],
+.profile-card input:disabled {
+  background-color: rgba(0,0,0,0.3) !important;
+  border-color: #333 !important;
+  color: var(--color-text-muted) !important;
   cursor: not-allowed;
-  border-color: #444 !important;
+  font-style: italic;
 }
-.profile-card .form-group-readonly input:focus {
-  border-color: #444 !important; /* Sin efecto de foco */
-  box-shadow: none !important;
-}
-/* --- Fin de la Corrección --- */
 
+/* =========================================
+   BOTONES DE ACCIÓN
+   ========================================= */
 
 .profile-actions {
   display: flex;
-  justify-content: flex-end; 
+  justify-content: flex-end;
   gap: 1rem;
-  margin-top: 1.5rem;
-  border-top: 1px solid #444;
+  margin-top: 2rem;
   padding-top: 2rem;
+  border-top: 1px solid var(--border-glass);
 }
 
-/* --- Vista de Detalles (Modo Lectura) --- */
-.profile-details-view {
-  font-size: 1.1rem;
-  color: var(--color-text-secondary);
-}
-.profile-details-view dl {
-  margin: 0;
-}
-.profile-details-view dt {
+.btn {
+  padding: 0.9rem 2rem;
+  border-radius: 6px;
+  font-family: var(--font-display);
   font-weight: 700;
-  color: var(--color-text-primary);
-  font-family: var(--font-display-pixel);
-  font-size: 1.2rem;
   text-transform: uppercase;
+  font-size: 0.95rem;
   letter-spacing: 1px;
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-.profile-details-view dd {
-  margin-left: 0;
-  line-height: 1.7;
-}
-.profile-details-view .bio-text {
-  white-space: pre-wrap; 
-  font-style: italic;
-  opacity: 0.9;
-}
-
-/* --- Tarjeta de Verificación (para Docentes) --- */
-.verification-status-card {
-  margin-top: 2.5rem;
-  padding: 1.5rem 2rem;
-  border-radius: var(--card-radius);
-  border: 2px dashed;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-}
-.verification-status-card .icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-.verification-status-card h4 {
-  font-family: var(--font-body-poppins);
-  font-size: 1.2rem;
-  margin: 0 0 0.3rem 0;
-  text-transform: none;
-}
-.verification-status-card p {
-  margin: 0;
-  font-size: 1rem;
-  line-height: 1.5;
+  gap: 0.6rem;
+  border: none;
 }
 
-/* Colores de la tarjeta de verificación */
-.verification-status-card.status-verificado {
-  background-color: rgba(76, 175, 80, 0.1);
-  border-color: var(--color-accent-green);
-  color: var(--color-accent-green);
-}
-.verification-status-card.status-pendiente {
-  background-color: rgba(255, 193, 7, 0.1);
-  border-color: var(--color-accent-yellow);
-  color: var(--color-accent-yellow);
-}
-.verification-status-card.status-rechazado {
-  background-color: rgba(230, 57, 70, 0.1);
-  border-color: var(--color-accent-red);
-  color: var(--color-accent-red);
+/* Botón Primario: Azul Neón Brillante */
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-neon-blue), #2b5cb8);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(75, 135, 255, 0.4);
 }
 
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(75, 135, 255, 0.6);
+  filter: brightness(1.1);
+}
 
-/* --- Mensajes de Estado --- */
+/* Botón Secundario: Borde Cian */
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--color-neon-cyan);
+  color: var(--color-neon-cyan);
+}
+
+.btn-secondary:hover {
+  background: rgba(77, 255, 255, 0.1);
+  box-shadow: 0 0 15px rgba(77, 255, 255, 0.3);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(1);
+}
+
+/* =========================================
+   MENSAJES Y ALERTA
+   ========================================= */
+
 .profile-message {
-  margin-top: 1.5rem;
-  padding: 12px 15px;
+  padding: 1rem;
   border-radius: 8px;
-  font-weight: 500;
   text-align: center;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease;
 }
+
 .profile-message.success {
-  color: var(--color-bg-dark);
-  background-color: var(--color-accent-cyan);
-  border: 1px solid var(--color-brand-cyan);
+  background: rgba(5, 255, 0, 0.1);
+  border: 1px solid var(--color-neon-green);
+  color: #ccffcc;
+  box-shadow: 0 0 15px rgba(5, 255, 0, 0.1) inset;
 }
+
 .profile-message.error {
-  color: var(--color-text-primary);
-  background-color: rgba(230, 57, 70, 0.5);
-  border: 1px solid var(--color-accent-red);
+  background: rgba(184, 0, 74, 0.15);
+  border: 1px solid var(--color-neon-red);
+  color: #ffcccc;
+  box-shadow: 0 0 15px rgba(184, 0, 74, 0.1) inset;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem;
+  }
+  
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profile-header-info h2 {
+    font-size: 2rem;
+  }
+  
+  .role-badge-container {
+    justify-content: center;
+  }
+  
+  .profile-tabs {
+    flex-direction: column;
+    padding: 0;
+  }
+  
+  .profile-tabs button {
+    width: 100%;
+    justify-content: center;
+    border-bottom: 1px solid var(--border-glass);
+  }
+  
+  .profile-tabs button.active::after {
+    height: 3px; /* Mantener indicador en móvil */
+  }
+  
+  .tab-content {
+    padding: 1.5rem;
+  }
+  
+  .profile-actions {
+    flex-direction: column-reverse;
+  }
+  
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }

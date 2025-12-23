@@ -1,5 +1,5 @@
+/* Archivo: lotes.routes.js (CORREGIDO) */
 import { Router } from 'express';
-// --- Importar la nueva función ---
 import { 
     crearLoteDeCurso, 
     buscarLotesPublicos, 
@@ -7,32 +7,35 @@ import {
     actualizarLote,
     eliminarLote, 
     obtenerLotesPorPlanId 
-    
 } from './lotes.controller.js';
 import { protegerRuta } from '../../middleware/auth.middleware.js';
 import { esDocente } from '../../middleware/role.middleware.js';
 
 const router = Router();
 
-// POST /api/v1/lotes (Crear lote) - Requiere ser Docente
+// --- RUTAS PÚBLICAS (Accesibles para todos) ---
+
+// 1. Buscar lotes (Catálogo)
+router.get('/search', buscarLotesPublicos);
+
+// 2. [CORREGIDO] Ver detalle de un lote específico
+// Eliminamos 'protegerRuta' para que invitados puedan ver el curso
+router.get('/:loteId', obtenerDetalleLote); 
+
+// 3. [CORREGIDO] Ver otros horarios del mismo plan (Carrusel)
+// Eliminamos 'protegerRuta'
+router.get('/by-plan/:planId', obtenerLotesPorPlanId);
+
+
+// --- RUTAS PROTEGIDAS (Solo Docentes) ---
+
+// Crear un nuevo lote
 router.post('/', protegerRuta, esDocente, crearLoteDeCurso);
 
-// --- [CORREGIDO] Ruta de búsqueda pública ---
-// GET /api/v1/lotes/search (Buscar lotes)
-// Eliminamos 'protegerRuta' para que sea accesible sin iniciar sesión.
-router.get('/search', buscarLotesPublicos); // <-- ¡AQUÍ ESTÁ EL CAMBIO!
-// ------------------------------------------
-
-// GET /api/v1/lotes/:loteId (Obtener detalle)
-router.get('/:loteId', protegerRuta, obtenerDetalleLote);
-
-// PUT /api/v1/lotes/:loteId (Actualizar lote)
+// Actualizar un lote existente
 router.put('/:loteId', protegerRuta, esDocente, actualizarLote);
 
-// Ruta para eliminar un lote
+// Eliminar un lote
 router.delete('/:loteId', protegerRuta, esDocente, eliminarLote);
-
-// GET /api/v1/lotes/by-plan/:planId (Obtener lotes por el ID del plan)
-router.get('/by-plan/:planId', protegerRuta, obtenerLotesPorPlanId);
 
 export default router;
